@@ -1,0 +1,2491 @@
+<!DOCTYPE html>
+<html lang="pt-MZ">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Data Analyst — Inteligência de Dados (Moçambique)</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg-topbar: #1F1F1F;
+      --bg-page: #F6F5F3;
+      --bg-card: #FFFFFF;
+      --text-primary: #1A1A1A;
+      --text-secondary: #555555;
+      --text-muted: #888888;
+      --accent-blue: #4285F4;
+      --link-blue: #1A73E8;
+      --border-light: #E8E6E1;
+      --border-input: #D6D6D6;
+      --border-dashed: #BDBDBD;
+      --btn-disabled: #9E9E9E;
+      --shadow-card: 0 2px 10px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.02);
+      --transition-fast: 180ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: "Google Sans", "Plus Jakarta Sans", "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding-top: 56px;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ==================== BARRA SUPERIOR FIXA ==================== */
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background-color: var(--bg-topbar);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      z-index: 1000;
+      color: #E8EAED;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .topbar-left {
+      width: 200px;
+      display: flex;
+      align-items: center;
+    }
+
+    .topbar-title {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 17px;
+      font-weight: 500;
+      color: #E2E2E2;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+    }
+
+    .topbar-btn {
+      background: transparent;
+      border: none;
+      color: #E8EAED;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color var(--transition-fast);
+    }
+
+    .topbar-btn:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .topbar-btn.remix-btn {
+      background-color: #2E2E2E;
+      padding: 7px 14px;
+      border-radius: 10px;
+    }
+
+    .topbar-btn.remix-btn:hover {
+      background-color: #3A3A3A;
+    }
+
+    .topbar-btn.icon-only {
+      padding: 8px;
+      border-radius: 8px;
+    }
+
+    .topbar-btn svg {
+      width: 17px;
+      height: 17px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.9;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ==================== BANNER DE TOPO (HERO GRADIENT) ==================== */
+    .hero-banner {
+      position: relative;
+      width: 100%;
+      height: 185px;
+      border-top-right-radius: 18px;
+      overflow: hidden;
+      background: linear-gradient(90deg, #E8392B 0%, #B0449A 36%, #8B5CC6 68%, #4A7BEA 100%);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hero-banner.hidden {
+      display: none;
+    }
+
+    .hero-band {
+      flex: 1;
+      width: 100%;
+    }
+
+    .hero-band.band-1 { background: rgba(255, 255, 255, 0); }
+    .hero-band.band-2 { background: rgba(255, 255, 255, 0.18); }
+    .hero-band.band-3 {
+      background: linear-gradient(
+        90deg,
+        rgba(255, 225, 222, 0.44) 0%,
+        rgba(240, 215, 238, 0.44) 50%,
+        rgba(218, 230, 255, 0.46) 100%
+      );
+    }
+
+    /* ==================== CONTENT WRAPPER ==================== */
+    .workspace-wrapper {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 28px 28px 96px;
+      transition: max-width 250ms ease;
+    }
+
+    .workspace-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .workspace-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background-color: var(--accent-blue);
+      flex-shrink: 0;
+    }
+
+    .workspace-tag-text {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: #666666;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    /* ==================== ECRÃ 1: UPLOAD & PERGUNTA ==================== */
+    .setup-view {
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+
+    .setup-view.hidden {
+      display: none;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.25fr 0.95fr;
+      gap: 48px;
+      align-items: start;
+      margin-bottom: 52px;
+      margin-top: 10px;
+    }
+
+    .hero-heading {
+      font-size: 84px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.02;
+      letter-spacing: -0.035em;
+    }
+
+    .hero-copy {
+      padding-top: 8px;
+      max-width: 450px;
+    }
+
+    .hero-lead {
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--text-primary);
+      line-height: 1.45;
+      margin-bottom: 18px;
+    }
+
+    .hero-sub {
+      font-size: 16px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    .card {
+      background-color: var(--bg-card);
+      border-radius: 28px;
+      border: 1px solid var(--border-light);
+      box-shadow: var(--shadow-card);
+      padding: 36px 40px;
+      margin-bottom: 26px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .step-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background-color: #1A1A1A;
+      color: #FFFFFF;
+      font-size: 14px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .card-title {
+      font-size: 21px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .dropzone {
+      border: 2px dashed var(--border-dashed);
+      border-radius: 24px;
+      min-height: 210px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 32px 24px;
+      cursor: pointer;
+      background-color: #FFFFFF;
+      transition: all var(--transition-fast);
+    }
+
+    .dropzone:hover,
+    .dropzone.dragover {
+      border-color: var(--accent-blue);
+      background-color: rgba(66, 133, 244, 0.03);
+    }
+
+    .dropzone-main {
+      font-size: 19.5px;
+      font-weight: 500;
+      color: #333333;
+      margin-bottom: 8px;
+    }
+
+    .dropzone-sub {
+      font-size: 15.5px;
+      color: var(--text-muted);
+    }
+
+    .sample-trigger-row {
+      margin-top: 16px;
+    }
+
+    .sample-btn {
+      background: #F3F4F6;
+      border: 1px solid #E2E4E8;
+      color: #333333;
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 500;
+      padding: 7px 16px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .sample-btn:hover {
+      background: #E8F0FE;
+      border-color: #D2E3FC;
+      color: var(--link-blue);
+    }
+
+    .file-list {
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .file-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #F8F9FA;
+      border: 1px solid #E5E7EB;
+      border-radius: 16px;
+      padding: 12px 18px;
+    }
+
+    .file-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .file-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: #E8F0FE;
+      color: var(--link-blue);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 11px;
+    }
+
+    .file-name {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .file-meta {
+      font-size: 13px;
+      color: #666666;
+      background: #FFFFFF;
+      border: 1px solid #E5E7EB;
+      padding: 3px 10px;
+      border-radius: 999px;
+    }
+
+    .file-remove {
+      background: transparent;
+      border: none;
+      color: #888888;
+      cursor: pointer;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .file-remove:hover {
+      background: #FEE2E2;
+      color: #DC2626;
+    }
+
+    .divider {
+      height: 1px;
+      background-color: #ECEAE6;
+      margin: 26px 0;
+    }
+
+    .gcs-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .gcs-title-group {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .gcs-title-group svg {
+      width: 18px;
+      height: 18px;
+      color: var(--link-blue);
+    }
+
+    .gcs-bypass-note {
+      font-size: 13.5px;
+      color: var(--text-muted);
+    }
+
+    .gcs-input-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .gcs-input {
+      flex: 1;
+      height: 50px;
+      border-radius: 999px;
+      border: 1px solid var(--border-input);
+      padding: 0 22px;
+      font-family: inherit;
+      font-size: 15px;
+      outline: none;
+    }
+
+    .gcs-input:focus {
+      border-color: var(--accent-blue);
+    }
+
+    .gcs-add-btn {
+      height: 50px;
+      padding: 0 24px;
+      border-radius: 999px;
+      border: none;
+      background-color: var(--btn-disabled);
+      color: #FFFFFF;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: not-allowed;
+      white-space: nowrap;
+    }
+
+    .gcs-add-btn.active {
+      background-color: #1A1A1A;
+      cursor: pointer;
+    }
+
+    .legal-notice {
+      font-size: 14px;
+      color: #666666;
+      line-height: 1.65;
+    }
+
+    .legal-notice p + p { margin-top: 4px; }
+    .legal-notice a {
+      color: var(--link-blue);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .question-textarea {
+      width: 100%;
+      height: 140px;
+      border-radius: 24px;
+      border: 1px solid var(--border-input);
+      padding: 20px 24px;
+      font-family: inherit;
+      font-size: 16px;
+      color: var(--text-primary);
+      resize: vertical;
+      outline: none;
+      line-height: 1.5;
+      margin-bottom: 18px;
+    }
+
+    .question-textarea:focus {
+      border-color: var(--accent-blue);
+    }
+
+    .chips-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .suggestion-chip {
+      background-color: #FFFFFF;
+      border: 1px solid #E0E0E0;
+      border-radius: 999px;
+      padding: 11px 20px;
+      font-family: inherit;
+      font-size: 15px;
+      color: #444444;
+      cursor: pointer;
+      transition: background-color var(--transition-fast);
+    }
+
+    .suggestion-chip:hover {
+      background-color: #F3F4F6;
+    }
+
+    .analyze-btn {
+      width: 100%;
+      height: 58px;
+      border-radius: 999px;
+      border: none;
+      background-color: var(--btn-disabled);
+      color: #FFFFFF;
+      font-family: inherit;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: not-allowed;
+      transition: all var(--transition-fast);
+    }
+
+    .analyze-btn.ready {
+      background: #1A1A1A;
+      cursor: pointer;
+    }
+
+    .analyze-btn.ready:hover {
+      background: #333333;
+    }
+
+    /* ==================== ECRÃ 2: INTERFACE DE ANÁLISE (FIEL À IMAGEM) ==================== */
+    .analysis-interface {
+      display: none;
+      animation: fadeIn 280ms ease forwards;
+    }
+
+    .analysis-interface.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 1. Barra de Topo Branca: Dataset + Pergunta + Botão "Nova análise" */
+    .top-inquiry-bar {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 22px;
+      padding: 20px 28px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .top-inquiry-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .top-dataset-label {
+      font-size: 13.5px;
+      color: #777777;
+      font-weight: 400;
+    }
+
+    .top-inquiry-text {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1A1A1A;
+    }
+
+    .new-analysis-btn {
+      background: #FFFFFF;
+      border: 1px solid #DFDDD8;
+      border-radius: 14px;
+      padding: 10px 18px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      color: #333333;
+      cursor: pointer;
+      transition: background var(--transition-fast), border-color var(--transition-fast);
+      white-space: nowrap;
+    }
+
+    .new-analysis-btn:hover {
+      background: #F6F5F3;
+      border-color: #C8C6C0;
+    }
+
+    /* 2. Layout Principal de 2 Colunas: Esquerda (Analytics Agent) + Direita (Relatório) */
+    .agent-workspace-layout {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* --- COLUNA ESQUERDA: ANALYTICS AGENT --- */
+    .agent-panel-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 24px;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 210px);
+      min-height: 620px;
+      max-height: 780px;
+      position: sticky;
+      top: 74px;
+      overflow: hidden;
+    }
+
+    .agent-panel-header {
+      padding: 20px 22px 14px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #1A1A1A;
+    }
+
+    .agent-tabs-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: #F6F5F3;
+      padding: 4px;
+      margin: 0 16px 12px;
+      border-radius: 12px;
+      border: 1px solid #ECEAE4;
+    }
+
+    .agent-tab-btn {
+      background: transparent;
+      border: none;
+      padding: 8px 10px;
+      border-radius: 9px;
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: #666666;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all var(--transition-fast);
+    }
+
+    .agent-tab-btn.active {
+      background: #FFFFFF;
+      color: #1A1A1A;
+      font-weight: 600;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    }
+
+    .tab-count-badge {
+      background: #EAE8E3;
+      color: #555555;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 999px;
+    }
+
+    .agent-panel-body {
+      flex: 1;
+      padding: 14px 22px;
+      overflow-y: auto;
+      font-size: 14.5px;
+      line-height: 1.65;
+      color: #2B2B2B;
+      border-top: 1px solid #F3F2EE;
+    }
+
+    .agent-doc-list {
+      padding-left: 18px;
+      margin-bottom: 14px;
+    }
+
+    .agent-doc-list li {
+      margin-bottom: 8px;
+    }
+
+    .code-artifact-pill {
+      display: inline-block;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 12.5px;
+      background: #F3F2EE;
+      color: #222222;
+      padding: 2px 8px;
+      border-radius: 6px;
+      border: 1px solid #E5E3DC;
+      margin-right: 4px;
+    }
+
+    .chat-followup-item {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px dashed #E6E4E0;
+    }
+
+    .chat-followup-q {
+      font-weight: 600;
+      color: #1A1A1A;
+      margin-bottom: 4px;
+      font-size: 13.5px;
+    }
+
+    .chat-followup-a {
+      color: #444444;
+      font-size: 13.8px;
+    }
+
+    /* Passo a passo em Agent Activity */
+    .activity-step-item {
+      display: flex;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid #F3F2EE;
+      font-size: 13.5px;
+    }
+
+    .activity-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #E8F0FE;
+      color: var(--link-blue);
+      font-size: 11px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    /* Sugestões inferiores + Input no Agente */
+    .agent-panel-footer {
+      padding: 12px 16px 16px;
+      border-top: 1px solid #F0EFEA;
+      background: #FFFFFF;
+    }
+
+    .agent-quick-chips {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+
+    .agent-quick-chip {
+      background: #F4F3F0;
+      border: none;
+      border-radius: 999px;
+      padding: 7px 14px;
+      font-family: inherit;
+      font-size: 12.5px;
+      color: #444444;
+      text-align: left;
+      cursor: pointer;
+      transition: background var(--transition-fast);
+      width: fit-content;
+      max-width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .agent-quick-chip:hover {
+      background: #E8E6E1;
+      color: #1A1A1A;
+    }
+
+    .agent-chat-form {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .agent-chat-input {
+      flex: 1;
+      height: 40px;
+      border-radius: 12px;
+      border: 1px solid #E0DED8;
+      padding: 0 14px;
+      font-family: inherit;
+      font-size: 13.5px;
+      outline: none;
+      background: #FAF9F7;
+    }
+
+    .agent-chat-input:focus {
+      border-color: var(--accent-blue);
+      background: #FFFFFF;
+    }
+
+    .agent-chat-send {
+      height: 40px;
+      padding: 0 14px;
+      border-radius: 12px;
+      border: none;
+      background: #9E9E9E;
+      color: #FFFFFF;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background var(--transition-fast);
+    }
+
+    .agent-chat-send.ready {
+      background: #1A1A1A;
+    }
+
+    /* --- COLUNA DIREITA: RELATÓRIO DE ANÁLISE --- */
+    .report-main-column {
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    /* Cartão de Cabeçalho com Barra Superior Colorida (Azul-Verde-Amarelo-Vermelho) */
+    .report-header-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 24px;
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .report-rainbow-bar {
+      height: 5px;
+      width: 100%;
+      background: linear-gradient(90deg, #4285F4 0%, #34A853 35%, #FBBC05 68%, #EA4335 100%);
+    }
+
+    .report-header-content {
+      padding: 28px 34px 24px;
+    }
+
+    .report-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .dataset-pill-blue {
+      background: #EEF4FF;
+      color: #1A73E8;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 5px 12px;
+      border-radius: 999px;
+    }
+
+    .report-date-text {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 13px;
+      color: #888888;
+    }
+
+    .report-title-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+
+    .report-main-heading {
+      font-size: 34px;
+      font-weight: 700;
+      color: #1A1A1A;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .report-inquiry-sub {
+      font-size: 15.5px;
+      color: #555555;
+    }
+
+    .report-inquiry-sub strong {
+      color: #1A1A1A;
+      font-weight: 600;
+    }
+
+    .report-export-btns {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-download-pdf {
+      height: 44px;
+      padding: 0 22px;
+      border-radius: 14px;
+      border: none;
+      background: linear-gradient(90deg, #4A7BEA 0%, #9B51E0 48%, #E84C3D 100%);
+      color: #FFFFFF;
+      font-family: inherit;
+      font-size: 14.5px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(155, 81, 224, 0.22);
+      transition: transform var(--transition-fast), opacity var(--transition-fast);
+    }
+
+    .btn-download-pdf:hover {
+      opacity: 0.94;
+      transform: translateY(-1px);
+    }
+
+    .btn-download-json {
+      height: 44px;
+      padding: 0 18px;
+      border-radius: 14px;
+      border: 1px solid #DFDDD8;
+      background: #FFFFFF;
+      color: #333333;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background var(--transition-fast);
+    }
+
+    .btn-download-json:hover {
+      background: #F6F5F3;
+    }
+
+    /* Abas do Relatório (Overview, Visualizations 3, Data Tables 5, Insights & Actions, Print Preview) */
+    .report-subtabs {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .report-subtab {
+      background: transparent;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 14px;
+      font-family: inherit;
+      font-size: 14.5px;
+      font-weight: 600;
+      color: #555555;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all var(--transition-fast);
+    }
+
+    .report-subtab:hover {
+      background: #F4F3F0;
+      color: #1A1A1A;
+    }
+
+    .report-subtab.active {
+      background: #1A1A1A;
+      color: #FFFFFF;
+    }
+
+    .subtab-badge {
+      background: #ECEAE4;
+      color: #555555;
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 999px;
+    }
+
+    .report-subtab.active .subtab-badge {
+      background: rgba(255, 255, 255, 0.2);
+      color: #FFFFFF;
+    }
+
+    /* Grelha de 4 Cartões KPI (idêntica à imagem) */
+    .report-kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+
+    .report-kpi-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 22px;
+      padding: 26px 24px;
+      box-shadow: var(--shadow-card);
+    }
+
+    .report-kpi-label {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #666666;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 14px;
+    }
+
+    .report-kpi-val {
+      font-size: 36px;
+      font-weight: 700;
+      color: #1A1A1A;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+    }
+
+    .report-kpi-sub {
+      font-size: 13px;
+      color: #777777;
+      margin-top: 8px;
+    }
+
+    /* Secções Internas das Sub-Abas */
+    .report-pane {
+      display: none;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    .report-pane.active {
+      display: flex;
+    }
+
+    .content-white-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 24px;
+      padding: 28px 32px;
+      box-shadow: var(--shadow-card);
+    }
+
+    .content-white-card h3 {
+      font-size: 19px;
+      font-weight: 600;
+      color: #1A1A1A;
+      margin-bottom: 14px;
+    }
+
+    .exec-narrative-text {
+      font-size: 15.5px;
+      line-height: 1.7;
+      color: #333333;
+    }
+
+    .charts-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .chart-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 24px;
+      padding: 24px 26px;
+      box-shadow: var(--shadow-card);
+    }
+
+    .chart-card.full {
+      grid-column: 1 / -1;
+    }
+
+    .chart-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .chart-card-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1A1A1A;
+    }
+
+    .chart-file-tag {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11.5px;
+      color: #666666;
+      background: #F4F3F0;
+      padding: 3px 9px;
+      border-radius: 6px;
+    }
+
+    .chart-box-canvas {
+      position: relative;
+      height: 270px;
+      width: 100%;
+    }
+
+    /* Tabelas de Dados */
+    .stats-table-wrap {
+      overflow-x: auto;
+      border: 1px solid #EAECEF;
+      border-radius: 16px;
+    }
+
+    .stats-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.8px;
+      text-align: left;
+    }
+
+    .stats-table th {
+      background: #F8F9FA;
+      padding: 13px 16px;
+      font-weight: 600;
+      color: #444444;
+      border-bottom: 1px solid #EAECEF;
+    }
+
+    .stats-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #F1F3F5;
+      color: #333333;
+    }
+
+    .insights-two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .insight-items-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .insight-items-list li {
+      background: #F9F8F6;
+      border: 1px solid #EAE8E2;
+      border-radius: 16px;
+      padding: 14px 18px;
+      font-size: 14.5px;
+      line-height: 1.55;
+    }
+
+    .anomaly-badge {
+      display: inline-block;
+      background: #FEF2F2;
+      color: #DC2626;
+      border: 1px solid #FECACA;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11.5px;
+      padding: 2px 7px;
+      border-radius: 6px;
+      margin-left: 6px;
+    }
+
+    /* ==================== BOTÕES FLUTUANTES LATERAIS ==================== */
+    .floating-controls {
+      position: fixed;
+      right: 14px;
+      top: 62%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+      z-index: 900;
+    }
+
+    .fab-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background-color: #2B2B2B;
+      color: #FFFFFF;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      transition: transform var(--transition-fast), background-color var(--transition-fast);
+    }
+
+    .fab-circle:hover {
+      background-color: #3D3D3D;
+      transform: scale(1.05);
+    }
+
+    .fab-circle svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+    }
+
+    .fab-mascot-dock {
+      margin-right: -14px;
+      background-color: #242424;
+      padding: 7px 15px 7px 8px;
+      border-radius: 999px 0 0 999px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: padding-right var(--transition-fast);
+    }
+
+    .fab-mascot-dock:hover {
+      padding-right: 21px;
+    }
+
+    .mascot-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4A7BEA 0%, #8B5CC6 55%, #EC4899 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.85);
+    }
+
+    .mascot-eye {
+      width: 5px;
+      height: 7px;
+      background: #FFFFFF;
+      border-radius: 99px;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #1F1F1F;
+      color: #FFFFFF;
+      padding: 12px 22px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      transition: transform 250ms ease;
+      z-index: 2000;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ==================== RESPONSIVO ==================== */
+    @media (max-width: 1100px) {
+      .agent-workspace-layout {
+        grid-template-columns: 1fr;
+      }
+      .agent-panel-card {
+        position: static;
+        height: 500px;
+      }
+      .report-kpi-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .workspace-wrapper {
+        padding: 20px 14px 80px;
+      }
+      .hero-grid,
+      .charts-2col,
+      .insights-two-col,
+      .report-kpi-row {
+        grid-template-columns: 1fr;
+      }
+      .hero-heading {
+        font-size: 48px;
+      }
+      .gcs-input-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .topbar-left { display: none; }
+      .topbar-title { position: static; transform: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== BARRA SUPERIOR FIXA ==================== -->
+  <header class="topbar">
+    <div class="topbar-left"></div>
+    <div class="topbar-title">AI Data Analyst</div>
+    <div class="topbar-actions">
+      <button class="topbar-btn remix-btn" id="btnRemix" title="Carregar exemplo e abrir análise">
+        <svg viewBox="0 0 24 24">
+          <circle cx="6" cy="6" r="3"></circle>
+          <circle cx="18" cy="6" r="3"></circle>
+          <circle cx="18" cy="18" r="3"></circle>
+          <path d="M9 6h6"></path>
+          <path d="M6 9v3a6 6 0 0 0 6 6h3"></path>
+        </svg>
+        <span>Remix</span>
+      </button>
+      <button class="topbar-btn" id="btnDevice" title="Alternar vista de ecrã">
+        <svg viewBox="0 0 24 24">
+          <rect x="2" y="4" width="14" height="12" rx="2"></rect>
+          <path d="M2 19h14"></path>
+          <rect x="18" y="8" width="4" height="11" rx="1"></rect>
+        </svg>
+        <span>Device</span>
+      </button>
+      <button class="topbar-btn icon-only" id="btnRefresh" title="Reiniciar área de trabalho">
+        <svg viewBox="0 0 24 24">
+          <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+          <path d="M3 3v5h5"></path>
+          <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path>
+          <path d="M16 16h5v5"></path>
+        </svg>
+      </button>
+      <button class="topbar-btn icon-only" id="btnFullscreen" title="Ecrã inteiro">
+        <svg viewBox="0 0 24 24">
+          <path d="M8 3H5a2 2 0 0 0-2 2v3"></path>
+          <path d="M21 8V5a2 2 0 0 0-2-2h-3"></path>
+          <path d="M3 16v3a2 2 0 0 0 2 2h3"></path>
+          <path d="M16 21h3a2 2 0 0 0 2-2v-3"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ==================== BANNER DE TOPO (HERO GRADIENT) ==================== -->
+  <div class="hero-banner" id="heroBanner">
+    <div class="hero-band band-1"></div>
+    <div class="hero-band band-2"></div>
+    <div class="hero-band band-3"></div>
+  </div>
+
+  <!-- ==================== ÁREA DE CONTEÚDO PRINCIPAL ==================== -->
+  <main class="workspace-wrapper" id="workspaceWrapper">
+    <div class="workspace-tag">
+      <span class="workspace-dot"></span>
+      <span class="workspace-tag-text" id="uiWorkspaceTag">DATA ANALYST WORKSPACE</span>
+    </div>
+
+    <!-- ==================== ECRÃ 1: UPLOAD & PERGUNTA INICIAL ==================== -->
+    <div class="setup-view" id="setupView">
+      <section class="hero-grid">
+        <h1 class="hero-heading" id="uiHeroHeading">Pergunte tudo<br>sobre os seus dados</h1>
+        <div class="hero-copy">
+          <p class="hero-lead" id="uiHeroLead">
+            O AI Data Analyst oferece inteligência de dados interativa, análises avançadas e insights acionáveis para o seu negócio.
+          </p>
+          <p class="hero-sub" id="uiHeroSub">
+            Carregue um ou mais ficheiros CSV, faça uma pergunta de negócio e deixe o agente analisá-los de forma autónoma.
+          </p>
+        </div>
+      </section>
+
+      <!-- Cartão 1 -->
+      <section class="card">
+        <div class="card-header">
+          <span class="step-badge">1</span>
+          <h2 class="card-title" id="uiCard1Title">Escolha um conjunto de dados</h2>
+        </div>
+
+        <input type="file" id="csvFileInput" accept=".csv,text/csv" multiple hidden />
+
+        <div class="dropzone" id="dropzone" role="button" tabindex="0">
+          <p class="dropzone-main" id="uiDropMain">Arraste ficheiro(s) CSV para aqui ou clique para procurar (≤ 1MB)</p>
+          <p class="dropzone-sub" id="uiDropSub">Suporta múltiplos ficheiros CSV relacionados para análise integrada pelo agente</p>
+          <div class="sample-trigger-row">
+            <button type="button" class="sample-btn" id="loadSampleBtn">
+              🇲🇿 Carregar dados de exemplo: vendas.csv (Moçambique)
+            </button>
+          </div>
+        </div>
+
+        <div class="file-list" id="fileList"></div>
+
+        <div class="divider"></div>
+
+        <!-- Secção GCS URI -->
+        <div class="gcs-section">
+          <div class="gcs-header">
+            <div class="gcs-title-group">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+                <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+              </svg>
+              <span id="uiGcsTitle">Cole um URI do GCS para ficheiros CSV superiores a 1MB</span>
+            </div>
+            <span class="gcs-bypass-note" id="uiGcsBypass">Ultrapassa o limite direto de 1MB</span>
+          </div>
+
+          <div class="gcs-input-row">
+            <input
+              type="text"
+              id="gcsInput"
+              class="gcs-input"
+              placeholder="gs://bucket-name/path/to/large_dataset.csv"
+            />
+            <button type="button" id="gcsAddBtn" class="gcs-add-btn">Adicionar Ficheiro GCS</button>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="legal-notice">
+          <p>
+            Ao utilizar esta funcionalidade, confirma que possui os direitos necessários sobre qualquer conteúdo que carregue. Não gere conteúdo que infrinja os direitos de propriedade intelectual ou de privacidade de terceiros. A utilização deste serviço de IA generativa está sujeita à nossa <a href="#politica" onclick="event.preventDefault()">Política de Utilização Proibida</a>.
+          </p>
+          <p>
+            Tenha em atenção que os carregamentos, incluindo os provenientes do Google Workspace, podem ser utilizados para desenvolver e melhorar produtos e serviços em conformidade com os nossos <a href="#termos" onclick="event.preventDefault()">termos</a>.
+          </p>
+        </div>
+      </section>
+
+      <!-- Cartão 2 -->
+      <section class="card">
+        <div class="card-header">
+          <span class="step-badge">2</span>
+          <h2 class="card-title" id="uiCard2Title">Faça uma pergunta de negócio</h2>
+        </div>
+
+        <textarea
+          id="questionInput"
+          class="question-textarea"
+          placeholder="Ex.: faça análise geral / Quais são as categorias e províncias que geram maior receita?"
+        ></textarea>
+
+        <div class="chips-container">
+          <button type="button" class="suggestion-chip" id="chip1">
+            Resuma as principais tendências e os factores mais importantes nestes dados.
+          </button>
+          <button type="button" class="suggestion-chip" id="chip2">
+            Quais são os principais segmentos e províncias por valor, e como se diferenciam?
+          </button>
+          <button type="button" class="suggestion-chip" id="chip3">
+            Existem anomalias ou valores atípicos (outliers) que eu deva investigar?
+          </button>
+        </div>
+      </section>
+
+      <!-- Botão Analisar -->
+      <button type="button" id="analyzeBtn" class="analyze-btn" disabled>
+        Analyze
+      </button>
+    </div>
+
+    <!-- ==================== ECRÃ 2: INTERFACE CRIADA APÓS CLICAR EM ANALYZE (IDÊNTICA À IMAGEM) ==================== -->
+    <section class="analysis-interface" id="analysisInterface">
+
+      <!-- Barra de Topo: Dataset + Pergunta + Botão "Nova análise" -->
+      <div class="top-inquiry-bar">
+        <div class="top-inquiry-left">
+          <span class="top-dataset-label" id="topBarDatasetName">Dataset: vendas</span>
+          <div class="top-inquiry-text" id="topBarInquiryText">faça análise geral</div>
+        </div>
+        <button type="button" class="new-analysis-btn" id="btnNewAnalysis">
+          Nova análise
+        </button>
+      </div>
+
+      <!-- Layout de 2 Colunas: Esquerda (Analytics Agent) + Direita (Analysis Card + KPIs + Abas) -->
+      <div class="agent-workspace-layout">
+
+        <!-- COLUNA ESQUERDA: ANALYTICS AGENT -->
+        <aside class="agent-panel-card">
+          <div class="agent-panel-header">Analytics Agent</div>
+
+          <div class="agent-tabs-row">
+            <button type="button" class="agent-tab-btn active" id="agentTabChat">
+              <span>Chat</span>
+              <span class="tab-count-badge" id="chatCountBadge">1</span>
+            </button>
+            <button type="button" class="agent-tab-btn" id="agentTabActivity">
+              <span>Agent Activity</span>
+            </button>
+          </div>
+
+          <!-- Conteúdo da Aba Chat -->
+          <div class="agent-panel-body" id="agentChatBody">
+            <div id="agentInitialSummary"></div>
+            <div id="agentFollowupList"></div>
+          </div>
+
+          <!-- Conteúdo da Aba Agent Activity (oculto por defeito) -->
+          <div class="agent-panel-body" id="agentActivityBody" style="display: none;">
+            <div class="activity-step-item">
+              <span class="activity-dot">1</span>
+              <div>
+                <strong>Inspecção do Conjunto de Dados</strong>
+                <div style="color: #666; font-size: 12.5px;" id="actStep1Desc">Leitura e validação das colunas CSV em memória.</div>
+              </div>
+            </div>
+            <div class="activity-step-item">
+              <span class="activity-dot">2</span>
+              <div>
+                <strong>Cálculo de Estatísticas e Agregações</strong>
+                <div style="color: #666; font-size: 12.5px;">Somas, médias, medianas, desvios padrão e agrupamentos por província e categoria.</div>
+              </div>
+            </div>
+            <div class="activity-step-item">
+              <span class="activity-dot">3</span>
+              <div>
+                <strong>Geração de Gráficos Visuais</strong>
+                <div style="color: #666; font-size: 12.5px;">Renderização de <code class="code-artifact-pill">vendas_por_mes.png</code>, <code class="code-artifact-pill">top_categorias.png</code> e <code class="code-artifact-pill">distribuicao_provincia.png</code>.</div>
+              </div>
+            </div>
+            <div class="activity-step-item">
+              <span class="activity-dot">4</span>
+              <div>
+                <strong>Compilação do Relatório Estruturado</strong>
+                <div style="color: #666; font-size: 12.5px;">Exportação pronta em <code class="code-artifact-pill">report.json</code> e vista de impressão PDF.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Rodapé do Painel Esquerdo: 3 Chips + Input -->
+          <div class="agent-panel-footer">
+            <div class="agent-quick-chips">
+              <button type="button" class="agent-quick-chip" data-prompt="Identificar outliers ou anomalias no conjunto de dados">
+                Identificar outliers ou anomalias no conjunto de dados
+              </button>
+              <button type="button" class="agent-quick-chip" data-prompt="Quais são as correlações ou padrões mais significativos?">
+                Quais são as correlações ou padrões mais significativos?
+              </button>
+              <button type="button" class="agent-quick-chip" data-prompt="Fornecer recomendações estratégicas com base nestes dados">
+                Fornecer recomendações estratégicas com base nestes dados
+              </button>
+            </div>
+
+            <form class="agent-chat-form" id="agentChatForm">
+              <input
+                type="text"
+                id="agentChatInput"
+                class="agent-chat-input"
+                placeholder="Faça uma pergunta de acompanhamento..."
+                autocomplete="off"
+              />
+              <button type="submit" class="agent-chat-send" id="agentChatSendBtn">
+                Enviar
+              </button>
+            </form>
+          </div>
+        </aside>
+
+        <!-- COLUNA DIREITA: RELATÓRIO PRINCIPAL -->
+        <div class="report-main-column">
+
+          <!-- Cartão de Cabeçalho com Barra Arco-Íris no Topo -->
+          <div class="report-header-card">
+            <div class="report-rainbow-bar"></div>
+            <div class="report-header-content">
+              <div class="report-meta-row">
+                <span class="dataset-pill-blue" id="reportDatasetBadge">VENDAS</span>
+                <span class="report-date-text" id="reportDateText">2026-10-27</span>
+              </div>
+
+              <div class="report-title-row">
+                <div>
+                  <h2 class="report-main-heading" id="reportMainHeading">Analysis: vendas</h2>
+                  <p class="report-inquiry-sub">
+                    <strong>Inquiry:</strong> <span id="reportInquirySpan">faca analise geral</span>
+                  </p>
+                </div>
+
+                <div class="report-export-btns">
+                  <button type="button" class="btn-download-pdf" id="btnDownloadPDF">
+                    Download PDF
+                  </button>
+                  <button type="button" class="btn-download-json" id="btnDownloadJSON">
+                    JSON
+                  </button>
+                </div>
+              </div>
+
+              <!-- 5 Sub-Abas: Overview, Visualizations 3, Data Tables 5, Insights & Actions, Print Preview -->
+              <div class="report-subtabs" role="tablist">
+                <button type="button" class="report-subtab active" data-pane="paneOverview">
+                  <span>Overview</span>
+                </button>
+                <button type="button" class="report-subtab" data-pane="paneVisualizations">
+                  <span>Visualizations</span>
+                  <span class="subtab-badge">3</span>
+                </button>
+                <button type="button" class="report-subtab" data-pane="paneDataTables">
+                  <span>Data Tables</span>
+                  <span class="subtab-badge" id="tablesCountBadge">5</span>
+                </button>
+                <button type="button" class="report-subtab" data-pane="paneInsights">
+                  <span>Insights &amp; Actions</span>
+                </button>
+                <button type="button" class="report-subtab" data-pane="panePrintPreview">
+                  <span>Print Preview</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Linha dos 4 Cartões de KPI (sempre visível no topo da coluna direita como na imagem) -->
+          <div class="report-kpi-row" id="reportKpiRow"></div>
+
+          <!-- SUB-ABA 1: OVERVIEW (VISÃO GERAL) -->
+          <div class="report-pane active" id="paneOverview">
+            <div class="content-white-card">
+              <h3>Resumo Executivo da Análise</h3>
+              <div class="exec-narrative-text" id="overviewNarrative"></div>
+            </div>
+
+            <div class="charts-2col">
+              <div class="chart-card">
+                <div class="chart-card-header">
+                  <span class="chart-card-title" id="ovChart1Title">Evolução Cronológica Mensal</span>
+                  <span class="chart-file-tag">vendas_por_mes.png</span>
+                </div>
+                <div class="chart-box-canvas">
+                  <canvas id="canvasOverview1"></canvas>
+                </div>
+              </div>
+
+              <div class="chart-card">
+                <div class="chart-card-header">
+                  <span class="chart-card-title" id="ovChart2Title">Desempenho por Categoria</span>
+                  <span class="chart-file-tag">vendas_por_categoria.png</span>
+                </div>
+                <div class="chart-box-canvas">
+                  <canvas id="canvasOverview2"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUB-ABA 2: VISUALIZATIONS (3 GRÁFICOS INTERACTIVOS) -->
+          <div class="report-pane" id="paneVisualizations">
+            <div class="charts-2col">
+              <div class="chart-card">
+                <div class="chart-card-header">
+                  <span class="chart-card-title" id="visChart1Title">1. Receita Mensal</span>
+                  <span class="chart-file-tag">vendas_por_mes.png</span>
+                </div>
+                <div class="chart-box-canvas">
+                  <canvas id="canvasVis1"></canvas>
+                </div>
+              </div>
+
+              <div class="chart-card">
+                <div class="chart-card-header">
+                  <span class="chart-card-title" id="visChart2Title">2. Top Categorias de Negócio</span>
+                  <span class="chart-file-tag">top_categorias.png</span>
+                </div>
+                <div class="chart-box-canvas">
+                  <canvas id="canvasVis2"></canvas>
+                </div>
+              </div>
+
+              <div class="chart-card full">
+                <div class="chart-card-header">
+                  <span class="chart-card-title" id="visChart3Title">3. Distribuição por Província / Segmento</span>
+                  <span class="chart-file-tag">distribuicao_provincia.png</span>
+                </div>
+                <div class="chart-box-canvas">
+                  <canvas id="canvasVis3"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUB-ABA 3: DATA TABLES (TABELAS DE DADOS) -->
+          <div class="report-pane" id="paneDataTables">
+            <div class="content-white-card">
+              <h3>1. Estatísticas Descritivas (Colunas Numéricas)</h3>
+              <div class="stats-table-wrap">
+                <table class="stats-table">
+                  <thead>
+                    <tr>
+                      <th>Coluna</th>
+                      <th>Soma Total</th>
+                      <th>Média</th>
+                      <th>Mediana</th>
+                      <th>Desvio Padrão</th>
+                      <th>Mínimo</th>
+                      <th>Máximo</th>
+                    </tr>
+                  </thead>
+                  <tbody id="statsTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="content-white-card">
+              <h3>2. Registos Completos do Dataset</h3>
+              <div class="stats-table-wrap" style="max-height: 420px;">
+                <table class="stats-table">
+                  <thead id="rawTableHead"></thead>
+                  <tbody id="rawTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUB-ABA 4: INSIGHTS & ACTIONS -->
+          <div class="report-pane" id="paneInsights">
+            <div class="content-white-card">
+              <div class="insights-two-col">
+                <div>
+                  <h3>💡 Principais Conclusões &amp; Acções Recomendadas</h3>
+                  <ul class="insight-items-list" id="insightsList"></ul>
+                </div>
+                <div>
+                  <h3>🚨 Anomalias &amp; Outliers Detectados (Z-Score)</h3>
+                  <ul class="insight-items-list" id="anomaliesList"></ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUB-ABA 5: PRINT PREVIEW -->
+          <div class="report-pane" id="panePrintPreview">
+            <div class="content-white-card" id="printPreviewContainer"></div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==================== BOTÕES FLUTUANTES LATERAIS ==================== -->
+  <aside class="floating-controls" aria-label="Ferramentas rápidas">
+    <button class="fab-circle" id="fabTranslate" title="Alternar Idioma">
+      <svg viewBox="0 0 24 24">
+        <path d="m5 8 6 6"></path>
+        <path d="m4 14 6-6 2-3"></path>
+        <path d="M2 5h12"></path>
+        <path d="M7 2h1"></path>
+        <path d="m22 22-5-10-5 10"></path>
+        <path d="M14 18h6"></path>
+      </svg>
+    </button>
+    <button class="fab-circle" id="fabApps" title="Aplicações">
+      <svg viewBox="0 0 24 24">
+        <rect x="3" y="3" width="7" height="7" rx="2"></rect>
+        <rect x="14" y="3" width="7" height="7" rx="2"></rect>
+        <rect x="14" y="14" width="7" height="7" rx="2"></rect>
+        <rect x="3" y="14" width="7" height="7" rx="2"></rect>
+      </svg>
+    </button>
+    <div class="fab-mascot-dock" id="fabMascot" title="Assistente IA">
+      <div class="mascot-avatar">
+        <span class="mascot-eye"></span>
+        <span class="mascot-eye"></span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- ==================== LÓGICA DA APLICAÇÃO ==================== -->
+  <script>
+    const datasets = [];
+    let chartInstances = [];
+    let latestReportData = null;
+
+    // Elementos DOM
+    const heroBanner = document.getElementById('heroBanner');
+    const setupView = document.getElementById('setupView');
+    const analysisInterface = document.getElementById('analysisInterface');
+
+    const dropzone = document.getElementById('dropzone');
+    const csvFileInput = document.getElementById('csvFileInput');
+    const loadSampleBtn = document.getElementById('loadSampleBtn');
+    const fileListEl = document.getElementById('fileList');
+    const gcsInput = document.getElementById('gcsInput');
+    const gcsAddBtn = document.getElementById('gcsAddBtn');
+    const questionInput = document.getElementById('questionInput');
+    const suggestionChips = document.querySelectorAll('.suggestion-chip');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const toastEl = document.getElementById('toast');
+
+    function showToast(message) {
+      toastEl.textContent = message;
+      toastEl.classList.add('show');
+      clearTimeout(showToast._timer);
+      showToast._timer = setTimeout(() => toastEl.classList.remove('show'), 2800);
+    }
+
+    // Parser CSV
+    function parseCSV(text) {
+      const lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n').filter(l => l.trim().length > 0);
+      if (lines.length === 0) return { headers: [], rows: [] };
+
+      const firstLine = lines[0];
+      const commaCount = (firstLine.match(/,/g) || []).length;
+      const semiCount = (firstLine.match(/;/g) || []).length;
+      const delimiter = semiCount > commaCount ? ';' : ',';
+
+      function splitRow(line) {
+        const result = [];
+        let cur = '';
+        let inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+          const ch = line[i];
+          if (ch === '"') {
+            if (inQuotes && line[i + 1] === '"') {
+              cur += '"';
+              i++;
+            } else {
+              inQuotes = !inQuotes;
+            }
+          } else if (ch === delimiter && !inQuotes) {
+            result.push(cur.trim());
+            cur = '';
+          } else {
+            cur += ch;
+          }
+        }
+        result.push(cur.trim());
+        return result;
+      }
+
+      const headers = splitRow(lines[0]).map((h, i) => h || `Coluna_${i + 1}`);
+      const rows = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const vals = splitRow(lines[i]);
+        if (vals.length === 1 && vals[0] === '') continue;
+        const obj = {};
+        headers.forEach((h, idx) => {
+          let raw = vals[idx] !== undefined ? vals[idx] : '';
+          const cleaned = raw.replace(/^(MZN|MT|[$€£R\$])\s*|[%\s]+$/gi, '').replace(/,/g, '');
+          if (cleaned !== '' && !isNaN(Number(cleaned))) {
+            obj[h] = Number(cleaned);
+          } else {
+            obj[h] = raw;
+          }
+        });
+        rows.push(obj);
+      }
+
+      return { headers, rows };
+    }
+
+    function updateAnalyzeButtonState() {
+      const ready = datasets.length > 0 && questionInput.value.trim().length > 0;
+      analyzeBtn.disabled = !ready;
+      analyzeBtn.classList.toggle('ready', ready);
+    }
+
+    function renderFileList() {
+      fileListEl.innerHTML = '';
+      datasets.forEach((ds, index) => {
+        const item = document.createElement('div');
+        item.className = 'file-item';
+        item.innerHTML = `
+          <div class="file-info">
+            <span class="file-icon">${ds.source === 'GCS' ? 'GCS' : 'CSV'}</span>
+            <span class="file-name">${ds.name}</span>
+            <span class="file-meta">${ds.rows.length} linhas × ${ds.headers.length} colunas</span>
+            <span class="file-meta">${ds.sizeLabel}</span>
+          </div>
+          <button type="button" class="file-remove" data-index="${index}">Remover ✕</button>
+        `;
+        fileListEl.appendChild(item);
+      });
+
+      fileListEl.querySelectorAll('.file-remove').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const idx = Number(e.currentTarget.getAttribute('data-index'));
+          datasets.splice(idx, 1);
+          renderFileList();
+          updateAnalyzeButtonState();
+        });
+      });
+
+      updateAnalyzeButtonState();
+    }
+
+    function handleFiles(fileList) {
+      Array.from(fileList).forEach(file => {
+        if (!file.name.toLowerCase().endsWith('.csv') && file.type !== 'text/csv') {
+          showToast(`Ficheiro "${file.name}" ignorado — carregue um ficheiro .csv.`);
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const parsed = parseCSV(e.target.result);
+          if (parsed.headers.length === 0) return;
+          const kb = (file.size / 1024).toFixed(1);
+          datasets.push({
+            name: file.name,
+            cleanName: file.name.replace(/\.csv$/i, ''),
+            source: 'Local',
+            sizeLabel: `${kb} KB`,
+            headers: parsed.headers,
+            rows: parsed.rows
+          });
+          renderFileList();
+          showToast(`Ficheiro ${file.name} carregado!`);
+        };
+        reader.readAsText(file);
+      });
+    }
+
+    dropzone.addEventListener('click', (e) => {
+      if (e.target === loadSampleBtn || loadSampleBtn.contains(e.target)) return;
+      csvFileInput.click();
+    });
+
+    csvFileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        handleFiles(e.target.files);
+        csvFileInput.value = '';
+      }
+    });
+
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('dragover');
+    });
+
+    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+      if (e.dataTransfer.files.length > 0) handleFiles(e.dataTransfer.files);
+    });
+
+    // Dados de Exemplo (Moçambique - Vendas & Quantidade)
+    const SAMPLE_CSV = `Mes,Categoria,Provincia,Segmento,Vendas,Quantidade,Custo_Operacional,Satisfacao
+2026-01,Pagamentos M-Pesa & e-Mola,Maputo Cidade,Grandes Empresas,68500,10,12400,95
+2026-01,Logistica & Corredores,Sofala (Beira),Corporativo,54200,8,11200,90
+2026-02,Agro-Processamento,Nampula,PME,48900,7,9800,88
+2026-02,Energia & Recursos,Tete,Grandes Empresas,62300,9,14500,92
+2026-03,Pagamentos M-Pesa & e-Mola,Maputo Provincia (Matola),Corporativo,59400,8,10800,94
+2026-03,Retalho & Distribuicao,Zambezia (Quelimane),PME,31200,5,7400,85
+2026-04,Logistica & Corredores,Nampula (Nacala),Grandes Empresas,64800,9,13100,91
+2026-04,Agro-Processamento,Manica (Chimoio),PME,38400,6,8200,89
+2026-05,Pagamentos M-Pesa & e-Mola,Maputo Cidade,Grandes Empresas,94500,14,15200,98
+2026-05,Retalho & Distribuicao,Inhambane,PME,29800,5,6900,86
+2026-06,Energia & Recursos,Cabo Delgado (Pemba),Grandes Empresas,58900,8,13900,90
+2026-06,Logistica & Corredores,Sofala (Beira),Grandes Empresas,31200,2,19500,72`;
+
+    loadSampleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const parsed = parseCSV(SAMPLE_CSV);
+      datasets.push({
+        name: 'vendas.csv',
+        cleanName: 'vendas',
+        source: 'Local',
+        sizeLabel: '2.1 KB',
+        headers: parsed.headers,
+        rows: parsed.rows
+      });
+      if (!questionInput.value.trim()) {
+        questionInput.value = 'faca analise geral';
+      }
+      renderFileList();
+      showToast('Dataset "vendas.csv" carregado! Clique em "Analyze".');
+    });
+
+    gcsInput.addEventListener('input', () => {
+      gcsAddBtn.classList.toggle('active', gcsInput.value.trim().length > 0);
+    });
+
+    gcsAddBtn.addEventListener('click', () => {
+      const uri = gcsInput.value.trim();
+      if (!uri) return;
+      const rawName = uri.split('/').pop() || 'vendas_gcs.csv';
+      const cleanName = rawName.replace(/\.csv$/i, '');
+      const parsed = parseCSV(SAMPLE_CSV);
+      datasets.push({
+        name: rawName.endsWith('.csv') ? rawName : `${rawName}.csv`,
+        cleanName,
+        source: 'GCS',
+        sizeLabel: '12.4 MB (GCS)',
+        headers: parsed.headers,
+        rows: parsed.rows
+      });
+      gcsInput.value = '';
+      gcsAddBtn.classList.remove('active');
+      renderFileList();
+    });
+
+    suggestionChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        questionInput.value = chip.textContent.trim();
+        questionInput.focus();
+        updateAnalyzeButtonState();
+      });
+    });
+
+    questionInput.addEventListener('input', updateAnalyzeButtonState);
+
+    // Funções Estatísticas
+    function computeStats(values) {
+      const sorted = [...values].sort((a, b) => a - b);
+      const n = sorted.length;
+      if (n === 0) return { sum: 0, mean: 0, median: 0, std: 0, min: 0, max: 0 };
+      const sum = sorted.reduce((a, b) => a + b, 0);
+      const mean = sum / n;
+      const median = n % 2 === 1 ? sorted[Math.floor(n / 2)] : (sorted[n / 2 - 1] + sorted[n / 2]) / 2;
+      const variance = sorted.reduce((acc, v) => acc + Math.pow(v - mean, 2), 0) / n;
+      const std = Math.sqrt(variance);
+      return { sum, mean, median, std, min: sorted[0], max: sorted[n - 1] };
+    }
+
+    function formatPlainNumber(n) {
+      if (Number.isInteger(n)) return String(n);
+      return Number(n.toFixed(2)).toLocaleString('pt-MZ');
+    }
+
+    // ==================== CONSTRUIR A INTERFACE APÓS CLICAR EM ANALYZE ====================
+    function buildAnalysisInterface() {
+      if (datasets.length === 0 || !questionInput.value.trim()) return;
+
+      const primaryDs = datasets[0];
+      const dsName = primaryDs.cleanName || primaryDs.name.replace(/\.csv$/i, '');
+      const inquiry = questionInput.value.trim();
+      const allRows = datasets.flatMap(d => d.rows);
+      const headers = primaryDs.headers;
+
+      // Esconder ecrã inicial e mostrar a Interface de Análise (como na captura de ecrã)
+      heroBanner.classList.add('hidden');
+      setupView.classList.add('hidden');
+      analysisInterface.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Classificar colunas
+      const numericCols = [];
+      const categoricalCols = [];
+      headers.forEach(col => {
+        const numCount = allRows.filter(r => typeof r[col] === 'number' && !isNaN(r[col])).length;
+        if (numCount >= Math.max(1, Math.floor(allRows.length * 0.6))) {
+          numericCols.push(col);
+        } else {
+          categoricalCols.push(col);
+        }
+      });
+
+      if (numericCols.length === 0) {
+        allRows.forEach((r, idx) => { r['Valor'] = idx + 1; });
+        numericCols.push('Valor');
+      }
+
+      const metric1 = numericCols.find(c => /venda|receita|mzn|valor|rev|sales|total/i.test(c)) || numericCols[0];
+      const metric2 = numericCols.find(c => c !== metric1 && /quant|transac|unid|qtd|count/i.test(c)) || numericCols[1] || metric1;
+
+      const dateCol = categoricalCols.find(c => /mes|data|ano|periodo|date|month/i.test(c)) || categoricalCols[0];
+      const catCol = categoricalCols.find(c => c !== dateCol && /cat|produto|sector|segmento/i.test(c)) || categoricalCols[0] || 'Categoria';
+      const provCol = categoricalCols.find(c => c !== dateCol && c !== catCol && /provincia|regiao|cidade|local/i.test(c)) || categoricalCols[1] || catCol;
+
+      // Calcular estatísticas
+      const colStats = {};
+      numericCols.forEach(col => {
+        const vals = allRows.map(r => Number(r[col])).filter(v => !isNaN(v));
+        colStats[col] = computeStats(vals);
+      });
+
+      // Agrupar por Categoria, Província e Mês
+      const byCategory = {};
+      const byProvince = {};
+      const byMonth = {};
+
+      allRows.forEach((r, idx) => {
+        const cKey = String(r[catCol] ?? `Cat ${idx + 1}`);
+        const pKey = String(r[provCol] ?? `Prov ${idx + 1}`);
+        const mKey = String(r[dateCol] ?? `M${idx + 1}`);
+        const val = Number(r[metric1]) || 0;
+
+        byCategory[cKey] = (byCategory[cKey] || 0) + val;
+        byProvince[pKey] = (byProvince[pKey] || 0) + val;
+        byMonth[mKey] = (byMonth[mKey] || 0) + val;
+      });
+
+      const sortedCats = Object.entries(byCategory).sort((a, b) => b[1] - a[1]);
+      const sortedProvs = Object.entries(byProvince).sort((a, b) => b[1] - a[1]);
+      const monthEntries = Object.entries(byMonth);
+
+      const topCat = sortedCats[0] || ['N/D', 0];
+      const topProv = sortedProvs[0] || ['N/D', 0];
+
+      // Detectar Outliers por Z-Score
+      const anomalies = [];
+      numericCols.forEach(col => {
+        const st = colStats[col];
+        if (st.std === 0) return;
+        allRows.forEach((r, idx) => {
+          const val = Number(r[col]);
+          if (isNaN(val)) return;
+          const z = (val - st.mean) / st.std;
+          if (Math.abs(z) >= 1.7) {
+            anomalies.push({
+              rowIdx: idx + 1,
+              label: r[catCol] || r[provCol] || `Linha #${idx + 1}`,
+              col,
+              val,
+              z: z.toFixed(2),
+              direction: z > 0 ? 'Pico acima da média' : 'Queda abaixo da média'
+            });
+          }
+        });
+      });
+      anomalies.sort((a, b) => Math.abs(Number(b.z)) - Math.abs(Number(a.z)));
+
+      // Guardar dados para exportação JSON e Chat
+      const todayStr = new Date().toISOString().slice(0, 10);
+      latestReportData = {
+        dataset: dsName,
+        date: todayStr,
+        inquiry,
+        rowCount: allRows.length,
+        columns: headers,
+        metrics: { metric1, metric2, catCol, provCol, dateCol },
+        statistics: colStats,
+        topCategory: topCat,
+        topProvince: topProv,
+        anomalies
+      };
+
+      // 1. Preencher Barra de Topo e Cabeçalho do Relatório
+      document.getElementById('topBarDatasetName').textContent = `Dataset: ${dsName}`;
+      document.getElementById('topBarInquiryText').textContent = inquiry;
+
+      document.getElementById('reportDatasetBadge').textContent = dsName.toUpperCase();
+      document.getElementById('reportDateText').textContent = todayStr;
+      document.getElementById('reportMainHeading').textContent = `Analysis: ${dsName}`;
+      document.getElementById('reportInquirySpan').textContent = inquiry;
+      document.getElementById('tablesCountBadge').textContent = String(numericCols.length + 1);
+
+      // 2. Preencher Painel Esquerdo (Analytics Agent -> Chat)
+      document.getElementById('agentInitialSummary').innerHTML = `
+        <p style="margin-bottom: 10px;">Concluí a análise autónoma do conjunto de dados <strong>${dsName}</strong> (${allRows.length} registos) para responder a: <em>"${inquiry}"</em>.</p>
+        <p style="font-weight: 600; margin-bottom: 6px;">Gráficos Gerados:</p>
+        <ul class="agent-doc-list">
+          <li><span class="code-artifact-pill">vendas_por_mes.png</span> (Evolução cronológica mensal de receita)</li>
+          <li><span class="code-artifact-pill">top_categorias.png</span> (Desempenho acumulado por ${catCol})</li>
+          <li><span class="code-artifact-pill">distribuicao_provincia.png</span> (Quota regional por ${provCol})</li>
+        </ul>
+        <p style="font-weight: 600; margin-bottom: 6px;">Relatório Completo:</p>
+        <ul class="agent-doc-list">
+          <li><span class="code-artifact-pill">report.json</span></li>
+        </ul>
+      `;
+      document.getElementById('agentFollowupList').innerHTML = '';
+      document.getElementById('chatCountBadge').textContent = '1';
+
+      // 3. Preencher os 4 Cartões de KPI (como na imagem: TOTAL VENDAS, TOTAL QUANTIDADE, etc.)
+      const halfIdx = Math.max(1, Math.floor(allRows.length / 2));
+      const period2Rows = allRows.slice(halfIdx);
+      const sumMetric1All = Math.round(colStats[metric1].sum);
+      const sumMetric2All = Math.round(colStats[metric2].sum);
+      const sumMetric1Recent = Math.round(period2Rows.reduce((acc, r) => acc + (Number(r[metric1]) || 0), 0));
+      const sumMetric2Recent = Math.round(period2Rows.reduce((acc, r) => acc + (Number(r[metric2]) || 0), 0));
+
+      document.getElementById('reportKpiRow').innerHTML = `
+        <div class="report-kpi-card">
+          <div class="report-kpi-label">TOTAL ${metric1.toUpperCase()}</div>
+          <div class="report-kpi-val">${formatPlainNumber(sumMetric1All)}</div>
+          <div class="report-kpi-sub">Acumulado global (MZN)</div>
+        </div>
+        <div class="report-kpi-card">
+          <div class="report-kpi-label">TOTAL ${metric2.toUpperCase()}</div>
+          <div class="report-kpi-val">${formatPlainNumber(sumMetric2All)}</div>
+          <div class="report-kpi-sub">Volume total registado</div>
+        </div>
+        <div class="report-kpi-card">
+          <div class="report-kpi-label">TOTAL ${metric1.toUpperCase()} (2.º PERÍODO)</div>
+          <div class="report-kpi-val">${formatPlainNumber(sumMetric1Recent)}</div>
+          <div class="report-kpi-sub">Líder: ${topCat[0]}</div>
+        </div>
+        <div class="report-kpi-card">
+          <div class="report-kpi-label">TOTAL ${metric2.toUpperCase()} (2.º PERÍODO)</div>
+          <div class="report-kpi-val">${formatPlainNumber(sumMetric2Recent)}</div>
+          <div class="report-kpi-sub">Destaque: ${topProv[0]}</div>
+        </div>
+      `;
+
+      // 4. Preencher Resumo Executivo (Overview)
+      const sharePct = ((topCat[1] / (colStats[metric1].sum || 1)) * 100).toFixed(1);
+      document.getElementById('overviewNarrative').innerHTML = `
+        A análise geral do conjunto de dados <strong>${dsName}</strong> revela um total acumulado de <strong>${ colStats[metric1].sum.toLocaleString('pt-MZ') } MT</strong> em <strong>${metric1}</strong> e <strong>${ colStats[metric2].sum.toLocaleString('pt-MZ') }</strong> em <strong>${metric2}</strong>.
+        O segmento líder em <strong>${catCol}</strong> é <strong>${topCat[0]}</strong>, responsável por <strong>${topCat[1].toLocaleString('pt-MZ')} MT</strong> (<strong>${sharePct}%</strong> do total).
+        Em termos geográficos (<strong>${provCol}</strong>), <strong>${topProv[0]}</strong> apresenta o maior volume com <strong>${topProv[1].toLocaleString('pt-MZ')} MT</strong>.
+      `;
+
+      // 5. Preencher Tabelas de Dados
+      document.getElementById('statsTableBody').innerHTML = numericCols.map(col => {
+        const s = colStats[col];
+        return `
+          <tr>
+            <td><strong>${col}</strong></td>
+            <td>${s.sum.toLocaleString('pt-MZ', { maximumFractionDigits: 2 })}</td>
+            <td>${s.mean.toLocaleString('pt-MZ', { maximumFractionDigits: 2 })}</td>
+            <td>${s.median.toLocaleString('pt-MZ', { maximumFractionDigits: 2 })}</td>
+            <td>${s.std.toLocaleString('pt-MZ', { maximumFractionDigits: 2 })}</td>
+            <td>${s.min.toLocaleString('pt-MZ', { maximumFractionDigits: 2 })}</td>
+            <td>${s.max.toLocaleString('pt-MZ', { maximumFractionDigits: 2 })}</td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('rawTableHead').innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
+      document.getElementById('rawTableBody').innerHTML = allRows.slice(0, 100).map(r => `
+        <tr>${headers.map(h => `<td>${typeof r[h] === 'number' ? r[h].toLocaleString('pt-MZ') : (r[h] ?? '')}</td>`).join('')}</tr>
+      `).join('');
+
+      // 6. Preencher Insights & Anomalias
+      document.getElementById('insightsList').innerHTML = [
+        `<strong>Principal Motor de Receita:</strong> <em>${topCat[0]}</em> lidera em ${catCol} com <strong>${topCat[1].toLocaleString('pt-MZ')} MT</strong> (${sharePct}% do total).`,
+        `<strong>Concentração Regional:</strong> <em>${topProv[0]}</em> lidera em ${provCol} com <strong>${topProv[1].toLocaleString('pt-MZ')} MT</strong>.`,
+        `<strong>Média por Operação:</strong> Cada registo apresenta uma média de <strong>${colStats[metric1].mean.toLocaleString('pt-MZ', { maximumFractionDigits: 1 })} MT</strong> e mediana de <strong>${colStats[metric1].median.toLocaleString('pt-MZ', { maximumFractionDigits: 1 })} MT</strong>.`
+      ].map(i => `<li>${i}</li>`).join('');
+
+      document.getElementById('anomaliesList').innerHTML = anomalies.length === 0
+        ? `<li>Nenhum outlier severo detectado (|z-score| &ge; 1.7).</li>`
+        : anomalies.slice(0, 6).map(a => `
+            <li>
+              <strong>${a.label}</strong> (Registo #${a.rowIdx}) — <em>${a.col}</em>: <strong>${a.val.toLocaleString('pt-MZ')}</strong> (${a.direction})
+              <span class="anomaly-badge">z = ${a.z}</span>
+            </li>
+          `).join('');
+
+      // 7. Preencher Print Preview
+      document.getElementById('printPreviewContainer').innerHTML = `
+        <h3>Pré-visualização de Impressão — Relatório ${dsName.toUpperCase()}</h3>
+        <p style="color:#666; margin-bottom:16px;">Data: ${todayStr} • Pergunta: "${inquiry}"</p>
+        <p style="line-height:1.7; margin-bottom:18px;">${document.getElementById('overviewNarrative').innerHTML}</p>
+        <button type="button" class="btn-download-pdf" onclick="window.print()">Imprimir / Guardar como PDF</button>
+      `;
+
+      // 8. Renderizar Gráficos Chart.js
+      chartInstances.forEach(c => c.destroy());
+      chartInstances = [];
+
+      const palette = ['#4285F4', '#8B5CC6', '#E8392B', '#10B981', '#F59E0B', '#B0449A'];
+
+      function createLineChart(canvasId) {
+        return new Chart(document.getElementById(canvasId).getContext('2d'), {
+          type: 'line',
+          data: {
+            labels: monthEntries.map(x => x[0]),
+            datasets: [{
+              label: metric1,
+              data: monthEntries.map(x => x[1]),
+              borderColor: '#4285F4',
+              backgroundColor: 'rgba(66, 133, 244, 0.12)',
+              borderWidth: 3,
+              pointBackgroundColor: '#E8392B',
+              pointRadius: 4,
+              fill: true,
+              tension: 0.35
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: { beginAtZero: false, grid: { color: '#F1F3F5' } },
+              x: { grid: { display: false } }
+            }
+          }
+        });
+      }
+
+      function createBarChart(canvasId, entries) {
+        return new Chart(document.getElementById(canvasId).getContext('2d'), {
+          type: 'bar',
+          data: {
+            labels: entries.map(x => x[0]),
+            datasets: [{
+              label: metric1,
+              data: entries.map(x => x[1]),
+              backgroundColor: palette,
+              borderRadius: 10
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: { beginAtZero: true, grid: { color: '#F1F3F5' } },
+              x: { grid: { display: false } }
+            }
+          }
+        });
+      }
+
+      chartInstances.push(createLineChart('canvasOverview1'));
+      chartInstances.push(createBarChart('canvasOverview2', sortedCats.slice(0, 6)));
+      chartInstances.push(createLineChart('canvasVis1'));
+      chartInstances.push(createBarChart('canvasVis2', sortedCats.slice(0, 6)));
+      chartInstances.push(createBarChart('canvasVis3', sortedProvs.slice(0, 8)));
+    }
+
+    analyzeBtn.addEventListener('click', buildAnalysisInterface);
+
+    // Botão "Nova análise" para voltar ao ecrã inicial
+    document.getElementById('btnNewAnalysis').addEventListener('click', () => {
+      analysisInterface.classList.remove('active');
+      setupView.classList.remove('hidden');
+      heroBanner.classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Alternar Abas no Painel Esquerdo (Chat vs Agent Activity)
+    const agentTabChat = document.getElementById('agentTabChat');
+    const agentTabActivity = document.getElementById('agentTabActivity');
+    const agentChatBody = document.getElementById('agentChatBody');
+    const agentActivityBody = document.getElementById('agentActivityBody');
+
+    agentTabChat.addEventListener('click', () => {
+      agentTabChat.classList.add('active');
+      agentTabActivity.classList.remove('active');
+      agentChatBody.style.display = 'block';
+      agentActivityBody.style.display = 'none';
+    });
+
+    agentTabActivity.addEventListener('click', () => {
+      agentTabActivity.classList.add('active');
+      agentTabChat.classList.remove('active');
+      agentActivityBody.style.display = 'block';
+      agentChatBody.style.display = 'none';
+    });
+
+    // Alternar Sub-Abas do Relatório (Overview, Visualizations, Data Tables, Insights, Print Preview)
+    document.querySelectorAll('.report-subtab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.report-subtab').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.report-pane').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        const paneId = btn.getAttribute('data-pane');
+        document.getElementById(paneId).classList.add('active');
+      });
+    });
+
+    // Perguntas de acompanhamento no Painel Esquerdo (Analytics Agent)
+    const agentChatInput = document.getElementById('agentChatInput');
+    const agentChatSendBtn = document.getElementById('agentChatSendBtn');
+
+    agentChatInput.addEventListener('input', () => {
+      agentChatSendBtn.classList.toggle('ready', agentChatInput.value.trim().length > 0);
+    });
+
+    function handleAgentFollowup(promptText) {
+      if (!latestReportData) return;
+      agentTabChat.click();
+
+      const { metrics, statistics, topCategory, topProvince, anomalies } = latestReportData;
+      const st = statistics[metrics.metric1];
+      const lower = promptText.toLowerCase();
+      let answer = '';
+
+      if (/outlier|anomalia/.test(lower)) {
+        answer = anomalies.length === 0
+          ? `Não foram detectados outliers severos (|z| &ge; 1.7) nas colunas numéricas.`
+          : `Foram identificados <strong>${anomalies.length}</strong> outliers estatísticos. O principal ocorre em <strong>${anomalies[0].label}</strong> (${anomalies[0].col} = ${anomalies[0].val.toLocaleString('pt-MZ')}, z = ${anomalies[0].z}).`;
+      } else if (/correlac|padr/.test(lower)) {
+        answer = `Observa-se um padrão de forte concentração em <strong>${topCategory[0]}</strong> e na região de <strong>${topProvince[0]}</strong>, acompanhando a evolução positiva de <strong>${metrics.metric2}</strong>.`;
+      } else {
+        answer = `Recomenda-se reforçar a alocação comercial em <strong>${topCategory[0]}</strong> (${topCategory[1].toLocaleString('pt-MZ')} MT) e replicar as boas práticas operacionais de <strong>${topProvince[0]}</strong> nas restantes províncias. A média actual por registo é de <strong>${st.mean.toLocaleString('pt-MZ', { maximumFractionDigits: 1 })} MT</strong>.`;
+      }
+
+      const list = document.getElementById('agentFollowupList');
+      const item = document.createElement('div');
+      item.className = 'chat-followup-item';
+      item.innerHTML = `
+        <div class="chat-followup-q">▸ ${promptText}</div>
+        <div class="chat-followup-a">${answer}</div>
+      `;
+      list.appendChild(item);
+
+      const badge = document.getElementById('chatCountBadge');
+      badge.textContent = String(Number(badge.textContent) + 1);
+      agentChatBody.scrollTop = agentChatBody.scrollHeight;
+    }
+
+    document.querySelectorAll('.agent-quick-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        handleAgentFollowup(chip.getAttribute('data-prompt'));
+      });
+    });
+
+    document.getElementById('agentChatForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const val = agentChatInput.value.trim();
+      if (!val) return;
+      agentChatInput.value = '';
+      agentChatSendBtn.classList.remove('ready');
+      handleAgentFollowup(val);
+    });
+
+    // Botões Download PDF e JSON
+    document.getElementById('btnDownloadPDF').addEventListener('click', () => {
+      window.print();
+    });
+
+    document.getElementById('btnDownloadJSON').addEventListener('click', () => {
+      if (!latestReportData) return;
+      const blob = new Blob([JSON.stringify(latestReportData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `report_${latestReportData.dataset}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Ficheiro report.json transferido!');
+    });
+
+    // Controlos da Barra Superior
+    document.getElementById('btnRefresh').addEventListener('click', () => {
+      datasets.length = 0;
+      questionInput.value = '';
+      renderFileList();
+      document.getElementById('btnNewAnalysis').click();
+      showToast('Área de trabalho reiniciada.');
+    });
+
+    document.getElementById('btnFullscreen').addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    });
+
+    let mobilePreview = false;
+    document.getElementById('btnDevice').addEventListener('click', () => {
+      mobilePreview = !mobilePreview;
+      document.getElementById('workspaceWrapper').style.maxWidth = mobilePreview ? '430px' : '1440px';
+      showToast(mobilePreview ? 'Vista mobile activada' : 'Vista desktop activada');
+    });
+
+    document.getElementById('btnRemix').addEventListener('click', () => {
+      if (datasets.length === 0) loadSampleBtn.click();
+      buildAnalysisInterface();
+    });
+
+    document.getElementById('fabMascot').addEventListener('click', () => {
+      if (datasets.length === 0) loadSampleBtn.click();
+      buildAnalysisInterface();
+    });
+  </script>
+</body>
+</html>
