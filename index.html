@@ -3244,29 +3244,32 @@
     const brandLogoBtn = document.getElementById('brandLogoBtn');
 
     function showView(viewName) {
-      viewHome.classList.remove('active');
-      viewAuth.classList.remove('active');
-      viewWorkspace.classList.remove('active');
+      if (viewHome) viewHome.classList.remove('active');
+      if (viewAuth) viewAuth.classList.remove('active');
+      if (viewWorkspace) viewWorkspace.classList.remove('active');
 
-      navHomeBtn.classList.remove('active');
-      navWorkspaceBtn.classList.remove('active');
-      navFeaturesBtn.classList.remove('active');
+      if (navHomeBtn) navHomeBtn.classList.remove('active');
+      if (navWorkspaceBtn) navWorkspaceBtn.classList.remove('active');
+      if (navFeaturesBtn) navFeaturesBtn.classList.remove('active');
 
       if (viewName === 'home') {
-        viewHome.classList.add('active');
-        navHomeBtn.classList.add('active');
+        if (viewHome) viewHome.classList.add('active');
+        if (navHomeBtn) navHomeBtn.classList.add('active');
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else if (viewName === 'auth') {
-        viewAuth.classList.add('active');
+        if (viewAuth) viewAuth.classList.add('active');
         window.scrollTo({ top: 0, behavior: 'smooth' });
+        setTimeout(() => {
+          const emailInput = document.getElementById('loginEmail');
+          if (emailInput) emailInput.focus();
+        }, 120);
       } else if (viewName === 'workspace') {
-        viewWorkspace.classList.add('active');
-        navWorkspaceBtn.classList.add('active');
+        if (viewWorkspace) viewWorkspace.classList.add('active');
+        if (navWorkspaceBtn) navWorkspaceBtn.classList.add('active');
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     }
 
-    
     // Lógica do Menu Mobile Hambúrguer
     const btnMobileToggle = document.getElementById('btnMobileToggle');
     const mobileNavDrawer = document.getElementById('mobileNavDrawer');
@@ -3282,7 +3285,6 @@
         mobileNavDrawer.classList.toggle('open');
       });
 
-      // Fechar ao clicar fora
       document.addEventListener('click', (e) => {
         if (!mobileNavDrawer.contains(e.target) && !btnMobileToggle.contains(e.target)) {
           mobileNavDrawer.classList.remove('open');
@@ -3312,40 +3314,43 @@
       });
     }
 
-    navHomeBtn.addEventListener('click', () => showView('home'));
-    navWorkspaceBtn.addEventListener('click', () => showView('workspace'));
-    brandLogoBtn.addEventListener('click', () => showView('home'));
+    if (navHomeBtn) navHomeBtn.addEventListener('click', () => showView('home'));
+    if (navWorkspaceBtn) navWorkspaceBtn.addEventListener('click', () => showView('workspace'));
+    if (brandLogoBtn) brandLogoBtn.addEventListener('click', () => showView('home'));
 
-    navFeaturesBtn.addEventListener('click', () => {
-      showView('home');
-      setTimeout(() => {
-        const featSec = document.getElementById('sectionFeatures');
-        if (featSec) featSec.scrollIntoView({ behavior: 'smooth' });
-      }, 50);
-    });
+    if (navFeaturesBtn) {
+      navFeaturesBtn.addEventListener('click', () => {
+        showView('home');
+        setTimeout(() => {
+          const featSec = document.getElementById('sectionFeatures');
+          if (featSec) featSec.scrollIntoView({ behavior: 'smooth' });
+        }, 50);
+      });
+    }
 
-    // Botões da Landing Page
-    document.getElementById('heroStartBtn').addEventListener('click', () => showView('workspace'));
-    document.getElementById('heroLoginBtn').addEventListener('click', () => {
-      if (currentUser) {
+    const heroStartBtn = document.getElementById('heroStartBtn');
+    if (heroStartBtn) heroStartBtn.addEventListener('click', () => showView('workspace'));
+
+    const heroSampleBtn = document.getElementById('heroSampleBtn');
+    if (heroSampleBtn) {
+      heroSampleBtn.addEventListener('click', () => {
         showView('workspace');
-      } else {
-        showView('auth');
-      }
-    });
-    document.getElementById('heroSampleBtn').addEventListener('click', () => {
-      showView('workspace');
-      if (datasets.length === 0) {
-        loadSampleBtn.click();
-      }
-      setTimeout(() => {
-        buildAnalysisInterface();
-      }, 100);
-    });
-    document.getElementById('bottomCtaBtn').addEventListener('click', () => showView('workspace'));
-    document.getElementById('footerLinkHome').addEventListener('click', (e) => { e.preventDefault(); showView('home'); });
-    document.getElementById('footerLinkWorkspace').addEventListener('click', (e) => { e.preventDefault(); showView('workspace'); });
-    document.getElementById('footerLinkLogin').addEventListener('click', (e) => { e.preventDefault(); showView('auth'); });
+        if (datasets.length === 0) loadSampleBtn.click();
+        setTimeout(() => buildAnalysisInterface(), 100);
+      });
+    }
+
+    const bottomCtaBtn = document.getElementById('bottomCtaBtn');
+    if (bottomCtaBtn) bottomCtaBtn.addEventListener('click', () => showView('workspace'));
+
+    const footerLinkHome = document.getElementById('footerLinkHome');
+    if (footerLinkHome) footerLinkHome.addEventListener('click', (e) => { e.preventDefault(); showView('home'); });
+
+    const footerLinkWorkspace = document.getElementById('footerLinkWorkspace');
+    if (footerLinkWorkspace) footerLinkWorkspace.addEventListener('click', (e) => { e.preventDefault(); showView('workspace'); });
+
+    const footerLinkLogin = document.getElementById('footerLinkLogin');
+    if (footerLinkLogin) footerLinkLogin.addEventListener('click', (e) => { e.preventDefault(); showView('auth'); });
 
     // ==================== GESTÃO DE AUTENTICAÇÃO (LOGIN & REGISTO) ====================
     let currentUser = null;
@@ -3366,66 +3371,38 @@
     const authToggleHint = document.getElementById('authToggleHint');
     const authToggleAction = document.getElementById('authToggleAction');
 
+    function checkWorkspacePrompt() {
+      const prompt = document.getElementById('workspaceAuthPrompt');
+      if (prompt) prompt.classList.toggle('hidden', !!currentUser);
+    }
+
     function updateAuthUI() {
       if (currentUser) {
-        topbarLoginBtn.style.display = 'none';
-        topbarUserBadge.classList.add('logged-in');
-        topbarUserName.textContent = currentUser.name;
-        topbarUserRole.textContent = currentUser.role || 'Data Analyst';
+        if (topbarLoginBtn) topbarLoginBtn.style.display = 'none';
+        if (topbarUserBadge) topbarUserBadge.classList.add('logged-in');
+        if (topbarUserName) topbarUserName.textContent = currentUser.name;
+        if (topbarUserRole) topbarUserRole.textContent = currentUser.role || 'Analista de Dados';
         
-        // Iniciais para o avatar
         const parts = currentUser.name.trim().split(' ');
         const initials = parts.length > 1 ? (parts[0][0] + parts[parts.length - 1][0]) : (currentUser.name.slice(0, 2));
-        topbarUserAvatar.textContent = initials.toUpperCase();
+        if (topbarUserAvatar) topbarUserAvatar.textContent = initials.toUpperCase();
       } else {
-        topbarLoginBtn.style.display = 'inline-flex';
-        topbarUserBadge.classList.remove('logged-in');
+        if (topbarLoginBtn) topbarLoginBtn.style.display = 'inline-flex';
+        if (topbarUserBadge) topbarUserBadge.classList.remove('logged-in');
       }
+      checkWorkspacePrompt();
     }
 
     function setCurrentUser(user, persist = true) {
       currentUser = user;
-      if (persist && user) {
-        localStorage.setItem('ai_analyst_user', JSON.stringify(user));
-      } else if (!user) {
-        localStorage.removeItem('ai_analyst_user');
-      }
-      updateAuthUI(); checkWorkspacePrompt(); 
-    // Suporte a Acesso Rápido ao Login em múltiplos pontos
-    const navLoginBtn = document.getElementById('navLoginBtn');
-    if (navLoginBtn) navLoginBtn.addEventListener('click', () => showView('auth'));
-
-        
-    const wapLoginBtn = document.getElementById('wapLoginBtn');
-    if (wapLoginBtn) wapLoginBtn.addEventListener('click', () => showView('auth'));
-
-        
-    // Atualizar visibilidade do banner no Workspace ao mudar de utilizador
-    function checkWorkspacePrompt() {
-      const prompt = document.getElementById('workspaceAuthPrompt');
-      if (prompt) {
-        prompt.classList.toggle('hidden', !!currentUser);
-      }
-      if (navLoginBtn) {
-        navLoginBtn.style.display = currentUser ? 'none' : 'inline-flex';
-      }
-      
-    }
-    
-    // Suporte a abrir direto via URL (#login, #entrar, #auth, #workspace)
-    function handleHashRouting() {
-      const hash = (window.location.hash || '').toLowerCase();
-      if (hash === '#login' || hash === '#entrar' || hash === '#auth') {
-        showView('auth');
-      } else if (hash === '#workspace' || hash === '#analise') {
-        showView('workspace');
-      } else if (hash === '#home' || hash === '#inicio') {
-        showView('home');
-      }
-    }
-    window.addEventListener('hashchange', handleHashRouting);
-    handleHashRouting();
-
+      try {
+        if (persist && user) {
+          localStorage.setItem('ai_analyst_user', JSON.stringify(user));
+        } else if (!user) {
+          localStorage.removeItem('ai_analyst_user');
+        }
+      } catch (err) {}
+      updateAuthUI();
     }
 
     // Inicialização da sessão
@@ -3442,128 +3419,184 @@
     // Alternar Abas Login / Registo
     function setAuthTab(tab) {
       if (tab === 'login') {
-        tabBtnLogin.classList.add('active');
-        tabBtnRegister.classList.remove('active');
-        formLogin.style.display = 'block';
-        formRegister.style.display = 'none';
-        authTitleText.textContent = 'Aceder à Plataforma';
-        authSubText.textContent = 'Inicie sessão para gerir os seus dados e guardar as análises.';
-        authToggleHint.textContent = 'Ainda não tem conta? ';
-        authToggleAction.textContent = 'Registe-se gratuitamente';
+        if (tabBtnLogin) tabBtnLogin.classList.add('active');
+        if (tabBtnRegister) tabBtnRegister.classList.remove('active');
+        if (formLogin) formLogin.style.display = 'block';
+        if (formRegister) formRegister.style.display = 'none';
+        if (authTitleText) authTitleText.textContent = 'Aceder à Plataforma';
+        if (authSubText) authSubText.textContent = 'Inicie sessão para gerir os seus dados e guardar as análises.';
+        if (authToggleHint) authToggleHint.textContent = 'Ainda não tem conta? ';
+        if (authToggleAction) authToggleAction.textContent = 'Registe-se gratuitamente';
       } else {
-        tabBtnRegister.classList.add('active');
-        tabBtnLogin.classList.remove('active');
-        formLogin.style.display = 'none';
-        formRegister.style.display = 'block';
-        authTitleText.textContent = 'Criar Nova Conta';
-        authSubText.textContent = 'Cadastre-se para desbloquear todo o poder do Agente de IA.';
-        authToggleHint.textContent = 'Já possui conta? ';
-        authToggleAction.textContent = 'Iniciar sessão';
+        if (tabBtnRegister) tabBtnRegister.classList.add('active');
+        if (tabBtnLogin) tabBtnLogin.classList.remove('active');
+        if (formLogin) formLogin.style.display = 'none';
+        if (formRegister) formRegister.style.display = 'block';
+        if (authTitleText) authTitleText.textContent = 'Criar Nova Conta';
+        if (authSubText) authSubText.textContent = 'Cadastre-se para desbloquear todo o poder do Agente de IA.';
+        if (authToggleHint) authToggleHint.textContent = 'Já possui conta? ';
+        if (authToggleAction) authToggleAction.textContent = 'Iniciar sessão';
       }
     }
 
-    tabBtnLogin.addEventListener('click', () => setAuthTab('login'));
-    tabBtnRegister.addEventListener('click', () => setAuthTab('register'));
-    authToggleAction.addEventListener('click', () => {
-      if (tabBtnLogin.classList.contains('active')) {
-        setAuthTab('register');
-      } else {
-        setAuthTab('login');
-      }
-    });
+    if (tabBtnLogin) tabBtnLogin.addEventListener('click', () => setAuthTab('login'));
+    if (tabBtnRegister) tabBtnRegister.addEventListener('click', () => setAuthTab('register'));
+    if (authToggleAction) {
+      authToggleAction.addEventListener('click', () => {
+        if (tabBtnLogin && tabBtnLogin.classList.contains('active')) {
+          setAuthTab('register');
+        } else {
+          setAuthTab('login');
+        }
+      });
+    }
 
-    topbarLoginBtn.addEventListener('click', () => showView('auth'));
-    topbarLogoutBtn.addEventListener('click', () => {
-      setCurrentUser(null);
-      showToast('Sessão terminada.');
-      showView('home');
-    });
+    // Botão de login na topbar
+    if (topbarLoginBtn) {
+      topbarLoginBtn.addEventListener('click', () => {
+        setAuthTab('login');
+        showView('auth');
+      });
+    }
+
+    // Botão de logout na topbar
+    if (topbarLogoutBtn) {
+      topbarLogoutBtn.addEventListener('click', () => {
+        setCurrentUser(null);
+        showToast('Sessão terminada.');
+        showView('home');
+      });
+    }
+
+    // Botão de login no banner do workspace
+    const wapLoginBtn = document.getElementById('wapLoginBtn');
+    if (wapLoginBtn) {
+      wapLoginBtn.addEventListener('click', () => {
+        setAuthTab('login');
+        showView('auth');
+      });
+    }
 
     // Alternar visibilidade de palavra-passe
     const toggleLoginPwd = document.getElementById('toggleLoginPwd');
     const loginPassword = document.getElementById('loginPassword');
-    toggleLoginPwd.addEventListener('click', () => {
-      const isPwd = loginPassword.type === 'password';
-      loginPassword.type = isPwd ? 'text' : 'password';
-    });
+    if (toggleLoginPwd && loginPassword) {
+      toggleLoginPwd.addEventListener('click', () => {
+        const isPwd = loginPassword.type === 'password';
+        loginPassword.type = isPwd ? 'text' : 'password';
+      });
+    }
 
     // Submissão de Login
-    formLogin.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const email = document.getElementById('loginEmail').value.trim();
-      const password = document.getElementById('loginPassword').value;
-      const remember = document.getElementById('loginRemember').checked;
+    if (formLogin) {
+      formLogin.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const emailInput = document.getElementById('loginEmail');
+        const pwdInput = document.getElementById('loginPassword');
+        const remInput = document.getElementById('loginRemember');
 
-      if (!email || !password) {
-        showToast('Por favor, preencha o email e a palavra-passe.');
-        return;
-      }
+        const email = emailInput ? emailInput.value.trim() : '';
+        const password = pwdInput ? pwdInput.value : '';
+        const remember = remInput ? remInput.checked : true;
 
-      // Verificar se é usuário cadastrado ou simular
-      let registeredUsers = [];
-      try {
-        registeredUsers = JSON.parse(localStorage.getItem('ai_analyst_registered_users') || '[]');
-      } catch (err) {}
+        if (!email || !password) {
+          showToast('Por favor, preencha o email e a palavra-passe.');
+          return;
+        }
 
-      const found = registeredUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
-      const userName = found ? found.name : email.split('@')[0].replace(/[._]/g, ' ');
-      const userRole = found ? found.role : 'Data Analyst';
+        let registeredUsers = [];
+        try {
+          registeredUsers = JSON.parse(localStorage.getItem('ai_analyst_registered_users') || '[]');
+        } catch (err) {}
 
-      const userObj = {
-        email,
-        name: userName.charAt(0).toUpperCase() + userName.slice(1),
-        role: userRole
-      };
+        const found = registeredUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
+        const userName = found ? found.name : email.split('@')[0].replace(/[._]/g, ' ');
+        const userRole = found ? found.role : 'Analista de Dados';
 
-      setCurrentUser(userObj, remember);
-      showToast(`Bem-vindo de volta, ${userObj.name}!`);
-      showView('workspace');
-    });
+        const userObj = {
+          email,
+          name: userName.charAt(0).toUpperCase() + userName.slice(1),
+          role: userRole
+        };
+
+        setCurrentUser(userObj, remember);
+        showToast(`Bem-vindo de volta, ${userObj.name}!`);
+        showView('workspace');
+      });
+    }
 
     // Login Rápido Demo (1-Clique)
-    document.getElementById('btnDemoQuickLogin').addEventListener('click', () => {
-      const demoUser = {
-        name: 'Rofina Cumbe',
-        email: 'analista@empresa.co.mz',
-        role: 'Analista de Dados Sénior'
-      };
-      setCurrentUser(demoUser, true);
-      showToast('Sessão de demonstração iniciada com sucesso!');
-      showView('workspace');
-    });
+    const btnDemoQuickLogin = document.getElementById('btnDemoQuickLogin');
+    if (btnDemoQuickLogin) {
+      btnDemoQuickLogin.addEventListener('click', () => {
+        const demoUser = {
+          name: 'Rofina Cumbe',
+          email: 'analista@empresa.co.mz',
+          role: 'Analista de Dados Sénior'
+        };
+        setCurrentUser(demoUser, true);
+        showToast('Sessão de demonstração iniciada com sucesso!');
+        showView('workspace');
+      });
+    }
 
     // Submissão de Registo
-    formRegister.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const name = document.getElementById('regName').value.trim();
-      const email = document.getElementById('regEmail').value.trim();
-      const role = document.getElementById('regRole').value;
-      const password = document.getElementById('regPassword').value;
+    if (formRegister) {
+      formRegister.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const regNameInput = document.getElementById('regName');
+        const regEmailInput = document.getElementById('regEmail');
+        const regRoleInput = document.getElementById('regRole');
+        const regPwdInput = document.getElementById('regPassword');
 
-      if (!name || !email || !password) {
-        showToast('Por favor, preencha todos os campos obrigatórios.');
-        return;
-      }
+        const name = regNameInput ? regNameInput.value.trim() : '';
+        const email = regEmailInput ? regEmailInput.value.trim() : '';
+        const role = regRoleInput ? regRoleInput.value : 'Analista de Dados';
+        const password = regPwdInput ? regPwdInput.value : '';
 
-      const newUser = { name, email, role };
+        if (!name || !email || !password) {
+          showToast('Por favor, preencha todos os campos obrigatórios.');
+          return;
+        }
 
-      try {
-        let registeredUsers = JSON.parse(localStorage.getItem('ai_analyst_registered_users') || '[]');
-        registeredUsers = registeredUsers.filter(u => u.email.toLowerCase() !== email.toLowerCase());
-        registeredUsers.push(newUser);
-        localStorage.setItem('ai_analyst_registered_users', JSON.stringify(registeredUsers));
-      } catch (err) {}
+        const newUser = { name, email, role };
 
-      setCurrentUser(newUser, true);
-      showToast(`Conta criada com sucesso! Bem-vindo(a), ${name}.`);
-      showView('workspace');
-    });
+        try {
+          let registeredUsers = JSON.parse(localStorage.getItem('ai_analyst_registered_users') || '[]');
+          registeredUsers = registeredUsers.filter(u => u.email.toLowerCase() !== email.toLowerCase());
+          registeredUsers.push(newUser);
+          localStorage.setItem('ai_analyst_registered_users', JSON.stringify(registeredUsers));
+        } catch (err) {}
+
+        setCurrentUser(newUser, true);
+        showToast(`Conta criada com sucesso! Bem-vindo(a), ${name}.`);
+        showView('workspace');
+      });
+    }
 
     // Link Esqueceu a Senha
-    document.getElementById('linkForgotPassword').addEventListener('click', () => {
-      const email = document.getElementById('loginEmail').value.trim() || 'o seu email corporativo';
-      alert(`Um link de recuperação seguro seria enviado para: ${email}. Na demonstração, pode utilizar o botão "Entrar com Conta de Teste" para acesso imediato.`);
-    });
+    const linkForgotPassword = document.getElementById('linkForgotPassword');
+    if (linkForgotPassword) {
+      linkForgotPassword.addEventListener('click', () => {
+        const emailInput = document.getElementById('loginEmail');
+        const email = (emailInput && emailInput.value.trim()) || 'o seu email corporativo';
+        alert(`Um link de recuperação seguro seria enviado para: ${email}. Para demonstração imediata, clique em "Entrar com Conta de Teste (1-Clique)".`);
+      });
+    }
+
+    // Suporte a abrir direto via URL (#login, #entrar, #auth, #workspace)
+    function handleHashRouting() {
+      const hash = (window.location.hash || '').toLowerCase();
+      if (hash === '#login' || hash === '#entrar' || hash === '#auth') {
+        showView('auth');
+      } else if (hash === '#workspace' || hash === '#analise') {
+        showView('workspace');
+      } else if (hash === '#home' || hash === '#inicio') {
+        showView('home');
+      }
+    }
+    window.addEventListener('hashchange', handleHashRouting);
+    handleHashRouting();
 
     const datasets = [];
     let chartInstances = [];
