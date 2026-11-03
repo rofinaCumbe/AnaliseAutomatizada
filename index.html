@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Data Analyst — Inteligência de Dados (Moçambique)</title>
+  <title>Análise Automatizada — Inteligência de Dados (Moçambique)</title>
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1325,16 +1325,990 @@
       .topbar-left { display: none; }
       .topbar-title { position: static; transform: none; }
     }
+  
+    /* ==================== SISTEMA DE VISTAS (SPA VIEWS) ==================== */
+    .app-view {
+      display: none;
+      animation: fadeInView 0.28s ease-in-out;
+    }
+    .app-view.active {
+      display: block;
+    }
+    @keyframes fadeInView {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Topbar Navegação & Identidade */
+    .topbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      color: #FFFFFF;
+      user-select: none;
+    }
+    .topbar-brand-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, #4285F4 0%, #34A853 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(66, 133, 244, 0.35);
+    }
+    .topbar-brand-icon svg {
+      width: 18px;
+      height: 18px;
+      color: #FFFFFF;
+    }
+    .topbar-brand-name {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #FFFFFF;
+    }
+    .topbar-brand-name span {
+      color: #8AB4F8;
+      font-weight: 500;
+      font-size: 13px;
+      margin-left: 4px;
+    }
+
+    .topbar-nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-left: 20px;
+    }
+    .topbar-nav-link {
+      background: transparent;
+      border: none;
+      color: #9AA0A6;
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 500;
+      padding: 7px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .topbar-nav-link:hover {
+      color: #FFFFFF;
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .topbar-nav-link.active {
+      color: #FFFFFF;
+      background: rgba(255, 255, 255, 0.14);
+      font-weight: 600;
+    }
+
+    /* Topbar Auth Area */
+    .topbar-auth-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn-topbar-login {
+      background: #4285F4;
+      color: #FFFFFF;
+      border: none;
+      padding: 7px 16px;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all var(--transition-fast);
+    }
+    .btn-topbar-login:hover {
+      background: #3367D6;
+      box-shadow: 0 2px 8px rgba(66, 133, 244, 0.4);
+      transform: translateY(-1px);
+    }
+    .topbar-user-badge {
+      display: none;
+      align-items: center;
+      gap: 9px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      padding: 4px 12px 4px 5px;
+    }
+    .topbar-user-badge.logged-in {
+      display: flex;
+    }
+    .topbar-user-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #EA4335, #FBBC05);
+      color: #FFFFFF;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-transform: uppercase;
+    }
+    .topbar-user-info {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+    }
+    .topbar-user-name {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #E8EAED;
+    }
+    .topbar-user-role {
+      font-size: 10.5px;
+      color: #9AA0A6;
+    }
+    .btn-topbar-logout {
+      background: transparent;
+      border: none;
+      color: #9AA0A6;
+      cursor: pointer;
+      padding: 3px 6px;
+      border-radius: 6px;
+      font-size: 12px;
+      margin-left: 2px;
+      transition: color var(--transition-fast);
+      display: inline-flex;
+      align-items: center;
+    }
+    .btn-topbar-logout:hover {
+      color: #EA4335;
+      background: rgba(234, 67, 53, 0.12);
+    }
+
+    /* ==================== PÁGINA INICIAL (LANDING PAGE) ==================== */
+    .landing-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px 80px;
+    }
+
+    /* Hero Principal */
+    .landing-hero {
+      text-align: center;
+      padding: 48px 16px 40px;
+      position: relative;
+    }
+    .landing-pill-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #1A73E8;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      margin-bottom: 24px;
+    }
+    .landing-pill-tag .pill-pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #34A853;
+      box-shadow: 0 0 0 3px rgba(52, 168, 83, 0.2);
+    }
+    .landing-title {
+      font-size: 46px;
+      font-weight: 800;
+      line-height: 1.18;
+      color: #1A1A1A;
+      letter-spacing: -0.03em;
+      max-width: 880px;
+      margin: 0 auto 20px;
+    }
+    .landing-title .gradient-text {
+      background: linear-gradient(135deg, #1A73E8 0%, #34A853 50%, #FBBC04 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .landing-subtitle {
+      font-size: 18.5px;
+      line-height: 1.6;
+      color: #555555;
+      max-width: 720px;
+      margin: 0 auto 36px;
+      font-weight: 400;
+    }
+    .landing-cta-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 30px;
+    }
+    .btn-landing-primary {
+      background: #1A1A1A;
+      color: #FFFFFF;
+      padding: 14px 28px;
+      border-radius: 999px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+      transition: all var(--transition-fast);
+      text-decoration: none;
+    }
+    .btn-landing-primary:hover {
+      background: #000000;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.22);
+    }
+    .btn-landing-secondary {
+      background: #FFFFFF;
+      color: #1A1A1A;
+      padding: 14px 28px;
+      border-radius: 999px;
+      font-size: 16px;
+      font-weight: 600;
+      border: 1px solid var(--border-input);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+      transition: all var(--transition-fast);
+    }
+    .btn-landing-secondary:hover {
+      background: #F8F9FA;
+      border-color: #BDBDBD;
+      transform: translateY(-2px);
+    }
+    .landing-trust-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      color: #777777;
+      font-size: 13.5px;
+      font-weight: 500;
+    }
+    .landing-trust-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Painel Ilustrativo Interativo (Preview Card) */
+    .landing-preview-card {
+      background: #FFFFFF;
+      border-radius: 20px;
+      border: 1px solid var(--border-light);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.06), 0 2px 10px rgba(0,0,0,0.02);
+      padding: 24px;
+      margin: 40px auto 70px;
+      max-width: 1060px;
+      position: relative;
+      overflow: hidden;
+    }
+    .preview-browser-dots {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 18px;
+    }
+    .preview-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: #E0E0E0;
+    }
+    .preview-dot.red { background: #EA4335; }
+    .preview-dot.yellow { background: #FBBC05; }
+    .preview-dot.green { background: #34A853; }
+
+    .preview-grid-mockup {
+      display: grid;
+      grid-template-columns: 310px 1fr;
+      gap: 20px;
+      background: #F8F9FA;
+      padding: 18px;
+      border-radius: 14px;
+    }
+    .mock-agent-panel {
+      background: #FFFFFF;
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid var(--border-light);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .mock-tag {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #1A73E8;
+    }
+    .mock-speech {
+      background: #EFF6FF;
+      border-left: 3px solid #1A73E8;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 12.5px;
+      line-height: 1.45;
+      color: #1E3A8A;
+    }
+    .mock-chips {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .mock-chip {
+      background: #F1F3F4;
+      font-size: 11px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      color: #3C4043;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .mock-dashboard {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .mock-kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    .mock-kpi {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+    .mock-kpi-label { font-size: 11px; color: #888; text-transform: uppercase; }
+    .mock-kpi-val { font-size: 16px; font-weight: 700; color: #1A1A1A; margin-top: 2px; }
+    .mock-chart-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .mock-chart-box {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      padding: 14px;
+      min-height: 130px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .mock-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      height: 80px;
+      padding-top: 10px;
+    }
+    .mock-bar {
+      flex: 1;
+      border-radius: 4px 4px 0 0;
+      background: linear-gradient(to top, #4285F4, #8AB4F8);
+    }
+
+    /* Seção de Funcionalidades */
+    .landing-section-heading {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .landing-section-tag {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1A73E8;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+      display: inline-block;
+    }
+    .landing-section-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: #1A1A1A;
+      letter-spacing: -0.02em;
+    }
+    .landing-section-subtitle {
+      font-size: 16px;
+      color: #666;
+      max-width: 600px;
+      margin: 10px auto 0;
+    }
+
+    .landing-features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-bottom: 80px;
+    }
+    .feature-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: var(--shadow-card);
+      transition: all var(--transition-fast);
+      display: flex;
+      flex-direction: column;
+    }
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.06);
+      border-color: #D2D2D2;
+    }
+    .feature-icon-wrapper {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .feature-icon-blue { background: #E8F0FE; color: #1A73E8; }
+    .feature-icon-green { background: #E6F4EA; color: #137333; }
+    .feature-icon-yellow { background: #FEF7E0; color: #B06000; }
+    .feature-icon-red { background: #FCE8E6; color: #C5221F; }
+    .feature-icon-purple { background: #F3E8FD; color: #8430CE; }
+    .feature-icon-teal { background: #E0F2F1; color: #00796B; }
+
+    .feature-icon-wrapper svg {
+      width: 24px;
+      height: 24px;
+    }
+    .feature-card-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1A1A1A;
+      margin-bottom: 10px;
+    }
+    .feature-card-desc {
+      font-size: 14.5px;
+      line-height: 1.55;
+      color: #666666;
+    }
+
+    /* Como Funciona em 3 Passos */
+    .landing-steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-bottom: 80px;
+      position: relative;
+    }
+    .step-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 18px;
+      padding: 30px;
+      position: relative;
+    }
+    .step-number-badge {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #1A1A1A;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 16px;
+      margin-bottom: 18px;
+    }
+    .step-card-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #1A1A1A;
+      margin-bottom: 8px;
+    }
+    .step-card-desc {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.5;
+    }
+
+    /* Banner CTA Final da Landing */
+    .landing-cta-box {
+      background: linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%);
+      border-radius: 24px;
+      padding: 56px 40px;
+      color: #FFFFFF;
+      text-align: center;
+      margin-bottom: 60px;
+      box-shadow: 0 16px 36px rgba(0,0,0,0.18);
+    }
+    .landing-cta-title {
+      font-size: 34px;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+    .landing-cta-subtitle {
+      font-size: 16.5px;
+      color: #BDBDBD;
+      max-width: 600px;
+      margin: 0 auto 30px;
+      line-height: 1.6;
+    }
+
+    /* Footer da Landing */
+    .landing-footer {
+      border-top: 1px solid var(--border-light);
+      padding-top: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #888888;
+      font-size: 13.5px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .footer-links {
+      display: flex;
+      gap: 20px;
+    }
+    .footer-links a {
+      color: #666;
+      text-decoration: none;
+      transition: color var(--transition-fast);
+    }
+    .footer-links a:hover {
+      color: #1A73E8;
+    }
+
+    /* ==================== TELA DE AUTENTICAÇÃO (LOGIN & REGISTO) ==================== */
+    .auth-page-container {
+      min-height: calc(100vh - 56px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      background: radial-gradient(circle at 50% 20%, #FFFFFF 0%, #F1F0EC 100%);
+    }
+    .auth-card {
+      background: #FFFFFF;
+      width: 100%;
+      max-width: 480px;
+      border-radius: 24px;
+      border: 1px solid var(--border-light);
+      box-shadow: 0 20px 48px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.02);
+      padding: 38px 36px;
+      animation: authCardEnter 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes authCardEnter {
+      from { opacity: 0; transform: scale(0.96) translateY(12px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .auth-card-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .auth-brand-badge {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #4285F4 0%, #34A853 100%);
+      color: #FFFFFF;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 12px rgba(66, 133, 244, 0.35);
+    }
+    .auth-brand-badge svg {
+      width: 26px;
+      height: 26px;
+    }
+    .auth-card-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1A1A1A;
+      margin-bottom: 6px;
+    }
+    .auth-card-sub {
+      font-size: 14px;
+      color: #666;
+    }
+
+    /* Abas Login / Registo */
+    .auth-tabs-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: #F1F3F4;
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 24px;
+    }
+    .auth-tab-btn {
+      background: transparent;
+      border: none;
+      padding: 9px 0;
+      border-radius: 9px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      color: #5F6368;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .auth-tab-btn.active {
+      background: #FFFFFF;
+      color: #1A1A1A;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    /* Formulário */
+    .auth-form-group {
+      margin-bottom: 18px;
+    }
+    .auth-label {
+      display: block;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #333333;
+      margin-bottom: 6px;
+    }
+    .auth-input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .auth-input-icon {
+      position: absolute;
+      left: 14px;
+      color: #888888;
+      width: 18px;
+      height: 18px;
+      pointer-events: none;
+    }
+    .auth-input {
+      width: 100%;
+      height: 48px;
+      border: 1px solid var(--border-input);
+      border-radius: 12px;
+      padding: 0 14px 0 44px;
+      font-family: inherit;
+      font-size: 14.5px;
+      color: #1A1A1A;
+      background: #FAFAFA;
+      transition: all var(--transition-fast);
+      outline: none;
+    }
+    .auth-input:focus {
+      border-color: var(--accent-blue);
+      background: #FFFFFF;
+      box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.15);
+    }
+    .auth-pwd-toggle {
+      position: absolute;
+      right: 14px;
+      background: transparent;
+      border: none;
+      color: #888;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+    .auth-pwd-toggle:hover { color: #333; }
+
+    .auth-row-options {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 22px;
+      font-size: 13.5px;
+    }
+    .auth-remember-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: #555;
+      cursor: pointer;
+    }
+    .auth-remember-label input {
+      accent-color: var(--accent-blue);
+    }
+    .auth-forgot-link {
+      color: var(--link-blue);
+      text-decoration: none;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .auth-forgot-link:hover { text-decoration: underline; }
+
+    .btn-auth-submit {
+      width: 100%;
+      height: 48px;
+      border-radius: 12px;
+      border: none;
+      background: #1A1A1A;
+      color: #FFFFFF;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all var(--transition-fast);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    }
+    .btn-auth-submit:hover {
+      background: #000000;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.18);
+    }
+
+    .auth-divider-text {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 20px 0;
+      color: #999;
+      font-size: 12.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .auth-divider-text::before,
+    .auth-divider-text::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--border-light);
+    }
+
+    .btn-demo-quick-login {
+      width: 100%;
+      height: 46px;
+      border-radius: 12px;
+      border: 1px solid #C2E7FF;
+      background: #E8F0FE;
+      color: #174EA6;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all var(--transition-fast);
+      margin-bottom: 10px;
+    }
+    .btn-demo-quick-login:hover {
+      background: #D2E3FC;
+      border-color: #AECBFA;
+      transform: translateY(-1px);
+    }
+
+    .auth-footer-help {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 13.5px;
+      color: #666;
+    }
+    .auth-footer-help a {
+      color: var(--link-blue);
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Responsividade */
+    @media (max-width: 992px) {
+      .landing-features-grid,
+      .landing-steps-grid {
+        grid-template-columns: 1fr;
+      }
+      .preview-grid-mockup {
+        grid-template-columns: 1fr;
+      }
+      .mock-kpi-row {
+        grid-template-columns: 1fr 1fr;
+      }
+      .landing-title {
+        font-size: 34px;
+      }
+      .topbar-nav {
+        display: none;
+      }
+    }
+
+  
+    /* Destaque para Acesso Fácil ao Login */
+    .btn-topbar-login {
+      background: #1A73E8 !important;
+      padding: 8px 18px !important;
+      font-size: 14px !important;
+      font-weight: 700 !important;
+      border-radius: 999px !important;
+      box-shadow: 0 2px 10px rgba(26, 115, 232, 0.4) !important;
+    }
+    .btn-topbar-login:hover {
+      background: #1557B0 !important;
+      transform: translateY(-1px);
+    }
+    .topbar-nav-link#navLoginBtn {
+      background: rgba(66, 133, 244, 0.15);
+      color: #8AB4F8;
+      font-weight: 600;
+    }
+    .topbar-nav-link#navLoginBtn:hover {
+      background: rgba(66, 133, 244, 0.28);
+      color: #FFFFFF;
+    }
+
+    /* Faixa de Acesso Rápido no Hero */
+    .login-quick-banner {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #FFFFFF;
+      border: 1px solid #D2E3FC;
+      border-radius: 999px;
+      padding: 8px 20px;
+      font-size: 13.5px;
+      color: #3C4043;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      margin-top: 14px;
+    }
+    .login-quick-banner .lqb-link {
+      color: #1A73E8;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    .login-quick-banner .lqb-link:hover {
+      color: #1557B0;
+    }
+
+    /* Faixa de Convite no Workspace */
+    .workspace-auth-prompt {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #E8F0FE;
+      border: 1px solid #C2E7FF;
+      border-radius: 12px;
+      padding: 12px 20px;
+      margin-bottom: 20px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .workspace-auth-prompt.hidden {
+      display: none;
+    }
+    .wap-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: #174EA6;
+      font-weight: 500;
+    }
+    .wap-btn {
+      background: #1A73E8;
+      color: #FFFFFF;
+      border: none;
+      padding: 7px 16px;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      white-space: nowrap;
+    }
+    .wap-btn:hover {
+      background: #1557B0;
+      transform: translateY(-1px);
+    }
+
   </style>
 </head>
 <body>
 
-  <!-- ==================== BARRA SUPERIOR FIXA ==================== -->
+  <!-- ==================== BARRA SUPERIOR FIXA MODERNA ==================== -->
   <header class="topbar">
-    <div class="topbar-left"></div>
-    <div class="topbar-title">AI Data Analyst</div>
+    <div class="topbar-left">
+      <a class="topbar-brand" id="brandLogoBtn" title="Ir para a Página Inicial">
+        <div class="topbar-brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 3v18h18"></path>
+            <path d="m19 9-5 5-4-4-3 3"></path>
+          </svg>
+        </div>
+        <div class="topbar-brand-name">Análise Automatizada <span>MZ</span></div>
+      </a>
+
+      <!-- Navegação SPA Principal -->
+      <nav class="topbar-nav">
+        <button type="button" class="topbar-nav-link active" id="navHomeBtn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          Início
+        </button>
+        <button type="button" class="topbar-nav-link" id="navWorkspaceBtn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18"></path><path d="M9 21V9"></path></svg>
+          Área de Análise
+        </button>
+        <button type="button" class="topbar-nav-link" id="navFeaturesBtn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          Funcionalidades
+        </button>
+        <button type="button" class="topbar-nav-link" id="navLoginBtn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+          Entrar / Login
+        </button>
+      </nav>
+    </div>
+
     <div class="topbar-actions">
-      <button class="topbar-btn remix-btn" id="btnRemix" title="Carregar exemplo e abrir análise">
+      <!-- Botão de Login (visível se deslogado) -->
+      <button type="button" class="btn-topbar-login" id="topbarLoginBtn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+        <span>Entrar</span>
+      </button>
+
+      <!-- Badge de Usuário Autenticado (visível quando logado) -->
+      <div class="topbar-user-badge" id="topbarUserBadge">
+        <div class="topbar-user-avatar" id="topbarUserAvatar">RC</div>
+        <div class="topbar-user-info">
+          <span class="topbar-user-name" id="topbarUserName">Rofina Cumbe</span>
+          <span class="topbar-user-role" id="topbarUserRole">Analista de Dados</span>
+        </div>
+        <button type="button" class="btn-topbar-logout" id="topbarLogoutBtn" title="Terminar Sessão">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        </button>
+      </div>
+
+      <button class="topbar-btn remix-btn" id="btnRemix" title="Carregar exemplo e abrir análise automatizada">
         <svg viewBox="0 0 24 24">
           <circle cx="6" cy="6" r="3"></circle>
           <circle cx="18" cy="6" r="3"></circle>
@@ -1342,15 +2316,15 @@
           <path d="M9 6h6"></path>
           <path d="M6 9v3a6 6 0 0 0 6 6h3"></path>
         </svg>
-        <span>Remix</span>
+        <span>Demonstração</span>
       </button>
-      <button class="topbar-btn" id="btnDevice" title="Alternar vista de ecrã">
+      <button class="topbar-btn" id="btnDevice" title="Alternar vista de ecrã (computador / telemóvel)">
         <svg viewBox="0 0 24 24">
           <rect x="2" y="4" width="14" height="12" rx="2"></rect>
           <path d="M2 19h14"></path>
           <rect x="18" y="8" width="4" height="11" rx="1"></rect>
         </svg>
-        <span>Device</span>
+        <span>Vista Ecrã</span>
       </button>
       <button class="topbar-btn icon-only" id="btnRefresh" title="Reiniciar área de trabalho">
         <svg viewBox="0 0 24 24">
@@ -1371,7 +2345,371 @@
     </div>
   </header>
 
-  <!-- ==================== BANNER DE TOPO (HERO GRADIENT) ==================== -->
+
+  <!-- ==================== VISTA 1: PÁGINA INICIAL (LANDING PAGE) ==================== -->
+  <div class="app-view active" id="viewHome">
+    <div class="landing-container">
+      
+      <!-- HERO PRINCIPAL -->
+      <section class="landing-hero">
+        <div class="landing-pill-tag">
+          <span class="pill-pulse"></span>
+          <span>Inteligência Artificial Analítica para Negócios &amp; Moçambique</span>
+        </div>
+
+        <h1 class="landing-title">
+          Transforme dados brutos em <span class="gradient-text">decisões estratégicas</span> com a Análise Automatizada
+        </h1>
+
+        <p class="landing-subtitle">
+          Carregue as suas tabelas CSV ou aponte para baldes na nuvem. O nosso Agente de IA analisa tendências, identifica anomalias e gera relatórios executivos prontos para apresentação.
+        </p>
+
+        <div class="landing-cta-row">
+          <button type="button" class="btn-landing-primary" id="heroStartBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+            <span>Iniciar Análise Agora</span>
+          </button>
+          <button type="button" class="btn-landing-secondary" id="heroSampleBtn">
+            <span>🇲🇿 Ver Demonstração com Vendas (MZ)</span>
+          </button>
+          <button type="button" class="btn-landing-primary" id="heroLoginBtn" style="background: #1A73E8; box-shadow: 0 4px 14px rgba(26, 115, 232, 0.35);">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+            <span>Entrar / Iniciar Sessão</span>
+          </button>
+        </div>
+
+        <!-- Faixa de Acesso Rápido ao Login -->
+        <div class="login-quick-banner" id="loginQuickBanner">
+          <span class="lqb-icon">🔐</span>
+          <span>Já tem conta ou deseja testar com 1 clique?</span>
+          <a class="lqb-link" id="linkQuickLogin">Aceder à Tela de Login &rarr;</a>
+        </div>
+
+        <div class="landing-trust-bar">
+          <div class="landing-trust-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34A853" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>100% no Navegador (Privacidade Total)</span>
+          </div>
+          <div class="landing-trust-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34A853" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Suporte a Moeda Metical (MT)</span>
+          </div>
+          <div class="landing-trust-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34A853" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Exportação em PDF &amp; JSON</span>
+          </div>
+          <div class="landing-trust-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34A853" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Chat Interativo com Agente IA</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- PREVIEW MOCKUP INTERATIVO -->
+      <section class="landing-preview-card">
+        <div class="preview-browser-dots">
+          <div class="preview-dot red"></div>
+          <div class="preview-dot yellow"></div>
+          <div class="preview-dot green"></div>
+        </div>
+
+        <div class="preview-grid-mockup">
+          <!-- Mockup Agente IA -->
+          <div class="mock-agent-panel">
+            <div class="mock-tag">Agente de Análise • Online</div>
+            <div class="mock-speech">
+              "Analisei <strong>48 registos</strong> de vendas em Moçambique. O produto líder é <strong>Arroz Nacional</strong> com receita de <strong>12.450.000 MT</strong>. Recomendo reforço logístico em Nampula e Maputo."
+            </div>
+            <div class="mock-chips">
+              <span class="mock-chip">🔍 Identificar anomalias e outliers</span>
+              <span class="mock-chip">📈 Quais as maiores províncias em receita?</span>
+              <span class="mock-chip">💡 Recomendações estratégicas de crescimento</span>
+            </div>
+          </div>
+
+          <!-- Mockup Dashboard -->
+          <div class="mock-dashboard">
+            <div class="mock-kpi-row">
+              <div class="mock-kpi">
+                <div class="mock-kpi-label">Receita Total</div>
+                <div class="mock-kpi-val">42.8M MT</div>
+              </div>
+              <div class="mock-kpi">
+                <div class="mock-kpi-label">Média por Venda</div>
+                <div class="mock-kpi-val">892.4K MT</div>
+              </div>
+              <div class="mock-kpi">
+                <div class="mock-kpi-label">Província Líder</div>
+                <div class="mock-kpi-val">Maputo</div>
+              </div>
+              <div class="mock-kpi">
+                <div class="mock-kpi-label">Valores Atípicos (Z)</div>
+                <div class="mock-kpi-val" style="color: #34A853;">0 Críticos</div>
+              </div>
+            </div>
+
+            <div class="mock-chart-row">
+              <div class="mock-chart-box">
+                <span style="font-size: 12px; font-weight: 600; color: #555;">Evolução Mensal (Tendência)</span>
+                <div class="mock-bars">
+                  <div class="mock-bar" style="height: 35%;"></div>
+                  <div class="mock-bar" style="height: 55%;"></div>
+                  <div class="mock-bar" style="height: 48%;"></div>
+                  <div class="mock-bar" style="height: 70%;"></div>
+                  <div class="mock-bar" style="height: 85%;"></div>
+                  <div class="mock-bar" style="height: 95%;"></div>
+                </div>
+              </div>
+              <div class="mock-chart-box">
+                <span style="font-size: 12px; font-weight: 600; color: #555;">Participação por Categoria</span>
+                <div class="mock-bars">
+                  <div class="mock-bar" style="height: 90%; background: #34A853;"></div>
+                  <div class="mock-bar" style="height: 72%; background: #4285F4;"></div>
+                  <div class="mock-bar" style="height: 60%; background: #FBBC05;"></div>
+                  <div class="mock-bar" style="height: 40%; background: #EA4335;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- GRADE DE FUNCIONALIDADES -->
+      <section class="landing-features-section" id="sectionFeatures">
+        <div class="landing-section-heading">
+          <span class="landing-section-tag">Recursos Avançados</span>
+          <h2 class="landing-section-title">Engenharia de Dados e IA ao seu Alcance</h2>
+          <p class="landing-section-subtitle">Desenvolvido especificamente para equipas comerciais, gestores de operações e analistas que precisam de rapidez.</p>
+        </div>
+
+        <div class="landing-features-grid">
+          <div class="feature-card">
+            <div class="feature-icon-wrapper feature-icon-blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            </div>
+            <h3 class="feature-card-title">Ingestão Rápida de CSV &amp; GCS</h3>
+            <p class="feature-card-desc">Arraste múltiplos ficheiros CSV com detecção automática de delimitadores vírgula ou ponto e vírgula, com suporte a grandes datasets na cloud via Google Cloud Storage.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon-wrapper feature-icon-green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            </div>
+            <h3 class="feature-card-title">Agente Analista Conversacional</h3>
+            <p class="feature-card-desc">Dialogue com os dados em português natural. Faça perguntas de acompanhamento sobre anomalias, correlações e projeções de vendas com respostas embasadas em estatística real.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon-wrapper feature-icon-yellow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            </div>
+            <h3 class="feature-card-title">Visualizações Interativas Chart.js</h3>
+            <p class="feature-card-desc">Gráficos de evolução temporal, rankings dinâmicos de categorias e dispersão geográfica por província calculados e renderizados na hora.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon-wrapper feature-icon-red">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            </div>
+            <h3 class="feature-card-title">Detecção de Outliers por Z-Score</h3>
+            <p class="feature-card-desc">Identifique automaticamente discrepâncias suspeitas, transações exorbitantes ou desvios estatísticos superiores a 1.7 desvios padrão para auditoria imediata.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon-wrapper feature-icon-purple">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+            </div>
+            <h3 class="feature-card-title">Relatórios PDF &amp; Exportação JSON</h3>
+            <p class="feature-card-desc">Gere dossiês executivos prontos para impressão ou partilha em PDF com cabeçalho limpo, além de ficheiro report.json para integração de APIs.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon-wrapper feature-icon-teal">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            </div>
+            <h3 class="feature-card-title">Segurança &amp; Privacidade Local</h3>
+            <p class="feature-card-desc">Os seus números sensíveis são processados diretamente na memória do navegador do seu computador, garantindo sigilo corporativo absoluto.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- COMO FUNCIONA EM 3 PASSOS -->
+      <section class="landing-section-heading">
+        <span class="landing-section-tag">Fluxo Simplificado</span>
+        <h2 class="landing-section-title">Como Funciona em 3 Passos</h2>
+      </section>
+
+      <div class="landing-steps-grid">
+        <div class="step-card">
+          <div class="step-number-badge">1</div>
+          <h3 class="step-card-title">Carregue a sua Tabela</h3>
+          <p class="step-card-desc">Arraste o seu ficheiro .CSV de vendas, estoque, finanças ou clientes, ou clique para carregar a nossa base de teste de Moçambique.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number-badge">2</div>
+          <h3 class="step-card-title">Defina a sua Questão</h3>
+          <p class="step-card-desc">Digite "faça análise geral" ou selecione chips rápidos sobre tendências, distribuição por província ou identificação de anomalias.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number-badge">3</div>
+          <h3 class="step-card-title">Obtenha Respostas &amp; Relatório</h3>
+          <p class="step-card-desc">O agente processa os cálculos em segundos, gera gráficos nítidos, resume conclusões e deixa o relatório pronto para download em PDF.</p>
+        </div>
+      </div>
+
+      <!-- BANNER CTA FINAL -->
+      <section class="landing-cta-box">
+        <h2 class="landing-cta-title">Pronto para elevar o nível das suas análises?</h2>
+        <p class="landing-cta-subtitle">Junte-se aos profissionais que tomam decisões fundamentadas em dados sem precisar de programar consultas complexas.</p>
+        <button type="button" class="btn-landing-primary" id="bottomCtaBtn" style="background: #FFFFFF; color: #1A1A1A;">
+          <span>Aceder ao Workspace de Análise</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+        </button>
+      </section>
+
+      <!-- FOOTER DA LANDING PAGE -->
+      <footer class="landing-footer">
+        <div>
+          <strong>Análise Automatizada Moçambique</strong> &copy; 2026. Todos os direitos reservados.
+        </div>
+        <div class="footer-links">
+          <a href="#" id="footerLinkHome">Início</a>
+          <a href="#" id="footerLinkWorkspace">Workspace</a>
+          <a href="#" id="footerLinkLogin">Login / Registo</a>
+          <a href="#" onclick="alert('Esta aplicação opera com processamento local no seu navegador.'); return false;">Termos de Privacidade</a>
+        </div>
+      </footer>
+
+    </div>
+  </div>
+
+  <!-- ==================== VISTA 2: TELA DE LOGIN & REGISTO ==================== -->
+  <div class="app-view" id="viewAuth">
+    <div class="auth-page-container">
+      <div class="auth-card">
+        
+        <div class="auth-card-header">
+          <div class="auth-brand-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v20"></path>
+              <path d="m17 5-5-3-5 3"></path>
+              <path d="m17 19-5 3-5-3"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </div>
+          <h2 class="auth-card-title" id="authTitleText">Aceder à Plataforma</h2>
+          <p class="auth-card-sub" id="authSubText">Inicie sessão para gerir os seus dados e guardar as análises de negócio.</p>
+        </div>
+
+        <!-- Abas Alternadoras: Entrar vs Criar Conta -->
+        <div class="auth-tabs-toggle">
+          <button type="button" class="auth-tab-btn active" id="tabBtnLogin">Entrar</button>
+          <button type="button" class="auth-tab-btn" id="tabBtnRegister">Criar Conta</button>
+        </div>
+
+        <!-- FORMULÁRIO 1: LOGIN -->
+        <form id="formLogin">
+          <div class="auth-form-group">
+            <label class="auth-label" for="loginEmail">Email Corporativo</label>
+            <div class="auth-input-wrapper">
+              <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+              <input type="email" id="loginEmail" class="auth-input" placeholder="ex: analista@empresa.co.mz" required autocomplete="email" />
+            </div>
+          </div>
+
+          <div class="auth-form-group">
+            <label class="auth-label" for="loginPassword">Palavra-passe</label>
+            <div class="auth-input-wrapper">
+              <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              <input type="password" id="loginPassword" class="auth-input" placeholder="Introduza a sua palavra-passe" required autocomplete="current-password" />
+              <button type="button" class="auth-pwd-toggle" id="toggleLoginPwd" title="Mostrar/ocultar senha">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="auth-row-options">
+            <label class="auth-remember-label">
+              <input type="checkbox" id="loginRemember" checked />
+              <span>Lembrar-me neste ecrã</span>
+            </label>
+            <a class="auth-forgot-link" id="linkForgotPassword">Esqueceu a senha?</a>
+          </div>
+
+          <button type="submit" class="btn-auth-submit" id="btnSubmitLogin">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+            <span>Iniciar Sessão</span>
+          </button>
+
+          <div class="auth-divider-text">Acesso Rápido de Teste</div>
+
+          <!-- BOTÃO DEMO DE 1 CLIQUE -->
+          <button type="button" class="btn-demo-quick-login" id="btnDemoQuickLogin">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            <span>Entrar com Conta de Teste (1-Clique)</span>
+          </button>
+        </form>
+
+        <!-- FORMULÁRIO 2: REGISTO (CRIAR CONTA) -->
+        <form id="formRegister" style="display: none;">
+          <div class="auth-form-group">
+            <label class="auth-label" for="regName">Nome Completo</label>
+            <div class="auth-input-wrapper">
+              <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              <input type="text" id="regName" class="auth-input" placeholder="ex: Rofina Cumbe" required />
+            </div>
+          </div>
+
+          <div class="auth-form-group">
+            <label class="auth-label" for="regEmail">Email Profissional</label>
+            <div class="auth-input-wrapper">
+              <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+              <input type="email" id="regEmail" class="auth-input" placeholder="ex: rofina@empresa.co.mz" required autocomplete="email" />
+            </div>
+          </div>
+
+          <div class="auth-form-group">
+            <label class="auth-label" for="regRole">Função / Cargo</label>
+            <div class="auth-input-wrapper">
+              <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+              <select id="regRole" class="auth-input" style="cursor: pointer;">
+                <option value="Analista de Dados">Analista de Dados / BI</option>
+                <option value="Gestor Comercial">Gestor(a) Comercial / Vendas</option>
+                <option value="Diretor Executivo">Diretor(a) Executivo(a) / C-Level</option>
+                <option value="Consultor de Negócios">Consultor(a) Estratégico(a)</option>
+                <option value="Engenheiro de Software">Engenheiro(a) de Sistemas</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="auth-form-group">
+            <label class="auth-label" for="regPassword">Criar Palavra-passe</label>
+            <div class="auth-input-wrapper">
+              <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              <input type="password" id="regPassword" class="auth-input" placeholder="Mínimo 6 caracteres" minlength="6" required />
+            </div>
+          </div>
+
+          <button type="submit" class="btn-auth-submit" id="btnSubmitRegister">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+            <span>Criar Minha Conta</span>
+          </button>
+        </form>
+
+        <div class="auth-footer-help">
+          <span id="authToggleHint">Ainda não tem conta?</span>
+          <a id="authToggleAction">Registe-se gratuitamente</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== VISTA 3: ÁREA DE TRABALHO DE ANÁLISE (WORKSPACE) ==================== -->
+  <div class="app-view" id="viewWorkspace">
+
+    <!-- ==================== BANNER DE TOPO (HERO GRADIENT) ==================== -->
   <div class="hero-banner" id="heroBanner">
     <div class="hero-band band-1"></div>
     <div class="hero-band band-2"></div>
@@ -1380,9 +2718,20 @@
 
   <!-- ==================== ÁREA DE CONTEÚDO PRINCIPAL ==================== -->
   <main class="workspace-wrapper" id="workspaceWrapper">
+    <!-- Banner de Convite ao Login no Workspace -->
+    <div class="workspace-auth-prompt" id="workspaceAuthPrompt">
+      <div class="wap-left">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        <span>Está a utilizar o modo visitante. Inicie sessão para guardar os seus relatórios e configurações personalizadas.</span>
+      </div>
+      <button type="button" class="wap-btn" id="wapLoginBtn">
+        Iniciar Sessão
+      </button>
+    </div>
+
     <div class="workspace-tag">
       <span class="workspace-dot"></span>
-      <span class="workspace-tag-text" id="uiWorkspaceTag">DATA ANALYST WORKSPACE</span>
+      <span class="workspace-tag-text" id="uiWorkspaceTag">ESPAÇO DE ANÁLISE AUTOMATIZADA</span>
     </div>
 
     <!-- ==================== ECRÃ 1: UPLOAD & PERGUNTA INICIAL ==================== -->
@@ -1391,7 +2740,7 @@
         <h1 class="hero-heading" id="uiHeroHeading">Pergunte tudo<br>sobre os seus dados</h1>
         <div class="hero-copy">
           <p class="hero-lead" id="uiHeroLead">
-            O AI Data Analyst oferece inteligência de dados interativa, análises avançadas e insights acionáveis para o seu negócio.
+            A Análise Automatizada oferece inteligência de dados interativa, análises avançadas e insights acionáveis para o seu negócio.
           </p>
           <p class="hero-sub" id="uiHeroSub">
             Carregue um ou mais ficheiros CSV, faça uma pergunta de negócio e deixe o agente analisá-los de forma autónoma.
@@ -1487,7 +2836,7 @@
 
       <!-- Botão Analisar -->
       <button type="button" id="analyzeBtn" class="analyze-btn" disabled>
-        Analyze
+        Analisar Dados
       </button>
     </div>
 
@@ -1497,7 +2846,7 @@
       <!-- Barra de Topo: Dataset + Pergunta + Botão "Nova análise" -->
       <div class="top-inquiry-bar">
         <div class="top-inquiry-left">
-          <span class="top-dataset-label" id="topBarDatasetName">Dataset: vendas</span>
+          <span class="top-dataset-label" id="topBarDatasetName">Conjunto de dados: vendas</span>
           <div class="top-inquiry-text" id="topBarInquiryText">faça análise geral</div>
         </div>
         <button type="button" class="new-analysis-btn" id="btnNewAnalysis">
@@ -1510,15 +2859,15 @@
 
         <!-- COLUNA ESQUERDA: ANALYTICS AGENT -->
         <aside class="agent-panel-card">
-          <div class="agent-panel-header">Analytics Agent</div>
+          <div class="agent-panel-header">Agente de Análise Automatizada</div>
 
           <div class="agent-tabs-row">
             <button type="button" class="agent-tab-btn active" id="agentTabChat">
-              <span>Chat</span>
+              <span>Conversa</span>
               <span class="tab-count-badge" id="chatCountBadge">1</span>
             </button>
             <button type="button" class="agent-tab-btn" id="agentTabActivity">
-              <span>Agent Activity</span>
+              <span>Atividade do Agente</span>
             </button>
           </div>
 
@@ -1603,15 +2952,15 @@
 
               <div class="report-title-row">
                 <div>
-                  <h2 class="report-main-heading" id="reportMainHeading">Analysis: vendas</h2>
+                  <h2 class="report-main-heading" id="reportMainHeading">Análise: vendas</h2>
                   <p class="report-inquiry-sub">
-                    <strong>Inquiry:</strong> <span id="reportInquirySpan">faca analise geral</span>
+                    <strong>Pergunta:</strong> <span id="reportInquirySpan">faca analise geral</span>
                   </p>
                 </div>
 
                 <div class="report-export-btns">
                   <button type="button" class="btn-download-pdf" id="btnDownloadPDF">
-                    Download PDF
+                    Descarregar PDF
                   </button>
                   <button type="button" class="btn-download-json" id="btnDownloadJSON">
                     JSON
@@ -1622,21 +2971,21 @@
               <!-- 5 Sub-Abas: Overview, Visualizations 3, Data Tables 5, Insights & Actions, Print Preview -->
               <div class="report-subtabs" role="tablist">
                 <button type="button" class="report-subtab active" data-pane="paneOverview">
-                  <span>Overview</span>
+                  <span>Visão Geral</span>
                 </button>
                 <button type="button" class="report-subtab" data-pane="paneVisualizations">
-                  <span>Visualizations</span>
+                  <span>Visualizações</span>
                   <span class="subtab-badge">3</span>
                 </button>
                 <button type="button" class="report-subtab" data-pane="paneDataTables">
-                  <span>Data Tables</span>
+                  <span>Tabelas de Dados</span>
                   <span class="subtab-badge" id="tablesCountBadge">5</span>
                 </button>
                 <button type="button" class="report-subtab" data-pane="paneInsights">
                   <span>Insights &amp; Actions</span>
                 </button>
                 <button type="button" class="report-subtab" data-pane="panePrintPreview">
-                  <span>Print Preview</span>
+                  <span>Pré-visualização</span>
                 </button>
               </div>
             </div>
@@ -1769,8 +3118,17 @@
     </section>
   </main>
 
+  </div>
+
   <!-- ==================== BOTÕES FLUTUANTES LATERAIS ==================== -->
   <aside class="floating-controls" aria-label="Ferramentas rápidas">
+    <button class="fab-circle" id="fabLoginQuick" title="Aceder à Tela de Login" style="background: #1A73E8; color: #FFFFFF;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+        <polyline points="10 17 15 12 10 7"></polyline>
+        <line x1="15" y1="12" x2="3" y2="12"></line>
+      </svg>
+    </button>
     <button class="fab-circle" id="fabTranslate" title="Alternar Idioma">
       <svg viewBox="0 0 24 24">
         <path d="m5 8 6 6"></path>
@@ -1801,6 +3159,299 @@
 
   <!-- ==================== LÓGICA DA APLICAÇÃO ==================== -->
   <script>
+
+    // ==================== SISTEMA DE ROTEAMENTO & NAVEGAÇÃO SPA ====================
+    const viewHome = document.getElementById('viewHome');
+    const viewAuth = document.getElementById('viewAuth');
+    const viewWorkspace = document.getElementById('viewWorkspace');
+
+    const navHomeBtn = document.getElementById('navHomeBtn');
+    const navWorkspaceBtn = document.getElementById('navWorkspaceBtn');
+    const navFeaturesBtn = document.getElementById('navFeaturesBtn');
+    const brandLogoBtn = document.getElementById('brandLogoBtn');
+
+    function showView(viewName) {
+      viewHome.classList.remove('active');
+      viewAuth.classList.remove('active');
+      viewWorkspace.classList.remove('active');
+
+      navHomeBtn.classList.remove('active');
+      navWorkspaceBtn.classList.remove('active');
+      navFeaturesBtn.classList.remove('active');
+
+      if (viewName === 'home') {
+        viewHome.classList.add('active');
+        navHomeBtn.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (viewName === 'auth') {
+        viewAuth.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (viewName === 'workspace') {
+        viewWorkspace.classList.add('active');
+        navWorkspaceBtn.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    navHomeBtn.addEventListener('click', () => showView('home'));
+    navWorkspaceBtn.addEventListener('click', () => showView('workspace'));
+    brandLogoBtn.addEventListener('click', () => showView('home'));
+
+    navFeaturesBtn.addEventListener('click', () => {
+      showView('home');
+      setTimeout(() => {
+        const featSec = document.getElementById('sectionFeatures');
+        if (featSec) featSec.scrollIntoView({ behavior: 'smooth' });
+      }, 50);
+    });
+
+    // Botões da Landing Page
+    document.getElementById('heroStartBtn').addEventListener('click', () => showView('workspace'));
+    document.getElementById('heroLoginBtn').addEventListener('click', () => {
+      if (currentUser) {
+        showView('workspace');
+      } else {
+        showView('auth');
+      }
+    });
+    document.getElementById('heroSampleBtn').addEventListener('click', () => {
+      showView('workspace');
+      if (datasets.length === 0) {
+        loadSampleBtn.click();
+      }
+      setTimeout(() => {
+        buildAnalysisInterface();
+      }, 100);
+    });
+    document.getElementById('bottomCtaBtn').addEventListener('click', () => showView('workspace'));
+    document.getElementById('footerLinkHome').addEventListener('click', (e) => { e.preventDefault(); showView('home'); });
+    document.getElementById('footerLinkWorkspace').addEventListener('click', (e) => { e.preventDefault(); showView('workspace'); });
+    document.getElementById('footerLinkLogin').addEventListener('click', (e) => { e.preventDefault(); showView('auth'); });
+
+    // ==================== GESTÃO DE AUTENTICAÇÃO (LOGIN & REGISTO) ====================
+    let currentUser = null;
+
+    const topbarLoginBtn = document.getElementById('topbarLoginBtn');
+    const topbarUserBadge = document.getElementById('topbarUserBadge');
+    const topbarUserAvatar = document.getElementById('topbarUserAvatar');
+    const topbarUserName = document.getElementById('topbarUserName');
+    const topbarUserRole = document.getElementById('topbarUserRole');
+    const topbarLogoutBtn = document.getElementById('topbarLogoutBtn');
+
+    const tabBtnLogin = document.getElementById('tabBtnLogin');
+    const tabBtnRegister = document.getElementById('tabBtnRegister');
+    const formLogin = document.getElementById('formLogin');
+    const formRegister = document.getElementById('formRegister');
+    const authTitleText = document.getElementById('authTitleText');
+    const authSubText = document.getElementById('authSubText');
+    const authToggleHint = document.getElementById('authToggleHint');
+    const authToggleAction = document.getElementById('authToggleAction');
+
+    function updateAuthUI() {
+      if (currentUser) {
+        topbarLoginBtn.style.display = 'none';
+        topbarUserBadge.classList.add('logged-in');
+        topbarUserName.textContent = currentUser.name;
+        topbarUserRole.textContent = currentUser.role || 'Data Analyst';
+        
+        // Iniciais para o avatar
+        const parts = currentUser.name.trim().split(' ');
+        const initials = parts.length > 1 ? (parts[0][0] + parts[parts.length - 1][0]) : (currentUser.name.slice(0, 2));
+        topbarUserAvatar.textContent = initials.toUpperCase();
+      } else {
+        topbarLoginBtn.style.display = 'inline-flex';
+        topbarUserBadge.classList.remove('logged-in');
+      }
+    }
+
+    function setCurrentUser(user, persist = true) {
+      currentUser = user;
+      if (persist && user) {
+        localStorage.setItem('ai_analyst_user', JSON.stringify(user));
+      } else if (!user) {
+        localStorage.removeItem('ai_analyst_user');
+      }
+      updateAuthUI(); checkWorkspacePrompt(); 
+    // Suporte a Acesso Rápido ao Login em múltiplos pontos
+    const navLoginBtn = document.getElementById('navLoginBtn');
+    if (navLoginBtn) navLoginBtn.addEventListener('click', () => showView('auth'));
+
+    const linkQuickLogin = document.getElementById('linkQuickLogin');
+    if (linkQuickLogin) linkQuickLogin.addEventListener('click', () => showView('auth'));
+
+    const wapLoginBtn = document.getElementById('wapLoginBtn');
+    if (wapLoginBtn) wapLoginBtn.addEventListener('click', () => showView('auth'));
+
+    const fabLoginQuick = document.getElementById('fabLoginQuick');
+    if (fabLoginQuick) fabLoginQuick.addEventListener('click', () => showView('auth'));
+
+    // Atualizar visibilidade do banner no Workspace ao mudar de utilizador
+    function checkWorkspacePrompt() {
+      const prompt = document.getElementById('workspaceAuthPrompt');
+      if (prompt) {
+        prompt.classList.toggle('hidden', !!currentUser);
+      }
+      if (navLoginBtn) {
+        navLoginBtn.style.display = currentUser ? 'none' : 'inline-flex';
+      }
+      if (fabLoginQuick) {
+        fabLoginQuick.title = currentUser ? `Sessão ativa: ${currentUser.name}` : 'Aceder à Tela de Login';
+      }
+    }
+    
+    // Suporte a abrir direto via URL (#login, #entrar, #auth, #workspace)
+    function handleHashRouting() {
+      const hash = (window.location.hash || '').toLowerCase();
+      if (hash === '#login' || hash === '#entrar' || hash === '#auth') {
+        showView('auth');
+      } else if (hash === '#workspace' || hash === '#analise') {
+        showView('workspace');
+      } else if (hash === '#home' || hash === '#inicio') {
+        showView('home');
+      }
+    }
+    window.addEventListener('hashchange', handleHashRouting);
+    handleHashRouting();
+
+    }
+
+    // Inicialização da sessão
+    try {
+      const stored = localStorage.getItem('ai_analyst_user');
+      if (stored) {
+        currentUser = JSON.parse(stored);
+      }
+    } catch (e) {
+      currentUser = null;
+    }
+    updateAuthUI();
+
+    // Alternar Abas Login / Registo
+    function setAuthTab(tab) {
+      if (tab === 'login') {
+        tabBtnLogin.classList.add('active');
+        tabBtnRegister.classList.remove('active');
+        formLogin.style.display = 'block';
+        formRegister.style.display = 'none';
+        authTitleText.textContent = 'Aceder à Plataforma';
+        authSubText.textContent = 'Inicie sessão para gerir os seus dados e guardar as análises.';
+        authToggleHint.textContent = 'Ainda não tem conta? ';
+        authToggleAction.textContent = 'Registe-se gratuitamente';
+      } else {
+        tabBtnRegister.classList.add('active');
+        tabBtnLogin.classList.remove('active');
+        formLogin.style.display = 'none';
+        formRegister.style.display = 'block';
+        authTitleText.textContent = 'Criar Nova Conta';
+        authSubText.textContent = 'Cadastre-se para desbloquear todo o poder do Agente de IA.';
+        authToggleHint.textContent = 'Já possui conta? ';
+        authToggleAction.textContent = 'Iniciar sessão';
+      }
+    }
+
+    tabBtnLogin.addEventListener('click', () => setAuthTab('login'));
+    tabBtnRegister.addEventListener('click', () => setAuthTab('register'));
+    authToggleAction.addEventListener('click', () => {
+      if (tabBtnLogin.classList.contains('active')) {
+        setAuthTab('register');
+      } else {
+        setAuthTab('login');
+      }
+    });
+
+    topbarLoginBtn.addEventListener('click', () => showView('auth'));
+    topbarLogoutBtn.addEventListener('click', () => {
+      setCurrentUser(null);
+      showToast('Sessão terminada.');
+      showView('home');
+    });
+
+    // Alternar visibilidade de palavra-passe
+    const toggleLoginPwd = document.getElementById('toggleLoginPwd');
+    const loginPassword = document.getElementById('loginPassword');
+    toggleLoginPwd.addEventListener('click', () => {
+      const isPwd = loginPassword.type === 'password';
+      loginPassword.type = isPwd ? 'text' : 'password';
+    });
+
+    // Submissão de Login
+    formLogin.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const remember = document.getElementById('loginRemember').checked;
+
+      if (!email || !password) {
+        showToast('Por favor, preencha o email e a palavra-passe.');
+        return;
+      }
+
+      // Verificar se é usuário cadastrado ou simular
+      let registeredUsers = [];
+      try {
+        registeredUsers = JSON.parse(localStorage.getItem('ai_analyst_registered_users') || '[]');
+      } catch (err) {}
+
+      const found = registeredUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
+      const userName = found ? found.name : email.split('@')[0].replace(/[._]/g, ' ');
+      const userRole = found ? found.role : 'Data Analyst';
+
+      const userObj = {
+        email,
+        name: userName.charAt(0).toUpperCase() + userName.slice(1),
+        role: userRole
+      };
+
+      setCurrentUser(userObj, remember);
+      showToast(`Bem-vindo de volta, ${userObj.name}!`);
+      showView('workspace');
+    });
+
+    // Login Rápido Demo (1-Clique)
+    document.getElementById('btnDemoQuickLogin').addEventListener('click', () => {
+      const demoUser = {
+        name: 'Rofina Cumbe',
+        email: 'analista@empresa.co.mz',
+        role: 'Analista de Dados Sénior'
+      };
+      setCurrentUser(demoUser, true);
+      showToast('Sessão de demonstração iniciada com sucesso!');
+      showView('workspace');
+    });
+
+    // Submissão de Registo
+    formRegister.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('regName').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const role = document.getElementById('regRole').value;
+      const password = document.getElementById('regPassword').value;
+
+      if (!name || !email || !password) {
+        showToast('Por favor, preencha todos os campos obrigatórios.');
+        return;
+      }
+
+      const newUser = { name, email, role };
+
+      try {
+        let registeredUsers = JSON.parse(localStorage.getItem('ai_analyst_registered_users') || '[]');
+        registeredUsers = registeredUsers.filter(u => u.email.toLowerCase() !== email.toLowerCase());
+        registeredUsers.push(newUser);
+        localStorage.setItem('ai_analyst_registered_users', JSON.stringify(registeredUsers));
+      } catch (err) {}
+
+      setCurrentUser(newUser, true);
+      showToast(`Conta criada com sucesso! Bem-vindo(a), ${name}.`);
+      showView('workspace');
+    });
+
+    // Link Esqueceu a Senha
+    document.getElementById('linkForgotPassword').addEventListener('click', () => {
+      const email = document.getElementById('loginEmail').value.trim() || 'o seu email corporativo';
+      alert(`Um link de recuperação seguro seria enviado para: ${email}. Na demonstração, pode utilizar o botão "Entrar com Conta de Teste" para acesso imediato.`);
+    });
+
     const datasets = [];
     let chartInstances = [];
     let latestReportData = null;
@@ -2000,7 +3651,7 @@
         questionInput.value = 'faca analise geral';
       }
       renderFileList();
-      showToast('Dataset "vendas.csv" carregado! Clique em "Analyze".');
+      showToast('Conjunto de dados "vendas.csv" carregado! Clique em "Analisar Dados".');
     });
 
     gcsInput.addEventListener('input', () => {
@@ -2163,12 +3814,12 @@
       };
 
       // 1. Preencher Barra de Topo e Cabeçalho do Relatório
-      document.getElementById('topBarDatasetName').textContent = `Dataset: ${dsName}`;
+      document.getElementById('topBarDatasetName').textContent = `Conjunto de dados: ${dsName}`;
       document.getElementById('topBarInquiryText').textContent = inquiry;
 
       document.getElementById('reportDatasetBadge').textContent = dsName.toUpperCase();
       document.getElementById('reportDateText').textContent = todayStr;
-      document.getElementById('reportMainHeading').textContent = `Analysis: ${dsName}`;
+      document.getElementById('reportMainHeading').textContent = `Análise: ${dsName}`;
       document.getElementById('reportInquirySpan').textContent = inquiry;
       document.getElementById('tablesCountBadge').textContent = String(numericCols.length + 1);
 
@@ -2436,7 +4087,7 @@
       handleAgentFollowup(val);
     });
 
-    // Botões Download PDF e JSON
+    // Botões Descarregar PDF e JSON
     document.getElementById('btnDownloadPDF').addEventListener('click', () => {
       window.print();
     });
@@ -2450,7 +4101,7 @@
       a.download = `report_${latestReportData.dataset}.json`;
       a.click();
       URL.revokeObjectURL(url);
-      showToast('Ficheiro report.json transferido!');
+      showToast('Relatório report.json descarregado com sucesso!');
     });
 
     // Controlos da Barra Superior
@@ -2474,15 +4125,17 @@
     document.getElementById('btnDevice').addEventListener('click', () => {
       mobilePreview = !mobilePreview;
       document.getElementById('workspaceWrapper').style.maxWidth = mobilePreview ? '430px' : '1440px';
-      showToast(mobilePreview ? 'Vista mobile activada' : 'Vista desktop activada');
+      showToast(mobilePreview ? 'Vista de telemóvel ativada' : 'Vista de computador ativada');
     });
 
     document.getElementById('btnRemix').addEventListener('click', () => {
+      showView('workspace');
       if (datasets.length === 0) loadSampleBtn.click();
       buildAnalysisInterface();
     });
 
     document.getElementById('fabMascot').addEventListener('click', () => {
+      showView('workspace');
       if (datasets.length === 0) loadSampleBtn.click();
       buildAnalysisInterface();
     });
