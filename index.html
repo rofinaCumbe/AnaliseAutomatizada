@@ -337,7 +337,8 @@
       height: 185px;
       border-top-right-radius: 18px;
       overflow: hidden;
-      background: linear-gradient(90deg, #E8392B 0%, #B0449A 36%, #8B5CC6 68%, #4A7BEA 100%);
+      background: linear-gradient(135deg, #1A73E8 0%, #34A853 52%, #FBBC04 100%);
+      box-shadow: 0 4px 20px rgba(26, 115, 232, 0.12);
       display: flex;
       flex-direction: column;
     }
@@ -356,9 +357,9 @@
     .hero-band.band-3 {
       background: linear-gradient(
         90deg,
-        rgba(255, 225, 222, 0.44) 0%,
-        rgba(240, 215, 238, 0.44) 50%,
-        rgba(218, 230, 255, 0.46) 100%
+        rgba(255, 255, 255, 0.28) 0%,
+        rgba(255, 255, 255, 0.12) 50%,
+        rgba(255, 255, 255, 0.25) 100%
       );
     }
 
@@ -378,19 +379,20 @@
     }
 
     .workspace-dot {
-      width: 11px;
-      height: 11px;
+      width: 9px;
+      height: 9px;
       border-radius: 50%;
-      background-color: var(--accent-blue);
+      background-color: #34A853;
+      box-shadow: 0 0 0 3px rgba(52, 168, 83, 0.22);
       flex-shrink: 0;
     }
 
     .workspace-tag-text {
       font-family: "JetBrains Mono", monospace;
-      font-size: 13.5px;
-      font-weight: 500;
-      color: #666666;
-      letter-spacing: 0.18em;
+      font-size: 13px;
+      font-weight: 600;
+      color: #1A73E8;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
     }
 
@@ -460,14 +462,15 @@
       width: 28px;
       height: 28px;
       border-radius: 50%;
-      background-color: #1A1A1A;
+      background: linear-gradient(135deg, #1A73E8 0%, #34A853 100%);
       color: #FFFFFF;
-      font-size: 14px;
-      font-weight: 600;
+      font-size: 13.5px;
+      font-weight: 700;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(26, 115, 232, 0.28);
     }
 
     .card-title {
@@ -514,22 +517,25 @@
     }
 
     .sample-btn {
-      background: #F3F4F6;
-      border: 1px solid #E2E4E8;
-      color: #333333;
+      background: #EFF6FF;
+      border: 1px solid #D2E3FC;
+      color: #1A73E8;
       font-family: inherit;
       font-size: 13.5px;
-      font-weight: 500;
-      padding: 7px 16px;
+      font-weight: 600;
+      padding: 8px 18px;
       border-radius: 999px;
       cursor: pointer;
       transition: all var(--transition-fast);
+      box-shadow: 0 1px 3px rgba(26, 115, 232, 0.08);
     }
 
     .sample-btn:hover {
       background: #E8F0FE;
-      border-color: #D2E3FC;
-      color: var(--link-blue);
+      border-color: #1A73E8;
+      color: #1557B0;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 6px rgba(26, 115, 232, 0.16);
     }
 
     .file-list {
@@ -742,12 +748,16 @@
     }
 
     .analyze-btn.ready {
-      background: #1A1A1A;
+      background: #1A73E8;
+      color: #FFFFFF;
+      box-shadow: 0 4px 14px rgba(26, 115, 232, 0.35);
       cursor: pointer;
     }
 
     .analyze-btn.ready:hover {
-      background: #333333;
+      background: #1557B0;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(26, 115, 232, 0.45);
     }
 
     /* ==================== ECRÃ 2: INTERFACE DE ANÁLISE (FIEL À IMAGEM) ==================== */
@@ -787,33 +797,41 @@
 
     .top-dataset-label {
       font-size: 13.5px;
-      color: #777777;
-      font-weight: 400;
+      color: #1A73E8;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .top-inquiry-text {
       font-size: 18px;
-      font-weight: 600;
+      font-weight: 700;
       color: #1A1A1A;
     }
 
     .new-analysis-btn {
-      background: #FFFFFF;
-      border: 1px solid #DFDDD8;
-      border-radius: 14px;
-      padding: 10px 18px;
+      background: #EFF6FF;
+      border: 1px solid #D2E3FC;
+      border-radius: 12px;
+      padding: 9px 18px;
       font-family: inherit;
-      font-size: 14px;
-      font-weight: 500;
-      color: #333333;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #1A73E8;
       cursor: pointer;
-      transition: background var(--transition-fast), border-color var(--transition-fast);
+      transition: all var(--transition-fast);
       white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .new-analysis-btn:hover {
-      background: #F6F5F3;
-      border-color: #C8C6C0;
+      background: #E8F0FE;
+      border-color: #1A73E8;
+      color: #1557B0;
+      transform: translateY(-1px);
     }
 
     /* 2. Layout Principal de 2 Colunas: Esquerda (Analytics Agent) + Direita (Relatório) */
@@ -843,18 +861,33 @@
     .agent-panel-header {
       padding: 20px 22px 14px;
       font-size: 16px;
-      font-weight: 600;
+      font-weight: 700;
       color: #1A1A1A;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .agent-panel-header::after {
+      content: "ONLINE";
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: #137333;
+      background: #E6F4EA;
+      padding: 3px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(52, 168, 83, 0.25);
     }
 
     .agent-tabs-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      background: #F6F5F3;
+      background: #F1F3F4;
       padding: 4px;
       margin: 0 16px 12px;
       border-radius: 12px;
-      border: 1px solid #ECEAE4;
+      border: 1px solid #E5E7EB;
     }
 
     .agent-tab-btn {
@@ -865,7 +898,7 @@
       font-family: inherit;
       font-size: 13.5px;
       font-weight: 500;
-      color: #666666;
+      color: #5F6368;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
@@ -876,9 +909,9 @@
 
     .agent-tab-btn.active {
       background: #FFFFFF;
-      color: #1A1A1A;
+      color: #1A73E8;
       font-weight: 600;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
     }
 
     .tab-count-badge {
@@ -913,12 +946,13 @@
       display: inline-block;
       font-family: "JetBrains Mono", monospace;
       font-size: 12.5px;
-      background: #F3F2EE;
-      color: #222222;
+      background: #EFF6FF;
+      color: #1A73E8;
       padding: 2px 8px;
       border-radius: 6px;
-      border: 1px solid #E5E3DC;
+      border: 1px solid #D2E3FC;
       margin-right: 4px;
+      font-weight: 600;
     }
 
     .chat-followup-item {
@@ -952,8 +986,9 @@
       width: 20px;
       height: 20px;
       border-radius: 50%;
-      background: #E8F0FE;
-      color: var(--link-blue);
+      background: #EFF6FF;
+      color: #1A73E8;
+      border: 1px solid #D2E3FC;
       font-size: 11px;
       font-weight: 700;
       display: inline-flex;
@@ -1038,7 +1073,8 @@
     }
 
     .agent-chat-send.ready {
-      background: #1A1A1A;
+      background: #1A73E8;
+      box-shadow: 0 2px 8px rgba(26, 115, 232, 0.35);
     }
 
     /* --- COLUNA DIREITA: RELATÓRIO DE ANÁLISE --- */
@@ -1061,7 +1097,7 @@
     .report-rainbow-bar {
       height: 5px;
       width: 100%;
-      background: linear-gradient(90deg, #4285F4 0%, #34A853 35%, #FBBC05 68%, #EA4335 100%);
+      background: linear-gradient(90deg, #1A73E8 0%, #34A853 50%, #FBBC04 100%);
     }
 
     .report-header-content {
@@ -1130,37 +1166,39 @@
       padding: 0 22px;
       border-radius: 14px;
       border: none;
-      background: linear-gradient(90deg, #4A7BEA 0%, #9B51E0 48%, #E84C3D 100%);
+      background: linear-gradient(135deg, #1A73E8 0%, #34A853 100%);
       color: #FFFFFF;
       font-family: inherit;
-      font-size: 14.5px;
+      font-size: 14px;
       font-weight: 600;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(155, 81, 224, 0.22);
-      transition: transform var(--transition-fast), opacity var(--transition-fast);
+      box-shadow: 0 4px 14px rgba(26, 115, 232, 0.28);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
     }
 
     .btn-download-pdf:hover {
-      opacity: 0.94;
       transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(26, 115, 232, 0.4);
     }
 
     .btn-download-json {
       height: 44px;
       padding: 0 18px;
       border-radius: 14px;
-      border: 1px solid #DFDDD8;
-      background: #FFFFFF;
-      color: #333333;
+      border: 1px solid #D2E3FC;
+      background: #EFF6FF;
+      color: #1A73E8;
       font-family: inherit;
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 600;
       cursor: pointer;
-      transition: background var(--transition-fast);
+      transition: all var(--transition-fast);
     }
 
     .btn-download-json:hover {
-      background: #F6F5F3;
+      background: #E8F0FE;
+      border-color: #1A73E8;
+      color: #1557B0;
     }
 
     /* Abas do Relatório (Overview, Visualizations 3, Data Tables 5, Insights & Actions, Print Preview) */
@@ -1188,18 +1226,19 @@
     }
 
     .report-subtab:hover {
-      background: #F4F3F0;
-      color: #1A1A1A;
+      background: #EFF6FF;
+      color: #1A73E8;
     }
 
     .report-subtab.active {
-      background: #1A1A1A;
+      background: #1A73E8;
       color: #FFFFFF;
+      box-shadow: 0 2px 8px rgba(26, 115, 232, 0.28);
     }
 
     .subtab-badge {
-      background: #ECEAE4;
-      color: #555555;
+      background: #E8F0FE;
+      color: #1A73E8;
       font-size: 11.5px;
       font-weight: 700;
       padding: 2px 7px;
@@ -1207,7 +1246,7 @@
     }
 
     .report-subtab.active .subtab-badge {
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.25);
       color: #FFFFFF;
     }
 
@@ -1229,10 +1268,10 @@
     .report-kpi-label {
       font-family: "JetBrains Mono", monospace;
       font-size: 12.5px;
-      font-weight: 600;
-      color: #666666;
+      font-weight: 700;
+      color: #1A73E8;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.06em;
       margin-bottom: 14px;
     }
 
@@ -4074,7 +4113,7 @@
       chartInstances.forEach(c => c.destroy());
       chartInstances = [];
 
-      const palette = ['#4285F4', '#8B5CC6', '#E8392B', '#10B981', '#F59E0B', '#B0449A'];
+      const palette = ['#1A73E8', '#34A853', '#FBBC04', '#EA4335', '#4285F4', '#0F9D58'];
 
       function createLineChart(canvasId) {
         return new Chart(document.getElementById(canvasId).getContext('2d'), {
@@ -4084,11 +4123,13 @@
             datasets: [{
               label: metric1,
               data: monthEntries.map(x => x[1]),
-              borderColor: '#4285F4',
-              backgroundColor: 'rgba(66, 133, 244, 0.12)',
+              borderColor: '#1A73E8',
+              backgroundColor: 'rgba(26, 115, 232, 0.12)',
               borderWidth: 3,
-              pointBackgroundColor: '#E8392B',
-              pointRadius: 4,
+              pointBackgroundColor: '#34A853',
+              pointBorderColor: '#FFFFFF',
+              pointBorderWidth: 2,
+              pointRadius: 5,
               fill: true,
               tension: 0.35
             }]
