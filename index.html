@@ -243,47 +243,7 @@
       color: #FFFFFF;
     }
 
-    /* Responsividade por Breakpoints */
-    @media (max-width: 1200px) {
-      .topbar-btn-text {
-        display: none !important;
-      }
-    }
-    @media (max-width: 920px) {
-      .topbar-nav {
-        display: none !important;
-      }
-      .topbar-btn.hamburger-btn {
-        display: inline-flex !important;
-      }
-      .topbar-btn.device-btn {
-        display: none !important;
-      }
-    }
-    @media (max-width: 640px) {
-      .topbar {
-        padding: 0 12px;
-      }
-      .topbar-brand-name span:first-child {
-        font-size: 14px;
-      }
-      .topbar-brand-name .brand-tag {
-        display: none;
-      }
-      .topbar-user-info {
-        display: none !important;
-      }
-      .topbar-btn.icon-only {
-        display: none !important;
-      }
-      .topbar-btn.remix-btn {
-        display: none !important;
-      }
-      .btn-topbar-login {
-        padding: 6px 12px !important;
-        font-size: 12.5px !important;
-      }
-    }
+    /* Responsividade da topbar consolidada no fim do CSS */
 
     .topbar-btn {
       background: transparent;
@@ -1450,39 +1410,7 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    /* ==================== RESPONSIVO ==================== */
-    @media (max-width: 1100px) {
-      .agent-workspace-layout {
-        grid-template-columns: 1fr;
-      }
-      .agent-panel-card {
-        position: static;
-        height: 500px;
-      }
-      .report-kpi-row {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    @media (max-width: 768px) {
-      .workspace-wrapper {
-        padding: 20px 14px 80px;
-      }
-      .hero-grid,
-      .charts-2col,
-      .insights-two-col,
-      .report-kpi-row {
-        grid-template-columns: 1fr;
-      }
-      .hero-heading {
-        font-size: 48px;
-      }
-      .gcs-input-row {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      /* topbar responsiva tratada */
-    }
+    /* Responsividade consolidada no fim do CSS */
   
     /* ==================== SISTEMA DE VISTAS (SPA VIEWS) ==================== */
     .app-view {
@@ -2299,73 +2227,12 @@
       cursor: pointer;
     }
 
-    /* Responsividade */
-    @media (max-width: 992px) {
-      .landing-features-grid,
-      .landing-steps-grid {
-        grid-template-columns: 1fr;
-      }
-      .preview-grid-mockup {
-        grid-template-columns: 1fr;
-      }
-      .mock-kpi-row {
-        grid-template-columns: 1fr 1fr;
-      }
-      .landing-title {
-        font-size: 34px;
-      }
-      .topbar-nav {
-        display: none;
-      }
-    }
+    /* Responsividade consolidada no fim do CSS */
 
   
-    /* Destaque para Acesso Fácil ao Login */
-    .btn-topbar-login {
-      background: #1A73E8 !important;
-      padding: 8px 18px !important;
-      font-size: 14px !important;
-      font-weight: 700 !important;
-      border-radius: 999px !important;
-      box-shadow: 0 2px 10px rgba(26, 115, 232, 0.4) !important;
-    }
-    .btn-topbar-login:hover {
-      background: #1557B0 !important;
-      transform: translateY(-1px);
-    }
-    .topbar-nav-link#navLoginBtn {
-      background: rgba(66, 133, 244, 0.15);
-      color: #8AB4F8;
-      font-weight: 600;
-    }
-    .topbar-nav-link#navLoginBtn:hover {
-      background: rgba(66, 133, 244, 0.28);
-      color: #FFFFFF;
-    }
+    
 
-    /* Faixa de Acesso Rápido no Hero */
-    .login-quick-banner {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      background: #FFFFFF;
-      border: 1px solid #D2E3FC;
-      border-radius: 999px;
-      padding: 8px 20px;
-      font-size: 13.5px;
-      color: #3C4043;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-      margin-top: 14px;
-    }
-    .login-quick-banner .lqb-link {
-      color: #1A73E8;
-      font-weight: 700;
-      cursor: pointer;
-      text-decoration: underline;
-    }
-    .login-quick-banner .lqb-link:hover {
-      color: #1557B0;
-    }
+    
 
     /* Faixa de Convite no Workspace */
     .workspace-auth-prompt {
@@ -2407,6 +2274,341 @@
     .wap-btn:hover {
       background: #1557B0;
       transform: translateY(-1px);
+    }
+
+  
+    /* ============================================================== */
+    /* SISTEMA DE RESPONSIVIDADE COMPLETO (DESKTOP, TABLET & MOBILE)  */
+    /* ============================================================== */
+
+    /* Prevenção de transbordamento horizontal em qualquer ecrã */
+    html, body {
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
+    img, canvas, svg {
+      max-width: 100%;
+    }
+
+    /* 1. Telas Médias / Laptops compactos (<= 1200px) */
+    @media (max-width: 1200px) {
+      .landing-container {
+        padding: 24px 20px 60px;
+      }
+      .workspace-wrapper {
+        padding: 24px 20px 70px;
+      }
+      .landing-features-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+      }
+      .topbar-btn-text {
+        display: none !important;
+      }
+    }
+
+    /* 2. Tablets em modo retrato e telas intermediárias (<= 1024px) */
+    @media (max-width: 1024px) {
+      /* Topbar Mobile Navigation */
+      .topbar-nav {
+        display: none !important;
+      }
+      .topbar-btn.hamburger-btn {
+        display: inline-flex !important;
+      }
+
+      /* Landing Page */
+      .landing-title {
+        font-size: clamp(28px, 5.5vw, 42px);
+      }
+      .landing-subtitle {
+        font-size: 16.5px;
+      }
+      .landing-steps-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      /* Setup View */
+      .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+        margin-bottom: 32px;
+      }
+      .hero-heading {
+        font-size: clamp(34px, 6.5vw, 56px);
+      }
+      .hero-copy {
+        max-width: 100%;
+      }
+
+      /* Interface de Análise */
+      .agent-workspace-layout {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      .agent-panel-card {
+        position: static;
+        height: auto;
+        min-height: 480px;
+        max-height: none;
+      }
+      .report-kpi-row {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+      }
+      .charts-2col,
+      .insights-two-col {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+    }
+
+    /* 3. Tablets menores e celulares em modo paisagem (<= 768px) */
+    @media (max-width: 768px) {
+      body {
+        padding-top: 56px;
+      }
+      .landing-container {
+        padding: 16px 14px 50px;
+      }
+      .workspace-wrapper {
+        padding: 16px 14px 60px;
+      }
+
+      /* Banner topo */
+      .hero-banner {
+        height: 110px;
+        border-radius: 14px;
+      }
+
+      /* Landing CTA */
+      .landing-cta-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+      }
+      .btn-landing-primary,
+      .btn-landing-secondary {
+        width: 100%;
+        justify-content: center;
+        padding: 13px 20px;
+        font-size: 15px;
+      }
+
+      /* Preview Mockup */
+      .preview-grid-mockup {
+        grid-template-columns: 1fr;
+        padding: 12px;
+        gap: 14px;
+      }
+      .landing-preview-card {
+        padding: 16px 12px;
+        margin: 24px auto 50px;
+      }
+
+      /* Setup Card */
+      .card {
+        padding: 24px 18px;
+        border-radius: 20px;
+        margin-bottom: 20px;
+      }
+      .card-title {
+        font-size: 18.5px;
+      }
+      .dropzone {
+        padding: 22px 14px;
+        min-height: 170px;
+      }
+      .dropzone-main {
+        font-size: 16.5px;
+      }
+      .dropzone-sub {
+        font-size: 13.5px;
+      }
+      .gcs-input-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+      .gcs-input {
+        width: 100%;
+        height: 46px;
+        font-size: 14px;
+      }
+      .gcs-add-btn {
+        width: 100%;
+        height: 46px;
+      }
+      .chips-container {
+        gap: 8px;
+      }
+      .suggestion-chip {
+        width: 100%;
+        white-space: normal;
+        line-height: 1.4;
+        text-align: left;
+        padding: 10px 16px;
+        font-size: 13.5px;
+        border-radius: 14px;
+      }
+
+      /* Relatório de Análise */
+      .top-inquiry-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+        padding: 16px 18px;
+      }
+      .new-analysis-btn {
+        width: 100%;
+        justify-content: center;
+      }
+      .report-header-content {
+        padding: 20px 18px;
+      }
+      .report-title-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 16px;
+      }
+      .report-export-btns {
+        width: 100%;
+        display: flex;
+        gap: 10px;
+      }
+      .btn-download-pdf,
+      .btn-download-json {
+        flex: 1;
+        justify-content: center;
+        text-align: center;
+        height: 42px;
+      }
+      .report-subtabs {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 6px;
+        width: 100%;
+        -webkit-overflow-scrolling: touch;
+      }
+      .report-subtab {
+        flex-shrink: 0;
+        padding: 8px 14px;
+        font-size: 13.5px;
+      }
+      .content-white-card {
+        padding: 20px 16px;
+        border-radius: 18px;
+      }
+      .chart-card {
+        padding: 18px 14px;
+        border-radius: 18px;
+      }
+      .chart-box-canvas {
+        height: 230px;
+      }
+      .stats-table-wrap {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      .stats-table {
+        min-width: 540px;
+        font-size: 12.5px;
+      }
+
+      /* Landing Footer */
+      .landing-footer {
+        flex-direction: column;
+        text-align: center;
+        gap: 14px;
+      }
+      .footer-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 14px;
+      }
+
+      /* Banner CTA final */
+      .landing-cta-box {
+        padding: 36px 20px;
+        border-radius: 20px;
+      }
+      .landing-cta-title {
+        font-size: 26px;
+      }
+      .landing-cta-subtitle {
+        font-size: 15px;
+      }
+    }
+
+    /* 4. Smartphones comuns (<= 540px) */
+    @media (max-width: 540px) {
+      .topbar {
+        padding: 0 12px;
+      }
+      .topbar-brand-name {
+        font-size: 14.5px;
+      }
+      .topbar-brand-name .brand-tag {
+        display: none;
+      }
+      .topbar-user-info {
+        display: none !important;
+      }
+      .btn-topbar-login {
+        padding: 6px 12px !important;
+        font-size: 12.5px !important;
+      }
+      .landing-features-grid {
+        grid-template-columns: 1fr;
+      }
+      .mock-kpi-row {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+      .mock-chart-row {
+        grid-template-columns: 1fr;
+      }
+      .report-kpi-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+      .report-kpi-card {
+        padding: 16px 14px;
+      }
+      .report-kpi-val {
+        font-size: 28px;
+      }
+      .auth-card {
+        padding: 28px 18px;
+        border-radius: 20px;
+      }
+      .auth-card-title {
+        font-size: 21px;
+      }
+      .auth-row-options {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+    }
+
+    /* 5. Smartphones compactos (<= 380px) */
+    @media (max-width: 380px) {
+      .topbar-brand-name {
+        font-size: 13.5px;
+      }
+      .mock-kpi-row {
+        grid-template-columns: 1fr;
+      }
+      .landing-title {
+        font-size: 25px;
+      }
+      .hero-heading {
+        font-size: 30px;
+      }
     }
 
   </style>
