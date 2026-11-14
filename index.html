@@ -4738,22 +4738,22 @@
             <div class="checkout-form-row">
               <div>
                 <label class="checkout-field-label">Nome Completo</label>
-                <input type="text" class="checkout-text-input" id="vckCustomerName" placeholder="ex: Rofina Cumbe" value="Rofina Cumbe">
+                <input type="text" class="checkout-text-input" id="vckCustomerName" placeholder="Introduza o seu nome completo" autocomplete="off">
               </div>
               <div>
                 <label class="checkout-field-label">Email de Acesso &amp; Recibo</label>
-                <input type="email" class="checkout-text-input" id="vckCustomerEmail" placeholder="seuemail@exemplo.com" value="analista@empresa.co.mz">
+                <input type="email" class="checkout-text-input" id="vckCustomerEmail" placeholder="exemplo@email.co.mz" autocomplete="off">
               </div>
             </div>
 
             <div class="checkout-form-row">
               <div>
                 <label class="checkout-field-label">NUIT (Opcional para Empresa)</label>
-                <input type="text" class="checkout-text-input" id="vckCustomerNuit" placeholder="ex: 400123456" maxlength="9">
+                <input type="text" class="checkout-text-input" id="vckCustomerNuit" placeholder="ex: 400123456" maxlength="9" autocomplete="off">
               </div>
               <div>
                 <label class="checkout-field-label">Cidade / Província</label>
-                <input type="text" class="checkout-text-input" id="vckCustomerCity" placeholder="ex: Maputo" value="Maputo">
+                <input type="text" class="checkout-text-input" id="vckCustomerCity" placeholder="ex: Maputo" autocomplete="off">
               </div>
             </div>
           </div>
@@ -4931,11 +4931,11 @@
             </div>
             <div class="receipt-row">
               <span>Subscritor:</span>
-              <strong id="rcpCustomerName">Rofina Cumbe</strong>
+              <strong id="rcpCustomerName">-</strong>
             </div>
             <div class="receipt-row">
               <span>Email:</span>
-              <strong id="rcpCustomerEmail">analista@empresa.co.mz</strong>
+              <strong id="rcpCustomerEmail">-</strong>
             </div>
             <div class="receipt-row">
               <span>Método de Pagamento:</span>
@@ -6197,12 +6197,20 @@
     if (btnConfirmCheckoutPay) {
       btnConfirmCheckoutPay.addEventListener('click', async () => {
         const phone = (vckPhoneInput ? vckPhoneInput.value : '').replace(/\D/g, '');
-        const name = (vckCustomerName ? vckCustomerName.value.trim() : '') || 'Cliente';
+        const name = (vckCustomerName ? vckCustomerName.value.trim() : '');
         const email = (vckCustomerEmail ? vckCustomerEmail.value.trim() : '');
+        const nuit = (vckCustomerNuit ? vckCustomerNuit.value.trim() : '');
+        const city = (vckCustomerCity ? vckCustomerCity.value.trim() : '');
 
-        // 1. Validação de Email
-        if (email && !email.includes('@')) {
-          alert('Por favor introduza um endereço de email válido para o envio do comprovativo.');
+        // 1. Validação dos Dados de Facturação (sem preenchimento automático)
+        if (!name) {
+          alert('Por favor introduza o seu Nome Completo para a facturação.');
+          if (vckCustomerName) vckCustomerName.focus();
+          return;
+        }
+
+        if (!email || !email.includes('@')) {
+          alert('Por favor introduza um endereço de email válido para a emissão e envio do comprovativo.');
           if (vckCustomerEmail) vckCustomerEmail.focus();
           return;
         }
@@ -6247,7 +6255,7 @@
               phone,
               amount: price,
               planName: planTitle,
-              customerEmail: email || 'analista@mz.co',
+              customerEmail: email,
               reference: `AA-${Date.now().toString().slice(-6)}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`
             })
           }).catch(() => null);
@@ -6325,7 +6333,7 @@
               if (elRefId) elRefId.textContent = paymentData.reference;
               if (elDateTime) elDateTime.textContent = dateStr;
               if (elCustName) elCustName.textContent = name;
-              if (elCustEmail) elCustEmail.textContent = email || 'analista@empresa.co.mz';
+              if (elCustEmail) elCustEmail.textContent = email;
               if (elMethod) elMethod.textContent = `${opLabel} (+258 ${phone.slice(0, 2)}•••••${phone.slice(-2)})`;
               if (elPlan) elPlan.textContent = planTitle;
               if (elAmount) elAmount.textContent = `${price} MZN`;
