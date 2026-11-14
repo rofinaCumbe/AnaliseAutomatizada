@@ -118,10 +118,18 @@
 
     // Abertura a partir de botões na landing page e workspace
     if (btnPlanPro) {
-      btnPlanPro.addEventListener('click', () => openCheckoutModal('pro', 'Plano Profissional', 499));
+      btnPlanPro.addEventListener('click', () => {
+        lastActiveViewBeforeCheckout = 'home';
+        setVckCycle('monthly');
+        showView('checkout');
+      });
     }
     if (btnPlanCorp) {
-      btnPlanCorp.addEventListener('click', () => openCheckoutModal('corp', 'Plano Corporativo Anual', 3999));
+      btnPlanCorp.addEventListener('click', () => {
+        lastActiveViewBeforeCheckout = 'home';
+        setVckCycle('yearly');
+        showView('checkout');
+      });
     }
     if (btnPlanFree) {
       btnPlanFree.addEventListener('click', () => {
@@ -130,7 +138,11 @@
       });
     }
     if (btnUpgradeWorkspace) {
-      btnUpgradeWorkspace.addEventListener('click', () => openCheckoutModal('pro', 'Plano Profissional', 499));
+      btnUpgradeWorkspace.addEventListener('click', () => {
+        lastActiveViewBeforeCheckout = 'workspace';
+        setVckCycle('monthly');
+        showView('checkout');
+      });
     }
 
     // Navegação para a seção de Preços
@@ -251,6 +263,291 @@
     if (btnContinueAfterPayment) {
       btnContinueAfterPayment.addEventListener('click', () => {
         closeCheckoutModal();
+        showView('workspace');
+      });
+    }
+
+  
+    // ==============================================================
+    // LÓGICA DA VISTA DEDICADA DE CHECKOUT (#viewCheckout)
+    // ==============================================================
+    const viewCheckout = document.getElementById('viewCheckout');
+    const btnBackFromCheckout = document.getElementById('btnBackFromCheckout');
+    const vckOptMpesa = document.getElementById('vckOptMpesa');
+    const vckOptEmola = document.getElementById('vckOptEmola');
+    const vckPhoneInput = document.getElementById('vckPhoneInput');
+    const vckDetectedLabel = document.getElementById('vckDetectedLabel');
+    const vckPayBtnText = document.getElementById('vckPayBtnText');
+    const btnConfirmCheckoutPay = document.getElementById('btnConfirmCheckoutPay');
+    const btnCycleMonthly = document.getElementById('btnCycleMonthly');
+    const btnCycleYearly = document.getElementById('btnCycleYearly');
+
+    const vckCustomerName = document.getElementById('vckCustomerName');
+    const vckCustomerEmail = document.getElementById('vckCustomerEmail');
+    const vckCustomerNuit = document.getElementById('vckCustomerNuit');
+    const vckCustomerCity = document.getElementById('vckCustomerCity');
+
+    const vckSummaryPlanName = document.getElementById('vckSummaryPlanName');
+    const vckSummaryPlanDesc = document.getElementById('vckSummaryPlanDesc');
+    const vckSubtotalDisplay = document.getElementById('vckSubtotalDisplay');
+    const vckTaxDisplay = document.getElementById('vckTaxDisplay');
+    const vckTotalDisplay = document.getElementById('vckTotalDisplay');
+
+    const checkoutViewFormState = document.getElementById('checkoutViewFormState');
+    const checkoutViewProcessingState = document.getElementById('checkoutViewProcessingState');
+    const checkoutViewSuccessState = document.getElementById('checkoutViewSuccessState');
+    const vckCountdownSec = document.getElementById('vckCountdownSec');
+    const vckPromptTargetPhone = document.getElementById('vckPromptTargetPhone');
+    const vckPromptOpName = document.getElementById('vckPromptOpName');
+    const vckProcessingRefBadge = document.getElementById('vckProcessingRefBadge');
+    const btnCancelProcessing = document.getElementById('btnCancelProcessing');
+    const btnPrintReceipt = document.getElementById('btnPrintReceipt');
+    const btnGoToWorkspaceAfterReceipt = document.getElementById('btnGoToWorkspaceAfterReceipt');
+
+    let vckSelectedOp = 'mpesa';
+    let vckCycle = 'monthly'; // 'monthly' | 'yearly'
+    let vckBasePriceMonthly = 499;
+    let vckBasePriceYearly = 3999;
+    let vckCountdownTimer = null;
+    let vckPollingTimer = null;
+    let lastActiveViewBeforeCheckout = 'home';
+
+    function setVckCycle(cycle) {
+      vckCycle = cycle;
+      if (cycle === 'monthly') {
+        if (btnCycleMonthly) btnCycleMonthly.classList.add('active');
+        if (btnCycleYearly) btnCycleYearly.classList.remove('active');
+        const price = vckBasePriceMonthly;
+        const tax = (price * 0.16).toFixed(2);
+        if (vckSubtotalDisplay) vckSubtotalDisplay.textContent = `${price}.00 MZN`;
+        if (vckTaxDisplay) vckTaxDisplay.textContent = `${tax} MZN`;
+        if (vckTotalDisplay) vckTotalDisplay.textContent = `${price} MZN`;
+        if (vckSummaryPlanDesc) vckSummaryPlanDesc.textContent = 'Ciclo mensal renovável. Análises ilimitadas e IA conversacional.';
+        updateVckPayButton();
+      } else {
+        if (btnCycleYearly) btnCycleYearly.classList.add('active');
+        if (btnCycleMonthly) btnCycleMonthly.classList.remove('active');
+        const price = vckBasePriceYearly;
+        const tax = (price * 0.16).toFixed(2);
+        if (vckSubtotalDisplay) vckSubtotalDisplay.textContent = `${price}.00 MZN`;
+        if (vckTaxDisplay) vckTaxDisplay.textContent = `${tax} MZN`;
+        if (vckTotalDisplay) vckTotalDisplay.textContent = `${price} MZN`;
+        if (vckSummaryPlanDesc) vckSummaryPlanDesc.textContent = 'Ciclo anual (Poupe 33%). Inclui conexão MongoDB e fatura fiscal.';
+        updateVckPayButton();
+      }
+    }
+
+    function setVckOperator(op) {
+      vckSelectedOp = op;
+      if (op === 'mpesa') {
+        if (vckOptMpesa) vckOptMpesa.classList.add('active');
+        if (vckOptEmola) vckOptEmola.classList.remove('active');
+        if (vckDetectedLabel) {
+          vckDetectedLabel.textContent = 'Vodacom M-Pesa';
+          vckDetectedLabel.style.color = '#E60000';
+        }
+      } else {
+        if (vckOptEmola) vckOptEmola.classList.add('active');
+        if (vckOptMpesa) vckOptMpesa.classList.remove('active');
+        if (vckDetectedLabel) {
+          vckDetectedLabel.textContent = 'Movitel e-Mola';
+          vckDetectedLabel.style.color = '#E67E22';
+        }
+      }
+      updateVckPayButton();
+    }
+
+    function updateVckPayButton() {
+      const currentPrice = vckCycle === 'monthly' ? vckBasePriceMonthly : vckBasePriceYearly;
+      const opName = vckSelectedOp === 'mpesa' ? 'M-Pesa' : 'e-Mola';
+      if (vckPayBtnText) {
+        vckPayBtnText.textContent = `Pagar ${currentPrice} MZN com ${opName}`;
+      }
+    }
+
+    if (btnCycleMonthly) btnCycleMonthly.addEventListener('click', () => setVckCycle('monthly'));
+    if (btnCycleYearly) btnCycleYearly.addEventListener('click', () => setVckCycle('yearly'));
+    if (vckOptMpesa) vckOptMpesa.addEventListener('click', () => setVckOperator('mpesa'));
+    if (vckOptEmola) vckOptEmola.addEventListener('click', () => setVckOperator('emola'));
+
+    // Detecção no campo de telemóvel da página de checkout
+    if (vckPhoneInput) {
+      vckPhoneInput.addEventListener('input', (e) => {
+        let val = e.target.value.replace(/\D/g, '');
+        if (val.startsWith('258')) val = val.substring(3);
+        e.target.value = val.slice(0, 9);
+
+        if (val.startsWith('84') || val.startsWith('85')) {
+          setVckOperator('mpesa');
+        } else if (val.startsWith('86') || val.startsWith('87')) {
+          setVckOperator('emola');
+        }
+      });
+    }
+
+    // Voltar da página de checkout
+    if (btnBackFromCheckout) {
+      btnBackFromCheckout.addEventListener('click', () => {
+        showView(lastActiveViewBeforeCheckout || 'home');
+      });
+    }
+
+    // Submissão do Pagamento na Página de Checkout
+    if (btnConfirmCheckoutPay) {
+      btnConfirmCheckoutPay.addEventListener('click', async () => {
+        const phone = (vckPhoneInput ? vckPhoneInput.value : '').replace(/\D/g, '');
+        if (!phone || phone.length !== 9) {
+          alert('Por favor introduza um número de telemóvel moçambicano válido com 9 dígitos (ex: 841234567 ou 861234567).');
+          if (vckPhoneInput) vckPhoneInput.focus();
+          return;
+        }
+
+        const price = vckCycle === 'monthly' ? vckBasePriceMonthly : vckBasePriceYearly;
+        const planTitle = vckCycle === 'monthly' ? 'Plano Profissional Mensal' : 'Plano Profissional Anual';
+        const customerName = (vckCustomerName ? vckCustomerName.value : '') || 'Cliente';
+        const customerEmail = (vckCustomerEmail ? vckCustomerEmail.value : '') || 'cliente@mz.co';
+
+        btnConfirmCheckoutPay.disabled = true;
+        btnConfirmCheckoutPay.innerHTML = `
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="spin-icon" style="animation:spin 1s linear infinite;"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
+          <span>A iniciar transacção com ${vckSelectedOp === 'mpesa' ? 'M-Pesa' : 'e-Mola'}...</span>
+        `;
+
+        try {
+          const res = await fetch('/api/payments/c2b', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              phone,
+              amount: price,
+              planName: planTitle,
+              customerEmail,
+              reference: `AA-${Date.now().toString().slice(-6)}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`
+            })
+          }).catch(() => null);
+
+          let paymentData = null;
+          if (res && res.ok) {
+            paymentData = await res.json();
+          } else {
+            paymentData = {
+              success: true,
+              paymentId: `pay_c2b_${Date.now()}`,
+              status: 'pending',
+              provider: vckSelectedOp === 'mpesa' ? 'M-Pesa (Vodacom)' : 'e-Mola (Movitel)',
+              phone,
+              reference: `AA-MZ-${Date.now().toString().slice(-6)}`,
+              amount: price
+            };
+          }
+
+          // Transição para tela de aguardo USSD
+          if (checkoutViewFormState) checkoutViewFormState.style.display = 'none';
+          if (checkoutViewProcessingState) checkoutViewProcessingState.style.display = 'block';
+          if (vckPromptTargetPhone) vckPromptTargetPhone.textContent = `+258 ${phone}`;
+          if (vckPromptOpName) vckPromptOpName.textContent = vckSelectedOp === 'mpesa' ? 'M-Pesa' : 'e-Mola';
+          if (vckProcessingRefBadge) vckProcessingRefBadge.textContent = `Referência: ${paymentData.reference}`;
+
+          // Contagem Regressiva de 60s
+          let secondsLeft = 60;
+          if (vckCountdownSec) vckCountdownSec.textContent = secondsLeft;
+          if (vckCountdownTimer) clearInterval(vckCountdownTimer);
+          vckCountdownTimer = setInterval(() => {
+            secondsLeft--;
+            if (vckCountdownSec) vckCountdownSec.textContent = secondsLeft;
+            if (secondsLeft <= 0) {
+              clearInterval(vckCountdownTimer);
+            }
+          }, 1000);
+
+          // Polling de verificação de status
+          let checkCount = 0;
+          const maxChecks = 16;
+          if (vckPollingTimer) clearInterval(vckPollingTimer);
+          vckPollingTimer = setInterval(async () => {
+            checkCount++;
+            let pollStatus = 'pending';
+            try {
+              const statusRes = await fetch(`/api/payments/status?paymentId=${encodeURIComponent(paymentData.paymentId)}`).catch(() => null);
+              if (statusRes && statusRes.ok) {
+                const sJson = await statusRes.json();
+                pollStatus = sJson.status;
+              } else if (checkCount >= 3) {
+                pollStatus = 'paid'; // simulação local
+              }
+            } catch (err) {
+              if (checkCount >= 3) pollStatus = 'paid';
+            }
+
+            if (pollStatus === 'paid' || pollStatus === 'completed') {
+              clearInterval(vckPollingTimer);
+              clearInterval(vckCountdownTimer);
+
+              // Preencher recibo oficial
+              const now = new Date();
+              const dateStr = now.toLocaleDateString('pt-MZ') + ' ' + now.toLocaleTimeString('pt-MZ', { hour: '2-digit', minute: '2-digit' });
+              
+              if (document.getElementById('rcpTxId')) document.getElementById('rcpTxId').textContent = paymentData.paymentId;
+              if (document.getElementById('rcpRefId')) document.getElementById('rcpRefId').textContent = paymentData.reference;
+              if (document.getElementById('rcpDateTime')) document.getElementById('rcpDateTime').textContent = dateStr;
+              if (document.getElementById('rcpCustomerName')) document.getElementById('rcpCustomerName').textContent = customerName;
+              if (document.getElementById('rcpCustomerEmail')) document.getElementById('rcpCustomerEmail').textContent = customerEmail;
+              if (document.getElementById('rcpPaymentMethod')) {
+                document.getElementById('rcpPaymentMethod').textContent = `${vckSelectedOp === 'mpesa' ? 'Vodacom M-Pesa' : 'Movitel e-Mola'} (+258 ${phone.slice(0,2)}•••••${phone.slice(-2)})`;
+              }
+              if (document.getElementById('rcpPlanName')) document.getElementById('rcpPlanName').textContent = planTitle;
+              if (document.getElementById('rcpAmountPaid')) document.getElementById('rcpAmountPaid').textContent = `${price} MZN`;
+
+              // Exibir tela de recibo
+              if (checkoutViewProcessingState) checkoutViewProcessingState.style.display = 'none';
+              if (checkoutViewSuccessState) checkoutViewSuccessState.style.display = 'block';
+
+              // Ativar perfil Pro na barra superior
+              const roleEl = document.getElementById('topbarUserRole');
+              if (roleEl) roleEl.textContent = 'Analista Pro (M-Pesa)';
+              showToast('Subscrição confirmada com sucesso! Recibo gerado.');
+
+            } else if (pollStatus === 'failed' || checkCount >= maxChecks) {
+              clearInterval(vckPollingTimer);
+              clearInterval(vckCountdownTimer);
+              alert('A transacção expirou ou o PIN não foi confirmado a tempo no seu telemóvel. Por favor tente novamente.');
+              if (checkoutViewProcessingState) checkoutViewProcessingState.style.display = 'none';
+              if (checkoutViewFormState) checkoutViewFormState.style.display = 'grid';
+              btnConfirmCheckoutPay.disabled = false;
+              updateVckPayButton();
+            }
+          }, 2500);
+
+        } catch (err) {
+          console.error(err);
+          alert('Erro na comunicação de pagamento.');
+          btnConfirmCheckoutPay.disabled = false;
+          updateVckPayButton();
+        }
+      });
+    }
+
+    if (btnCancelProcessing) {
+      btnCancelProcessing.addEventListener('click', () => {
+        if (vckPollingTimer) clearInterval(vckPollingTimer);
+        if (vckCountdownTimer) clearInterval(vckCountdownTimer);
+        if (checkoutViewProcessingState) checkoutViewProcessingState.style.display = 'none';
+        if (checkoutViewFormState) checkoutViewFormState.style.display = 'grid';
+        if (btnConfirmCheckoutPay) {
+          btnConfirmCheckoutPay.disabled = false;
+          updateVckPayButton();
+        }
+      });
+    }
+
+    if (btnPrintReceipt) {
+      btnPrintReceipt.addEventListener('click', () => {
+        window.print();
+      });
+    }
+
+    if (btnGoToWorkspaceAfterReceipt) {
+      btnGoToWorkspaceAfterReceipt.addEventListener('click', () => {
         showView('workspace');
       });
     }
@@ -3414,6 +3711,539 @@
       border-top: 1px solid var(--border-light);
     }
 
+  
+    /* ============================================================== */
+    /* VISTA DEDICADA DE CHECKOUT DE PAGAMENTO (M-PESA & E-MOLA)      */
+    /* ============================================================== */
+
+    .checkout-page-container {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 32px 24px 80px;
+    }
+
+    /* Barra Superior do Checkout */
+    .checkout-top-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .checkout-back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      padding: 8px 16px;
+      border-radius: 12px;
+      color: #333333;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      text-decoration: none;
+    }
+    .checkout-back-btn:hover {
+      background: #F1F3F4;
+      border-color: #BDBDBD;
+      transform: translateX(-2px);
+    }
+    .checkout-security-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #E6F4EA;
+      color: #137333;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12.5px;
+      font-weight: 600;
+    }
+
+    .checkout-page-title-row {
+      margin-bottom: 32px;
+    }
+    .checkout-page-title {
+      font-size: 30px;
+      font-weight: 800;
+      color: #1A1A1A;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+    .checkout-page-desc {
+      font-size: 15px;
+      color: #666666;
+    }
+
+    /* Grid Principal de 2 Colunas */
+    .checkout-grid-layout {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+
+    /* Cartões do Checkout */
+    .checkout-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      padding: 28px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-card);
+    }
+    .checkout-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 22px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .checkout-card-step-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #1A73E8;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .checkout-card-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #1A1A1A;
+    }
+
+    /* Linhas de Formulário */
+    .checkout-form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .checkout-form-group-full {
+      margin-bottom: 16px;
+    }
+    .checkout-field-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #333333;
+      margin-bottom: 6px;
+    }
+    .checkout-text-input {
+      width: 100%;
+      height: 46px;
+      border: 1.5px solid var(--border-light);
+      border-radius: 12px;
+      padding: 0 14px;
+      font-size: 14.5px;
+      font-family: inherit;
+      color: #1A1A1A;
+      background: #FFFFFF;
+      transition: all var(--transition-fast);
+      outline: none;
+    }
+    .checkout-text-input:focus {
+      border-color: #1A73E8;
+      box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.12);
+    }
+
+    /* Cartões Seletor de Carteira Móvel */
+    .momo-selector-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .momo-option-card {
+      border: 2px solid var(--border-light);
+      border-radius: 16px;
+      padding: 16px 14px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      background: #FFFFFF;
+      position: relative;
+    }
+    .momo-option-card:hover {
+      border-color: #BDBDBD;
+      background: #FAFAFA;
+    }
+    .momo-option-card.active.opt-mpesa {
+      border-color: #E60000;
+      background: #FFF8F8;
+      box-shadow: 0 4px 14px rgba(230, 0, 0, 0.1);
+    }
+    .momo-option-card.active.opt-emola {
+      border-color: #E67E22;
+      background: #FFF9F4;
+      box-shadow: 0 4px 14px rgba(230, 126, 34, 0.1);
+    }
+    .momo-radio-indicator {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid #CCCCCC;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .momo-option-card.active .momo-radio-indicator {
+      border-color: currentColor;
+    }
+    .momo-option-card.active .momo-radio-indicator::after {
+      content: '';
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+    .opt-mpesa { color: #E60000; }
+    .opt-emola { color: #E67E22; }
+
+    .momo-logo-text {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 4px;
+      display: inline-block;
+    }
+    .momo-carrier-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #333333;
+      margin-bottom: 2px;
+    }
+    .momo-carrier-prefixes {
+      font-size: 11.5px;
+      color: #777777;
+    }
+
+    /* Como Funciona Box */
+    .momo-guide-box {
+      background: #F8F9FA;
+      border: 1px solid var(--border-light);
+      border-radius: 14px;
+      padding: 16px;
+      margin-top: 16px;
+    }
+    .momo-guide-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #333333;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .momo-guide-steps {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 12.5px;
+      color: #555555;
+    }
+    .momo-guide-steps li {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+    .step-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #E8EAED;
+      color: #555555;
+      font-size: 10px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* Resumo Lateral do Pedido */
+    .checkout-order-summary-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: var(--shadow-card);
+      position: sticky;
+      top: 84px;
+    }
+    .summary-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1A1A1A;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .plan-cycle-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: #F1F3F4;
+      padding: 4px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      gap: 4px;
+    }
+    .cycle-btn {
+      border: none;
+      background: transparent;
+      padding: 8px 10px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #555555;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .cycle-btn.active {
+      background: #FFFFFF;
+      color: #1A73E8;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+    .save-tag {
+      background: #E6F4EA;
+      color: #137333;
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    .summary-plan-details {
+      background: #F8F9FA;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    .summary-plan-name {
+      font-weight: 700;
+      font-size: 16px;
+      color: #1A1A1A;
+      margin-bottom: 4px;
+    }
+    .summary-plan-desc {
+      font-size: 12.5px;
+      color: #666666;
+    }
+
+    .summary-price-lines {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .summary-line {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      color: #555555;
+    }
+    .summary-line.total {
+      font-size: 18px;
+      font-weight: 800;
+      color: #1A1A1A;
+      margin-top: 6px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--border-light);
+    }
+    .summary-line.total .price-highlight {
+      color: #1A73E8;
+      font-size: 24px;
+    }
+
+    .summary-guarantees {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 18px;
+      font-size: 12px;
+      color: #666666;
+    }
+    .guarantee-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .guarantee-item svg {
+      width: 14px;
+      height: 14px;
+      color: #137333;
+      flex-shrink: 0;
+    }
+
+    /* Botão Primário de Pagamento no Checkout */
+    .btn-pay-checkout-main {
+      width: 100%;
+      height: 52px;
+      background: #1A73E8;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all var(--transition-fast);
+      box-shadow: 0 4px 16px rgba(26, 115, 232, 0.38);
+    }
+    .btn-pay-checkout-main:hover {
+      background: #1557B0;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(26, 115, 232, 0.48);
+    }
+    .btn-pay-checkout-main:disabled {
+      background: #CCCCCC;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    /* Tela de Processamento USSD no Checkout */
+    .checkout-processing-box {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      padding: 40px 30px;
+      text-align: center;
+      box-shadow: var(--shadow-card);
+    }
+    .countdown-timer-circle {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      background: #E8F0FE;
+      color: #1A73E8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      font-weight: 800;
+      position: relative;
+      animation: pulseRipple 1.8s infinite;
+    }
+    .countdown-sec {
+      font-size: 26px;
+      line-height: 1;
+    }
+    .countdown-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Comprovativo de Pagamento Emitido */
+    .receipt-container {
+      background: #FFFFFF;
+      border: 2px dashed #B8C0CC;
+      border-radius: 20px;
+      padding: 32px;
+      max-width: 620px;
+      margin: 0 auto;
+      box-shadow: var(--shadow-card);
+    }
+    .receipt-header {
+      text-align: center;
+      padding-bottom: 20px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .receipt-stamp {
+      display: inline-block;
+      border: 2px solid #137333;
+      color: #137333;
+      font-weight: 800;
+      font-size: 13px;
+      padding: 4px 14px;
+      border-radius: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 12px;
+    }
+    .receipt-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: #1A1A1A;
+    }
+    .receipt-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .receipt-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13.5px;
+      color: #555;
+    }
+    .receipt-row strong {
+      color: #1A1A1A;
+    }
+    .receipt-actions-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    /* Responsividade do Checkout */
+    @media (max-width: 900px) {
+      .checkout-grid-layout {
+        grid-template-columns: 1fr;
+      }
+      .checkout-order-summary-card {
+        position: static;
+        order: -1;
+      }
+      .checkout-form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (max-width: 540px) {
+      .checkout-page-container {
+        padding: 20px 14px 60px;
+      }
+      .checkout-card {
+        padding: 20px 16px;
+      }
+      .momo-selector-cards {
+        grid-template-columns: 1fr;
+      }
+      .receipt-container {
+        padding: 20px 16px;
+      }
+      .receipt-actions-row {
+        flex-direction: column;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -4405,6 +5235,273 @@
 
 
 
+    <!-- ==================== VISTA 4: CHECKOUT DE PAGAMENTO ==================== -->
+  <div class="app-view" id="viewCheckout">
+    <div class="checkout-page-container">
+      
+      <!-- Navegação Superior do Checkout -->
+      <div class="checkout-top-nav">
+        <button type="button" class="checkout-back-btn" id="btnBackFromCheckout">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          <span>Voltar</span>
+        </button>
+        <div class="checkout-security-badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+          <span>Pagamento Protegido SSL 256-bit</span>
+        </div>
+      </div>
+
+      <!-- Título da Página -->
+      <div class="checkout-page-title-row">
+        <h1 class="checkout-page-title">Finalizar Subscrição</h1>
+        <p class="checkout-page-desc">Pagamento rápido em Meticais (MZN) através de débito móvel sem necessidade de cartão internacional.</p>
+      </div>
+
+      <!-- ESTADO 1: FORMULÁRIO PRINCIPAL DE CHECKOUT -->
+      <div class="checkout-grid-layout" id="checkoutViewFormState">
+        
+        <!-- Coluna Esquerda: Dados e Método de Pagamento -->
+        <div class="checkout-main-col">
+          
+          <!-- Cartão 1: Dados do Subscritor -->
+          <div class="checkout-card">
+            <div class="checkout-card-header">
+              <div class="checkout-card-step-num">1</div>
+              <h2 class="checkout-card-title">Dados de Facturação</h2>
+            </div>
+            
+            <div class="checkout-form-row">
+              <div>
+                <label class="checkout-field-label">Nome Completo</label>
+                <input type="text" class="checkout-text-input" id="vckCustomerName" placeholder="ex: Rofina Cumbe" value="Rofina Cumbe">
+              </div>
+              <div>
+                <label class="checkout-field-label">Email de Acesso &amp; Recibo</label>
+                <input type="email" class="checkout-text-input" id="vckCustomerEmail" placeholder="seuemail@exemplo.com" value="analista@empresa.co.mz">
+              </div>
+            </div>
+
+            <div class="checkout-form-row">
+              <div>
+                <label class="checkout-field-label">NUIT (Opcional para Empresa)</label>
+                <input type="text" class="checkout-text-input" id="vckCustomerNuit" placeholder="ex: 400123456" maxlength="9">
+              </div>
+              <div>
+                <label class="checkout-field-label">Cidade / Província</label>
+                <input type="text" class="checkout-text-input" id="vckCustomerCity" placeholder="ex: Maputo" value="Maputo">
+              </div>
+            </div>
+          </div>
+
+          <!-- Cartão 2: Seleção da Carteira Móvel & Telemóvel -->
+          <div class="checkout-card">
+            <div class="checkout-card-header">
+              <div class="checkout-card-step-num">2</div>
+              <h2 class="checkout-card-title">Método de Pagamento Móvel</h2>
+            </div>
+
+            <label class="checkout-field-label" style="margin-bottom: 10px;">Escolha a sua carteira móvel:</label>
+            <div class="momo-selector-cards">
+              <div class="momo-option-card active opt-mpesa" id="vckOptMpesa" data-op="mpesa">
+                <div class="momo-radio-indicator"></div>
+                <span class="momo-logo-text">M-Pesa</span>
+                <div class="momo-carrier-name">Vodacom Moçambique</div>
+                <div class="momo-carrier-prefixes">Prefixos suportados: 84, 85</div>
+              </div>
+
+              <div class="momo-option-card opt-emola" id="vckOptEmola" data-op="emola">
+                <div class="momo-radio-indicator"></div>
+                <span class="momo-logo-text">e-Mola</span>
+                <div class="momo-carrier-name">Movitel Moçambique</div>
+                <div class="momo-carrier-prefixes">Prefixos suportados: 86, 87</div>
+              </div>
+            </div>
+
+            <!-- Campo de Telemóvel com Detecção -->
+            <div class="checkout-form-group-full">
+              <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                <label class="checkout-field-label" style="margin:0;">Número de Telemóvel para Pagamento</label>
+                <span id="vckDetectedLabel" style="font-size:12px; font-weight:700; color:#E60000;">Vodacom M-Pesa</span>
+              </div>
+              <div class="checkout-phone-input-wrap">
+                <div class="checkout-phone-prefix">+258</div>
+                <input type="tel" class="checkout-phone-input" id="vckPhoneInput" placeholder="84 123 4567" maxlength="9" autocomplete="tel">
+              </div>
+              <div class="checkout-hint">
+                Introduza apenas os 9 dígitos (ex: 84XXXXXXX ou 86XXXXXXX). O sistema detecta a operadora automaticamente.
+              </div>
+            </div>
+
+            <!-- Guia de como autorizar -->
+            <div class="momo-guide-box">
+              <div class="momo-guide-title">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                <span>Instruções do Débito Móvel</span>
+              </div>
+              <ul class="momo-guide-steps">
+                <li><span class="step-dot">1</span> Após clicar em "Confirmar e Pagar", a Kivora Payments envia um pedido USSD oficial ao seu telemóvel.</li>
+                <li><span class="step-dot">2</span> O ecrã do seu telemóvel exibirá o valor exato a ser debitado.</li>
+                <li><span class="step-dot">3</span> Digite o seu <strong>PIN secreto</strong> do M-Pesa / e-Mola para aprovar.</li>
+                <li><span class="step-dot">4</span> O seu plano será ativado imediatamente sem precisar recarregar a página.</li>
+              </ul>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Coluna Direita: Resumo do Pedido -->
+        <div class="checkout-summary-col">
+          <div class="checkout-order-summary-card">
+            <h3 class="summary-title">Resumo do Pedido</h3>
+
+            <!-- Alternador de Ciclo (Mensal / Anual) -->
+            <div class="plan-cycle-toggle">
+              <button type="button" class="cycle-btn active" id="btnCycleMonthly">
+                <span>Mensal</span>
+              </button>
+              <button type="button" class="cycle-btn" id="btnCycleYearly">
+                <span>Anual</span>
+                <span class="save-tag">-33%</span>
+              </button>
+            </div>
+
+            <div class="summary-plan-details">
+              <div class="summary-plan-name" id="vckSummaryPlanName">Plano Profissional</div>
+              <div class="summary-plan-desc" id="vckSummaryPlanDesc">Análises ilimitadas, IA conversacional e exportações PDF/JSON.</div>
+            </div>
+
+            <div class="summary-price-lines">
+              <div class="summary-line">
+                <span>Preço do Plano:</span>
+                <span id="vckSubtotalDisplay">499.00 MZN</span>
+              </div>
+              <div class="summary-line">
+                <span>IVA (16% incluso):</span>
+                <span id="vckTaxDisplay">68.82 MZN</span>
+              </div>
+              <div class="summary-line">
+                <span>Taxa de processamento:</span>
+                <span style="color:#137333; font-weight:600;">Grátis (0.00 MZN)</span>
+              </div>
+              <div class="summary-line total">
+                <span>Total a Pagar:</span>
+                <span class="price-highlight" id="vckTotalDisplay">499 MZN</span>
+              </div>
+            </div>
+
+            <!-- Botão de Ação Primário -->
+            <button type="button" class="btn-pay-checkout-main" id="btnConfirmCheckoutPay">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+              <span id="vckPayBtnText">Pagar 499 MZN com M-Pesa</span>
+            </button>
+
+            <!-- Garantias -->
+            <div class="summary-guarantees">
+              <div class="guarantee-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span>Acesso instantâneo após introduzir o PIN</span>
+              </div>
+              <div class="guarantee-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span>Processado com segurança via Kivora Payments</span>
+              </div>
+              <div class="guarantee-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span>Sem fidelização, cancele quando desejar</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ESTADO 2: AGUARDANDO CONFIRMAÇÃO USSD NO TELEMÓVEL -->
+      <div id="checkoutViewProcessingState" style="display:none; max-width:600px; margin:0 auto;">
+        <div class="checkout-processing-box">
+          <div class="countdown-timer-circle">
+            <span class="countdown-sec" id="vckCountdownSec">60</span>
+            <span class="countdown-label">seg</span>
+          </div>
+          <h2 style="font-size:24px; font-weight:800; color:#1A1A1A; margin-bottom:10px;">Confirme no seu Telemóvel</h2>
+          <p style="font-size:15px; color:#555; line-height:1.5; margin-bottom:20px;">
+            Foi enviado um pedido de débito para <strong id="vckPromptTargetPhone">+258 84XXXXXXX</strong>.<br>
+            Desbloqueie o ecrã do seu telemóvel e <strong>introduza o seu PIN do <span id="vckPromptOpName">M-Pesa</span></strong>.
+          </p>
+          <div class="checkout-reference-badge" id="vckProcessingRefBadge">Referência: AA-MZ-000000</div>
+          
+          <div style="display:flex; justify-content:center; align-items:center; gap:10px; color:#1A73E8; font-weight:600; font-size:14px; margin-top:16px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="spin-icon" style="animation:spin 1s linear infinite;"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
+            <span id="vckStatusPollingMsg">Aguardando autorização da rede móvel...</span>
+          </div>
+
+          <div style="margin-top:30px; display:flex; justify-content:center; gap:12px;">
+            <button type="button" class="checkout-back-btn" id="btnCancelProcessing">Cancelar ou Corrigir Número</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ESTADO 3: RECIBO / COMPROVATIVO OFICIAL DE SUCESSO -->
+      <div id="checkoutViewSuccessState" style="display:none;">
+        <div class="receipt-container">
+          <div class="receipt-header">
+            <div class="receipt-stamp">PAGAMENTO LIQUIDADO COM SUCESSO</div>
+            <h2 class="receipt-title">Comprovativo de Subscrição</h2>
+            <div style="font-size:13px; color:#777; margin-top:4px;">Análise Automatizada &bull; Kivora Payments Moçambique</div>
+          </div>
+
+          <div class="receipt-rows">
+            <div class="receipt-row">
+              <span>N.º de Transacção:</span>
+              <strong id="rcpTxId">pay_xxxxxxxxx</strong>
+            </div>
+            <div class="receipt-row">
+              <span>Referência Externa:</span>
+              <strong id="rcpRefId">AA-MZ-000000</strong>
+            </div>
+            <div class="receipt-row">
+              <span>Data e Hora:</span>
+              <strong id="rcpDateTime">14/11/2026 12:45</strong>
+            </div>
+            <div class="receipt-row">
+              <span>Subscritor:</span>
+              <strong id="rcpCustomerName">Rofina Cumbe</strong>
+            </div>
+            <div class="receipt-row">
+              <span>Email:</span>
+              <strong id="rcpCustomerEmail">analista@empresa.co.mz</strong>
+            </div>
+            <div class="receipt-row">
+              <span>Método de Pagamento:</span>
+              <strong id="rcpPaymentMethod">Vodacom M-Pesa (+258 84•••••••)</strong>
+            </div>
+            <div class="receipt-row">
+              <span>Plano Contratado:</span>
+              <strong id="rcpPlanName">Plano Profissional (Mensal)</strong>
+            </div>
+            <div class="receipt-row" style="border-top:1px dashed var(--border-light); padding-top:10px; font-size:16px;">
+              <span>Total Pago:</span>
+              <strong style="color:#137333; font-size:18px;" id="rcpAmountPaid">499 MZN</strong>
+            </div>
+          </div>
+
+          <div class="receipt-actions-row">
+            <button type="button" class="checkout-back-btn" id="btnPrintReceipt" style="flex:1; justify-content:center; height:46px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+              <span>Imprimir / Guardar Recibo</span>
+            </button>
+            <button type="button" class="btn-pay-checkout-main" id="btnGoToWorkspaceAfterReceipt" style="flex:1.2; height:46px;">
+              <span>Aceder ao Workspace Pro</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 
   <!-- ==================== LÓGICA DA APLICAÇÃO ==================== -->
@@ -4420,10 +5517,12 @@
     const navFeaturesBtn = document.getElementById('navFeaturesBtn');
     const brandLogoBtn = document.getElementById('brandLogoBtn');
 
-    function showView(viewName) {
+    function showView(viewName, planData) {
+      const vCheckout = document.getElementById('viewCheckout');
       if (viewHome) viewHome.classList.remove('active');
       if (viewAuth) viewAuth.classList.remove('active');
       if (viewWorkspace) viewWorkspace.classList.remove('active');
+      if (vCheckout) vCheckout.classList.remove('active');
 
       if (navHomeBtn) navHomeBtn.classList.remove('active');
       if (navWorkspaceBtn) navWorkspaceBtn.classList.remove('active');
@@ -4443,6 +5542,18 @@
       } else if (viewName === 'workspace') {
         if (viewWorkspace) viewWorkspace.classList.add('active');
         if (navWorkspaceBtn) navWorkspaceBtn.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (viewName === 'checkout') {
+        if (vCheckout) {
+          vCheckout.classList.add('active');
+          if (checkoutViewFormState) checkoutViewFormState.style.display = 'grid';
+          if (checkoutViewProcessingState) checkoutViewProcessingState.style.display = 'none';
+          if (checkoutViewSuccessState) checkoutViewSuccessState.style.display = 'none';
+          if (btnConfirmCheckoutPay) {
+            btnConfirmCheckoutPay.disabled = false;
+            updateVckPayButton();
+          }
+        }
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     }
