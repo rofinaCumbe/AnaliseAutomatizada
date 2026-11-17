@@ -3725,6 +3725,519 @@
       }
     }
 
+  
+    /* ============================================================== */
+    /* PAINEL ADMINISTRATIVO (#viewAdmin)                             */
+    /* ============================================================== */
+    .admin-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 32px 24px 80px;
+    }
+
+    /* Topbar Link Admin */
+    .nav-admin-link {
+      background: #1A1A1A !important;
+      color: #FFFFFF !important;
+      font-weight: 700 !important;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .nav-admin-link:hover {
+      background: #333333 !important;
+    }
+
+    /* Cabeçalho do Admin */
+    .admin-header {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 24px;
+      padding: 28px 32px;
+      margin-bottom: 28px;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .admin-header-title-box {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .admin-role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #1A1A1A;
+      color: #FFFFFF;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      align-self: flex-start;
+    }
+    .admin-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: #1A1A1A;
+      letter-spacing: -0.02em;
+    }
+    .admin-subtitle {
+      font-size: 14px;
+      color: #666666;
+    }
+
+    .admin-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .admin-pill-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #E6F4EA;
+      color: #137333;
+      padding: 8px 14px;
+      border-radius: 12px;
+      font-size: 12.5px;
+      font-weight: 600;
+      border: 1px solid #CEEAD6;
+    }
+    .admin-pill-status .dot-pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #137333;
+      animation: pulseGreen 1.8s infinite;
+    }
+    @keyframes pulseGreen {
+      0% { box-shadow: 0 0 0 0 rgba(19, 115, 51, 0.4); }
+      70% { box-shadow: 0 0 0 8px rgba(19, 115, 51, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(19, 115, 51, 0); }
+    }
+
+    .btn-admin-switch-ws {
+      background: #1A73E8;
+      color: #FFFFFF;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-size: 13.5px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      box-shadow: 0 2px 8px rgba(26, 115, 232, 0.25);
+    }
+    .btn-admin-switch-ws:hover {
+      background: #1557B0;
+      transform: translateY(-1px);
+    }
+
+    /* Grid de KPIs Administrativos */
+    .admin-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+    .admin-kpi-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      transition: all var(--transition-fast);
+    }
+    .admin-kpi-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.06);
+    }
+    .admin-kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: #1A73E8;
+    }
+    .admin-kpi-card.kpi-green::before { background: #137333; }
+    .admin-kpi-card.kpi-purple::before { background: #8430CE; }
+    .admin-kpi-card.kpi-amber::before { background: #E67E22; }
+
+    .admin-kpi-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .admin-kpi-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #666666;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .admin-kpi-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .icon-blue-bg { background: #E8F0FE; color: #1A73E8; }
+    .icon-green-bg { background: #E6F4EA; color: #137333; }
+    .icon-purple-bg { background: #F3E8FD; color: #8430CE; }
+    .icon-amber-bg { background: #FFF4E5; color: #E67E22; }
+
+    .admin-kpi-val {
+      font-size: 32px;
+      font-weight: 800;
+      color: #1A1A1A;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+    .admin-kpi-desc {
+      font-size: 12.5px;
+      color: #777777;
+    }
+
+    /* Abas de Navegação do Admin */
+    .admin-tabs-nav {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border-light);
+      margin-bottom: 24px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    .admin-tab-btn {
+      background: transparent;
+      border: none;
+      padding: 12px 20px;
+      font-family: inherit;
+      font-size: 14.5px;
+      font-weight: 600;
+      color: #666666;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 12px 12px 0 0;
+      position: relative;
+      transition: all var(--transition-fast);
+      white-space: nowrap;
+    }
+    .admin-tab-btn:hover {
+      color: #1A73E8;
+      background: #F8F9FA;
+    }
+    .admin-tab-btn.active {
+      color: #1A73E8;
+      font-weight: 700;
+      background: #FFFFFF;
+    }
+    .admin-tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: #1A73E8;
+      border-radius: 3px 3px 0 0;
+    }
+
+    /* Seções de Conteúdo das Abas */
+    .admin-tab-content {
+      display: none;
+    }
+    .admin-tab-content.active {
+      display: block;
+    }
+
+    /* Barra de Ações das Tabelas */
+    .admin-section-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+    .admin-search-wrap {
+      display: flex;
+      align-items: center;
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      padding: 0 14px;
+      width: 320px;
+      max-width: 100%;
+    }
+    .admin-search-input {
+      border: none;
+      height: 42px;
+      width: 100%;
+      outline: none;
+      font-size: 13.5px;
+      background: transparent;
+    }
+    .btn-admin-add-user {
+      background: #1A73E8;
+      color: #FFFFFF;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all var(--transition-fast);
+    }
+    .btn-admin-add-user:hover {
+      background: #1557B0;
+    }
+
+    /* Tabela do Admin */
+    .admin-table-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+      margin-bottom: 30px;
+    }
+    .admin-table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13.5px;
+    }
+    .admin-table th {
+      background: #F8F9FA;
+      padding: 14px 18px;
+      color: #555555;
+      font-weight: 700;
+      border-bottom: 1px solid var(--border-light);
+      white-space: nowrap;
+    }
+    .admin-table td {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border-light);
+      color: #333333;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+    .admin-table tr:last-child td {
+      border-bottom: none;
+    }
+    .admin-table tr:hover td {
+      background: #FAFAFA;
+    }
+
+    /* Badges de Tabela */
+    .badge-admin-role {
+      background: #1A1A1A;
+      color: #FFFFFF;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+    .badge-admin-pro {
+      background: #E8F0FE;
+      color: #1A73E8;
+      font-weight: 700;
+      font-size: 11.5px;
+      padding: 3px 9px;
+      border-radius: 8px;
+    }
+    .badge-admin-free {
+      background: #F1F3F4;
+      color: #555555;
+      font-size: 11.5px;
+      padding: 3px 9px;
+      border-radius: 8px;
+    }
+    .badge-admin-corp {
+      background: #F3E8FD;
+      color: #8430CE;
+      font-weight: 700;
+      font-size: 11.5px;
+      padding: 3px 9px;
+      border-radius: 8px;
+    }
+    .badge-status-active {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: #137333;
+      font-weight: 600;
+      font-size: 12px;
+    }
+    .badge-status-active::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #137333;
+    }
+
+    .btn-admin-action {
+      background: #F1F3F4;
+      border: 1px solid #E0E0E0;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #333333;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      margin-right: 6px;
+    }
+    .btn-admin-action:hover {
+      background: #E8EAED;
+    }
+    .btn-admin-action.danger {
+      color: #C5221F;
+    }
+    .btn-admin-action.danger:hover {
+      background: #FCE8E6;
+      border-color: #F5C2C7;
+    }
+
+    /* Cartões de Infraestrutura */
+    .admin-infra-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    .admin-infra-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: var(--shadow-card);
+    }
+    .admin-infra-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .admin-infra-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1A1A1A;
+    }
+    .admin-infra-details {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 13px;
+      color: #555555;
+    }
+    .infra-detail-row {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px dashed var(--border-light);
+      padding-bottom: 6px;
+    }
+    .infra-detail-row:last-child {
+      border-bottom: none;
+    }
+
+    /* Modal Adicionar Utilizador */
+    .admin-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      padding: 16px;
+    }
+    .admin-modal-backdrop.show {
+      display: flex;
+    }
+    .admin-modal {
+      background: #FFFFFF;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 20px 48px rgba(0,0,0,0.2);
+      overflow: hidden;
+      animation: modalSlideUp 0.2s ease-out;
+    }
+    .admin-modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .admin-modal-title {
+      font-size: 17px;
+      font-weight: 700;
+    }
+    .admin-modal-body {
+      padding: 24px;
+    }
+
+    /* Responsividade do Painel Admin */
+    @media (max-width: 1024px) {
+      .admin-kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .admin-infra-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (max-width: 540px) {
+      .admin-container {
+        padding: 16px 12px 60px;
+      }
+      .admin-header {
+        padding: 20px 16px;
+      }
+      .admin-kpi-grid {
+        grid-template-columns: 1fr;
+      }
+      .admin-header-actions {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .btn-admin-switch-ws {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -3762,6 +4275,10 @@
               <button type="button" class="topbar-nav-link" id="navPricingBtn">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
           <span>Planos &amp; M-Pesa</span>
+        </button>
+              <button type="button" class="topbar-nav-link nav-admin-link" id="navAdminBtn" style="display: none;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F1C40F" stroke-width="2.2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+          <span>Painel Admin</span>
         </button>
       </nav>
     </div>
@@ -3810,6 +4327,10 @@
       <button type="button" class="mobile-nav-link" id="mNavFeatures">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
         <span>Funcionalidades</span>
+      </button>
+            <button type="button" class="mobile-nav-link" id="mNavAdmin" style="display: none; color: #1A73E8; font-weight: 700;">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#F1C40F" stroke-width="2.2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+        <span>Painel Administrativo</span>
       </button>
       <button type="button" class="mobile-nav-link" id="mNavPricing">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
@@ -4997,6 +5518,346 @@
     </div>
   </div>
 
+    <!-- ==================== VISTA 5: PAINEL ADMINISTRATIVO ==================== -->
+  <div class="app-view" id="viewAdmin">
+    <div class="admin-container">
+      
+      <!-- Cabeçalho Executivo do Admin -->
+      <div class="admin-header">
+        <div class="admin-header-title-box">
+          <span class="admin-role-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F1C40F" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+            Administrador do Sistema
+          </span>
+          <h1 class="admin-title">Painel de Controlo Administrativo</h1>
+          <p class="admin-subtitle">Gestão global de contas, subscrições M-Pesa / e-Mola, métricas da plataforma e base de dados MongoDB Atlas.</p>
+        </div>
+
+        <div class="admin-header-actions">
+          <div class="admin-pill-status" title="Conexão operacional com MongoDB Atlas">
+            <span class="dot-pulse"></span>
+            <span>MongoDB Atlas: Online</span>
+          </div>
+          <div class="admin-pill-status" style="background:#E8F0FE; color:#1A73E8; border-color:#C2E7FF;" title="Gateway de pagamentos móveis operacional">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            <span>Kivora API: Ativa</span>
+          </div>
+          <button type="button" class="btn-admin-switch-ws" id="btnAdminToWorkspace">
+            <span>Aceder à Área de Análise</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Grid de 4 KPIs Globais -->
+      <div class="admin-kpi-grid">
+        <div class="admin-kpi-card">
+          <div class="admin-kpi-header">
+            <span class="admin-kpi-title">Total Utilizadores</span>
+            <div class="admin-kpi-icon icon-blue-bg">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            </div>
+          </div>
+          <div class="admin-kpi-val" id="admKpiUsers">28</div>
+          <div class="admin-kpi-desc">Utilizadores registados na base local e cloud</div>
+        </div>
+
+        <div class="admin-kpi-card kpi-green">
+          <div class="admin-kpi-header">
+            <span class="admin-kpi-title">Receita M-Pesa / e-Mola</span>
+            <div class="admin-kpi-icon icon-green-bg">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+            </div>
+          </div>
+          <div class="admin-kpi-val" id="admKpiRevenue">14.970 MZN</div>
+          <div class="admin-kpi-desc">Volume total transacionado via Kivora</div>
+        </div>
+
+        <div class="admin-kpi-card kpi-purple">
+          <div class="admin-kpi-header">
+            <span class="admin-kpi-title">Subscrições Pro Ativas</span>
+            <div class="admin-kpi-icon icon-purple-bg">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+          </div>
+          <div class="admin-kpi-val" id="admKpiPro">18</div>
+          <div class="admin-kpi-desc">Planos Profissionais e Corporativos ativos</div>
+        </div>
+
+        <div class="admin-kpi-card kpi-amber">
+          <div class="admin-kpi-header">
+            <span class="admin-kpi-title">Datasets Processados</span>
+            <div class="admin-kpi-icon icon-amber-bg">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+            </div>
+          </div>
+          <div class="admin-kpi-val" id="admKpiDatasets">142</div>
+          <div class="admin-kpi-desc">Relatórios e análises com IA geradas</div>
+        </div>
+      </div>
+
+      <!-- Abas de Navegação do Painel Admin -->
+      <div class="admin-tabs-nav">
+        <button type="button" class="admin-tab-btn active" id="admTabBtnUsers" data-tab="users">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+          <span>Gestão de Utilizadores</span>
+        </button>
+        <button type="button" class="admin-tab-btn" id="admTabBtnTrans" data-tab="trans">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+          <span>Transacções M-Pesa &amp; e-Mola</span>
+        </button>
+        <button type="button" class="admin-tab-btn" id="admTabBtnInfra" data-tab="infra">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          <span>Infraestrutura &amp; Base de Dados</span>
+        </button>
+      </div>
+
+      <!-- ABA 1: GESTÃO DE UTILIZADORES -->
+      <div class="admin-tab-content active" id="admTabContentUsers">
+        <div class="admin-section-bar">
+          <div class="admin-search-wrap">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" style="margin-right:8px;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" class="admin-search-input" id="admSearchUserInput" placeholder="Pesquisar por nome ou email...">
+          </div>
+          <button type="button" class="btn-admin-add-user" id="btnAdminOpenAddUser">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>Adicionar Novo Utilizador</span>
+          </button>
+        </div>
+
+        <div class="admin-table-card">
+          <div class="admin-table-wrap">
+            <table class="admin-table" id="admUsersTable">
+              <thead>
+                <tr>
+                  <th>Utilizador / Nome</th>
+                  <th>Email de Contacto</th>
+                  <th>Cargo / Função</th>
+                  <th>Plano Actual</th>
+                  <th>Estado</th>
+                  <th>Ações de Controlo</th>
+                </tr>
+              </thead>
+              <tbody id="admUsersTbody">
+                <!-- Inserido dinamicamente via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ABA 2: TRANSAÇÕES M-PESA & E-MOLA -->
+      <div class="admin-tab-content" id="admTabContentTrans">
+        <div class="admin-section-bar">
+          <div style="font-size:14px; color:#555; font-weight:600;">
+            Cobranças C2B e Subscrições Móveis Recentes (Kivora Payments API):
+          </div>
+        </div>
+
+        <div class="admin-table-card">
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>ID Kivora</th>
+                  <th>Referência</th>
+                  <th>Cliente</th>
+                  <th>Operadora Móvel</th>
+                  <th>Montante</th>
+                  <th>Data e Hora</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="admTransTbody">
+                <tr>
+                  <td><code>pay_kv_894101</code></td>
+                  <td><strong>AA-2026-9041</strong></td>
+                  <td>Rofina Cumbe</td>
+                  <td><span class="momo-badge momo-mpesa">M-Pesa (Vodacom)</span></td>
+                  <td><strong>499 MZN</strong></td>
+                  <td>17/11/2026 12:40</td>
+                  <td><span class="badge-status-active">Liquidado</span></td>
+                </tr>
+                <tr>
+                  <td><code>pay_kv_772390</code></td>
+                  <td><strong>AA-2026-8812</strong></td>
+                  <td>Carlos Mondlane</td>
+                  <td><span class="momo-badge momo-emola">e-Mola (Movitel)</span></td>
+                  <td><strong>499 MZN</strong></td>
+                  <td>17/11/2026 11:15</td>
+                  <td><span class="badge-status-active">Liquidado</span></td>
+                </tr>
+                <tr>
+                  <td><code>pay_kv_661902</code></td>
+                  <td><strong>AA-2026-7734</strong></td>
+                  <td>Teresa Macamo</td>
+                  <td><span class="momo-badge momo-mpesa">M-Pesa (Vodacom)</span></td>
+                  <td><strong>3.999 MZN</strong></td>
+                  <td>16/11/2026 16:30</td>
+                  <td><span class="badge-status-active">Liquidado (Anual)</span></td>
+                </tr>
+                <tr>
+                  <td><code>pay_kv_552199</code></td>
+                  <td><strong>AA-2026-6621</strong></td>
+                  <td>Alberto Manhiça</td>
+                  <td><span class="momo-badge momo-mpesa">M-Pesa (Vodacom)</span></td>
+                  <td><strong>499 MZN</strong></td>
+                  <td>16/11/2026 10:20</td>
+                  <td><span class="badge-status-active">Liquidado</span></td>
+                </tr>
+                <tr>
+                  <td><code>pay_kv_441803</code></td>
+                  <td><strong>AA-2026-5510</strong></td>
+                  <td>Marta Sitoe</td>
+                  <td><span class="momo-badge momo-emola">e-Mola (Movitel)</span></td>
+                  <td><strong>499 MZN</strong></td>
+                  <td>15/11/2026 14:05</td>
+                  <td><span class="badge-status-active">Liquidado</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ABA 3: INFRAESTRUTURA & CONFIGURAÇÕES -->
+      <div class="admin-tab-content" id="admTabContentInfra">
+        <div class="admin-infra-grid">
+          <!-- Card MongoDB Atlas -->
+          <div class="admin-infra-card">
+            <div class="admin-infra-header">
+              <span class="admin-infra-title">MongoDB Atlas</span>
+              <span class="badge-status-active">Conectado</span>
+            </div>
+            <div class="admin-infra-details">
+              <div class="infra-detail-row">
+                <span>Cluster:</span>
+                <strong>cluster0.kjp90za.mongodb.net</strong>
+              </div>
+              <div class="infra-detail-row">
+                <span>Base de Dados:</span>
+                <strong>analiseautomatizadadb</strong>
+              </div>
+              <div class="infra-detail-row">
+                <span>Utilizador BD:</span>
+                <strong>rofinacumbe01_db_user</strong>
+              </div>
+              <div class="infra-detail-row">
+                <span>Protocolo:</span>
+                <strong>mongodb+srv (SSL/TLS)</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Kivora Payments -->
+          <div class="admin-infra-card">
+            <div class="admin-infra-header">
+              <span class="admin-infra-title">Kivora Payments API</span>
+              <span class="badge-status-active">Ativa</span>
+            </div>
+            <div class="admin-infra-details">
+              <div class="infra-detail-row">
+                <span>Endpoint Base:</span>
+                <strong>https://www.kivorapayments.com</strong>
+              </div>
+              <div class="infra-detail-row">
+                <span>Versão API:</span>
+                <strong>2026-07-31 (OpenAPI 3.1)</strong>
+              </div>
+              <div class="infra-detail-row">
+                <span>Operadoras:</span>
+                <strong>M-Pesa (Vodacom) &bull; e-Mola (Movitel)</strong>
+              </div>
+              <div class="infra-detail-row">
+                <span>Moeda Padrão:</span>
+                <strong>MZN (Metical Moçambicano)</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Servidor & Deploy -->
+          <div class="admin-infra-card">
+            <div class="admin-infra-header">
+              <span class="admin-infra-title">Servidor &amp; Hosting</span>
+              <span class="badge-status-active">Operacional</span>
+            </div>
+            <div class="admin-infra-details">
+              <div class="infra-detail-row">
+                <span>Ambiente:</span>
+                <strong>Node.js / Vercel Serverless</strong>
+              </div>
+              <div class="infra-detail-row">
+                <span>Endpoints API:</span>
+                <strong>/api/payments/c2b &bull; /status</strong>
+              </div>
+              <div class="infra-detail-row">
+                <span>Repositório GitHub:</span>
+                <strong>AnaliseAutomatizada (main)</strong>
+              </div>
+              <div class="infra-detail-row">
+                <span>Porta Local:</span>
+                <strong>3000</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:#FFFFFF; border:1px solid var(--border-light); border-radius:20px; padding:24px; box-shadow:var(--shadow-card);">
+          <h3 style="font-size:16px; font-weight:700; margin-bottom:12px;">Manutenção e Ferramentas do Administrador</h3>
+          <p style="font-size:13.5px; color:#666; margin-bottom:18px;">
+            Ações de limpeza e reinicialização para testes e auditoria do sistema em Moçambique.
+          </p>
+          <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <button type="button" class="btn-admin-action" id="btnAdminResetUsers" style="padding:10px 16px;">
+              Repor Lista Padrão de Utilizadores
+            </button>
+            <button type="button" class="btn-admin-action danger" id="btnAdminClearCache" style="padding:10px 16px;">
+              Limpar Cache do Navegador
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL: ADICIONAR UTILIZADOR (ADMIN) -->
+  <div class="admin-modal-backdrop" id="modalAdminAddUser">
+    <div class="admin-modal">
+      <div class="admin-modal-header">
+        <h3 class="admin-modal-title">Adicionar Novo Utilizador</h3>
+        <button type="button" class="checkout-close-btn" id="btnAdminCloseAddUser">&times;</button>
+      </div>
+      <div class="admin-modal-body">
+        <form id="formAdminCreateUser">
+          <div style="margin-bottom:16px;">
+            <label class="checkout-field-label">Nome Completo</label>
+            <input type="text" class="checkout-text-input" id="admNewName" placeholder="ex: Armando Guebuza" required>
+          </div>
+          <div style="margin-bottom:16px;">
+            <label class="checkout-field-label">Email de Acesso</label>
+            <input type="email" class="checkout-text-input" id="admNewEmail" placeholder="ex: armando@empresa.co.mz" required>
+          </div>
+          <div style="margin-bottom:16px;">
+            <label class="checkout-field-label">Função / Cargo</label>
+            <input type="text" class="checkout-text-input" id="admNewRole" placeholder="ex: Analista de Negócios" value="Analista de Dados">
+          </div>
+          <div style="margin-bottom:20px;">
+            <label class="checkout-field-label">Plano Atribuído</label>
+            <select class="checkout-text-input" id="admNewPlan" style="cursor:pointer;">
+              <option value="pro">Plano Profissional (499 MZN)</option>
+              <option value="corp">Plano Corporativo (3.999 MZN)</option>
+              <option value="free">Plano Gratuito / Básico</option>
+            </select>
+          </div>
+          <button type="submit" class="btn-pay-checkout-main" style="height:46px;">
+            <span>Criar Conta de Utilizador</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 
   <!-- ==================== LÓGICA DA APLICAÇÃO ==================== -->
@@ -5017,19 +5878,23 @@
       const vAuth = document.getElementById('viewAuth');
       const vWorkspace = document.getElementById('viewWorkspace');
       const vCheckout = document.getElementById('viewCheckout');
+      const vAdmin = document.getElementById('viewAdmin');
 
       const nHome = document.getElementById('navHomeBtn');
       const nWorkspace = document.getElementById('navWorkspaceBtn');
       const nFeatures = document.getElementById('navFeaturesBtn');
+      const nAdmin = document.getElementById('navAdminBtn');
 
       if (vHome) vHome.classList.remove('active');
       if (vAuth) vAuth.classList.remove('active');
       if (vWorkspace) vWorkspace.classList.remove('active');
       if (vCheckout) vCheckout.classList.remove('active');
+      if (vAdmin) vAdmin.classList.remove('active');
 
       if (nHome) nHome.classList.remove('active');
       if (nWorkspace) nWorkspace.classList.remove('active');
       if (nFeatures) nFeatures.classList.remove('active');
+      if (nAdmin) nAdmin.classList.remove('active');
 
       if (viewName === 'home') {
         if (vHome) vHome.classList.add('active');
@@ -5058,6 +5923,13 @@
           const btnPay = document.getElementById('btnConfirmCheckoutPay');
           if (btnPay) btnPay.disabled = false;
         }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (viewName === 'admin') {
+        if (vAdmin) {
+          vAdmin.classList.add('active');
+          if (typeof renderAdminDashboard === 'function') renderAdminDashboard();
+        }
+        if (nAdmin) nAdmin.classList.add('active');
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     }
@@ -5178,9 +6050,19 @@
         const parts = currentUser.name.trim().split(' ');
         const initials = parts.length > 1 ? (parts[0][0] + parts[parts.length - 1][0]) : (currentUser.name.slice(0, 2));
         if (topbarUserAvatar) topbarUserAvatar.textContent = initials.toUpperCase();
+
+        const isAdmin = currentUser.role === 'Administrador do Sistema' || currentUser.email.toLowerCase() === 'admin@analiseautomatizada.co.mz';
+        const navAdm = document.getElementById('navAdminBtn');
+        const mNavAdm = document.getElementById('mNavAdmin');
+        if (navAdm) navAdm.style.display = isAdmin ? 'inline-flex' : 'none';
+        if (mNavAdm) mNavAdm.style.display = isAdmin ? 'flex' : 'none';
       } else {
         if (topbarLoginBtn) topbarLoginBtn.style.display = 'inline-flex';
         if (topbarUserBadge) topbarUserBadge.classList.remove('logged-in');
+        const navAdm = document.getElementById('navAdminBtn');
+        const mNavAdm = document.getElementById('mNavAdmin');
+        if (navAdm) navAdm.style.display = 'none';
+        if (mNavAdm) mNavAdm.style.display = 'none';
       }
       checkWorkspacePrompt();
     }
@@ -5324,7 +6206,7 @@
           };
           setCurrentUser(adminUser, remember);
           showToast('Bem-vindo, Administrador do Sistema!');
-          showView('workspace');
+          showView('admin');
           return;
         }
 
@@ -5374,7 +6256,7 @@
         };
         setCurrentUser(adminUser, true);
         showToast('Sessão de Administrador iniciada com sucesso!');
-        showView('workspace');
+        showView('admin');
       });
     }
 
@@ -6480,6 +7362,221 @@
     if (btnGoToWorkspaceAfterReceipt) {
       btnGoToWorkspaceAfterReceipt.addEventListener('click', () => {
         showView('workspace');
+      });
+    }
+
+  
+    // ==============================================================
+    // LÓGICA DO PAINEL ADMINISTRATIVO (#viewAdmin)
+    // ==============================================================
+    const navAdminBtn = document.getElementById('navAdminBtn');
+    const mNavAdmin = document.getElementById('mNavAdmin');
+    const btnAdminToWorkspace = document.getElementById('btnAdminToWorkspace');
+    const admUsersTbody = document.getElementById('admUsersTbody');
+    const admSearchUserInput = document.getElementById('admSearchUserInput');
+    const btnAdminOpenAddUser = document.getElementById('btnAdminOpenAddUser');
+    const modalAdminAddUser = document.getElementById('modalAdminAddUser');
+    const btnAdminCloseAddUser = document.getElementById('btnAdminCloseAddUser');
+    const formAdminCreateUser = document.getElementById('formAdminCreateUser');
+    const btnAdminResetUsers = document.getElementById('btnAdminResetUsers');
+    const btnAdminClearCache = document.getElementById('btnAdminClearCache');
+
+    const defaultAdminUsersList = [
+      { name: 'Administrador', email: 'admin@analiseautomatizada.co.mz', role: 'Administrador do Sistema', plan: 'admin', status: 'Ativo' },
+      { name: 'Rofina Cumbe', email: 'analista@empresa.co.mz', role: 'Analista de Dados Sénior', plan: 'pro', status: 'Ativo' },
+      { name: 'Carlos Mondlane', email: 'carlos.mondlane@bancozambezia.mz', role: 'Gestor de Risco', plan: 'pro', status: 'Ativo' },
+      { name: 'Teresa Macamo', email: 'teresa.macamo@consultoria.co.mz', role: 'Engenheira de Dados', plan: 'corp', status: 'Ativo' },
+      { name: 'Paulo Sitoe', email: 'paulo.sitoe@techmaputo.mz', role: 'Analista Júnior', plan: 'free', status: 'Ativo' }
+    ];
+
+    function getAdminUsers() {
+      try {
+        let stored = JSON.parse(localStorage.getItem('ai_analyst_registered_users') || '[]');
+        if (stored.length === 0) {
+          stored = [...defaultAdminUsersList];
+          localStorage.setItem('ai_analyst_registered_users', JSON.stringify(stored));
+        }
+        return stored;
+      } catch (e) {
+        return defaultAdminUsersList;
+      }
+    }
+
+    function renderAdminDashboard() {
+      const users = getAdminUsers();
+      const filter = (admSearchUserInput ? admSearchUserInput.value.toLowerCase().trim() : '');
+
+      // Atualizar KPIs
+      const elKpiUsers = document.getElementById('admKpiUsers');
+      const elKpiPro = document.getElementById('admKpiPro');
+      if (elKpiUsers) elKpiUsers.textContent = String(users.length);
+      if (elKpiPro) {
+        const proCount = users.filter(u => u.plan === 'pro' || u.plan === 'corp' || u.role.includes('Pro') || u.role.includes('Admin')).length;
+        elKpiPro.textContent = String(proCount);
+      }
+
+      if (!admUsersTbody) return;
+      admUsersTbody.innerHTML = '';
+
+      const filtered = users.filter(u => 
+        u.name.toLowerCase().includes(filter) || u.email.toLowerCase().includes(filter) || (u.role && u.role.toLowerCase().includes(filter))
+      );
+
+      filtered.forEach((user, idx) => {
+        const tr = document.createElement('tr');
+        const planBadge = user.plan === 'admin'
+          ? '<span class="badge-admin-role">Admin</span>'
+          : user.plan === 'corp'
+            ? '<span class="badge-admin-corp">Corporativo</span>'
+            : (user.plan === 'pro' || user.role.includes('Pro'))
+              ? '<span class="badge-admin-pro">Pro (M-Pesa)</span>'
+              : '<span class="badge-admin-free">Gratuito</span>';
+
+        const isMainAdmin = user.email.toLowerCase() === 'admin@analiseautomatizada.co.mz';
+
+        tr.innerHTML = `
+          <td><strong>${user.name}</strong></td>
+          <td>${user.email}</td>
+          <td>${user.role || 'Analista'}</td>
+          <td>${planBadge}</td>
+          <td><span class="badge-status-active">Ativo</span></td>
+          <td>
+            ${isMainAdmin 
+              ? '<span style="color:#888; font-size:12px; font-weight:600;">Conta Principal</span>' 
+              : `
+                <button type="button" class="btn-admin-action" onclick="toggleUserPlan('${user.email}')" title="Alternar entre Plano Pro e Básico">
+                  ${user.plan === 'pro' || user.plan === 'corp' ? 'Mudar para Grátis' : 'Promover a Pro'}
+                </button>
+                <button type="button" class="btn-admin-action danger" onclick="deleteAdminUser('${user.email}')" title="Remover utilizador">
+                  Eliminar
+                </button>
+              `}
+          </td>
+        `;
+        admUsersTbody.appendChild(tr);
+      });
+    }
+
+    // Alternar Plano de Utilizador
+    window.toggleUserPlan = function(email) {
+      let users = getAdminUsers();
+      users = users.map(u => {
+        if (u.email.toLowerCase() === email.toLowerCase()) {
+          const isPro = u.plan === 'pro' || u.plan === 'corp';
+          u.plan = isPro ? 'free' : 'pro';
+          u.role = isPro ? 'Analista de Dados' : 'Analista Pro (M-Pesa)';
+        }
+        return u;
+      });
+      localStorage.setItem('ai_analyst_registered_users', JSON.stringify(users));
+      renderAdminDashboard();
+      showToast('Plano de utilizador atualizado com sucesso!');
+    };
+
+    // Eliminar Utilizador
+    window.deleteAdminUser = function(email) {
+      if (!confirm(`Tem a certeza que deseja eliminar o utilizador ${email}?`)) return;
+      let users = getAdminUsers();
+      users = users.filter(u => u.email.toLowerCase() !== email.toLowerCase());
+      localStorage.setItem('ai_analyst_registered_users', JSON.stringify(users));
+      renderAdminDashboard();
+      showToast('Utilizador eliminado.');
+    };
+
+    // Alternar Abas no Painel Admin
+    document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tabKey = btn.getAttribute('data-tab');
+        document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+
+        if (tabKey === 'users') {
+          const c = document.getElementById('admTabContentUsers');
+          if (c) c.classList.add('active');
+        } else if (tabKey === 'trans') {
+          const c = document.getElementById('admTabContentTrans');
+          if (c) c.classList.add('active');
+        } else if (tabKey === 'infra') {
+          const c = document.getElementById('admTabContentInfra');
+          if (c) c.classList.add('active');
+        }
+      });
+    });
+
+    // Pesquisa de Utilizadores
+    if (admSearchUserInput) {
+      admSearchUserInput.addEventListener('input', () => renderAdminDashboard());
+    }
+
+    // Modal Adicionar Utilizador
+    if (btnAdminOpenAddUser) {
+      btnAdminOpenAddUser.addEventListener('click', () => {
+        if (modalAdminAddUser) modalAdminAddUser.classList.add('show');
+      });
+    }
+    if (btnAdminCloseAddUser) {
+      btnAdminCloseAddUser.addEventListener('click', () => {
+        if (modalAdminAddUser) modalAdminAddUser.classList.remove('show');
+      });
+    }
+
+    if (formAdminCreateUser) {
+      formAdminCreateUser.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('admNewName').value.trim();
+        const email = document.getElementById('admNewEmail').value.trim();
+        const role = document.getElementById('admNewRole').value.trim();
+        const plan = document.getElementById('admNewPlan').value;
+
+        if (!name || !email) return;
+
+        let users = getAdminUsers();
+        users = users.filter(u => u.email.toLowerCase() !== email.toLowerCase());
+        users.push({ name, email, role: role || 'Analista de Dados', plan: plan || 'pro', status: 'Ativo' });
+        localStorage.setItem('ai_analyst_registered_users', JSON.stringify(users));
+
+        if (modalAdminAddUser) modalAdminAddUser.classList.remove('show');
+        formAdminCreateUser.reset();
+        renderAdminDashboard();
+        showToast(`Utilizador ${name} criado com sucesso!`);
+      });
+    }
+
+    // Alternar para Workspace pelo botão do Admin
+    if (btnAdminToWorkspace) {
+      btnAdminToWorkspace.addEventListener('click', () => {
+        showView('workspace');
+      });
+    }
+    if (navAdminBtn) {
+      navAdminBtn.addEventListener('click', () => {
+        showView('admin');
+      });
+    }
+    if (mNavAdmin) {
+      mNavAdmin.addEventListener('click', () => {
+        showView('admin');
+      });
+    }
+
+    // Ferramentas de Manutenção
+    if (btnAdminResetUsers) {
+      btnAdminResetUsers.addEventListener('click', () => {
+        if (confirm('Deseja repor a lista padrão de utilizadores do sistema?')) {
+          localStorage.setItem('ai_analyst_registered_users', JSON.stringify(defaultAdminUsersList));
+          renderAdminDashboard();
+          showToast('Lista de utilizadores restaurada para o padrão.');
+        }
+      });
+    }
+
+    if (btnAdminClearCache) {
+      btnAdminClearCache.addEventListener('click', () => {
+        if (confirm('Deseja limpar todos os dados de simulação e reiniciar a aplicação?')) {
+          localStorage.removeItem('ai_analyst_registered_users');
+          location.reload();
+        }
       });
     }
 
