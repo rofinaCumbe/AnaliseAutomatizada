@@ -1,7 +1,8 @@
 /**
- * API Serverless Endpoint: Consulta de Status de Pagamento C2B
+ * API Serverless Endpoint: Consulta de Status de Pagamento C2B & Atualização no MongoDB Atlas
  * Rota: GET /api/payments/status?paymentId=pay_xxx
  */
+const { connectToDatabase } = require('../lib/mongodb');
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', true);
@@ -34,47 +35,74 @@ module.exports = async function handler(req, res) {
     const kivoraKey = process.env.KIVORA_SECRET_KEY;
     const kivoraUrl = (process.env.KIVORA_API_URL || 'https://www.kivorapayments.com').replace(/\/+$/, '');
 
-    // Se for simulação ou chave não preenchida
+    let currentStatus = 'pending';
+    let isSimulated = false;
+
     if (paymentId.startsWith('pay_sim_') || !kivoraKey || kivoraKey.includes('sua_chave')) {
+      isSimulated = true;
       const createdAt = parseInt(paymentId.replace('pay_sim_', ''), 10) || Date.now();
       const elapsedSeconds = (Date.now() - createdAt) / 1000;
 
-      // Simular aprovação após 5 segundos de espera
-      let simStatus = 'pending';
       if (elapsedSeconds > 5) {
-        simStatus = 'paid';
+        currentStatus = 'paid';
       } else if (elapsedSeconds > 2) {
-        simStatus = 'processing';
+        currentStatus = 'processing';
       }
-
-      return res.status(200).json({
-        id: paymentId,
-        status: simStatus,
-        amount: 499,
-        currency: 'MZN',
-        reference: `SIM-REF-${paymentId}`,
-        createdAt: new Date(createdAt).toISOString(),
-        isSimulated: true,
-        message: simStatus === 'paid' ? 'Pagamento confirmado com sucesso!' : 'Aguardando validação do PIN no telemóvel...'
+    } else {
+      const response = await fetch(`${kivoraUrl}/v1/c2b/${encodeURIComponent(paymentId)}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${kivoraKey}`,
+          'Accept': 'application/json'
+        }
       });
-    }
 
-    // Consulta oficial à Kivora Payments
-    const response = await fetch(`${kivoraUrl}/v1/c2b/${encodeURIComponent(paymentId)}`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${kivoraKey}`,
-        'Accept': 'application/json'
+      const data = await response.json();
+      if (!response.ok) {
+        return res.status(response.status).json(data);
       }
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      return res.status(response.status).json(data);
+      currentStatus = data.status;
     }
 
-    return res.status(200).json(data);
+    // Atualizar status no MongoDB Atlas se mudou para paid/completed
+    if (currentStatus === 'paid' || currentStatus === 'completed') {
+      try {
+        const { db } = await connectToDatabase();
+        const tx = await db.collection('transactions').findOneAndUpdate(
+          { paymentId },
+          { $set: { status: 'paid', updatedAt: new Date() } },
+          { returnDocument: 'after' }
+        );
+        if (tx && tx.customerEmail) {
+          await db.collection('users').updateOne(
+            { email: tx.customerEmail.toLowerCase() },
+            {
+              $set: {
+                plan: 'pro',
+                role: 'Analista Pro (M-Pesa)',
+                status: 'Ativo',
+                updatedAt: new Date()
+              },
+              $setOnInsert: {
+                name: tx.customerName || 'Subscritor Pro',
+                email: tx.customerEmail.toLowerCase(),
+                createdAt: new Date()
+              }
+            },
+            { upsert: true }
+          );
+        }
+      } catch (dbErr) {
+        console.warn('Aviso ao atualizar transação no MongoDB:', dbErr.message);
+      }
+    }
+
+    return res.status(200).json({
+      id: paymentId,
+      status: currentStatus,
+      isSimulated,
+      message: currentStatus === 'paid' ? 'Pagamento confirmado com sucesso!' : 'Aguardando validação do PIN no telemóvel...'
+    });
 
   } catch (err) {
     console.error('Erro na consulta de status Kivora:', err);

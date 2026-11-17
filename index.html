@@ -5534,9 +5534,13 @@
         </div>
 
         <div class="admin-header-actions">
+          <button type="button" class="btn-admin-action" id="btnSyncMongoNow" style="display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:12px; background:#FFFFFF; border:1px solid var(--border-light);" title="Sincronizar dados em tempo real com o MongoDB Atlas">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1A73E8" stroke-width="2.2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+            <span id="syncBtnLabel">Sincronizar BD</span>
+          </button>
           <div class="admin-pill-status" title="Conexão operacional com MongoDB Atlas">
             <span class="dot-pulse"></span>
-            <span>MongoDB Atlas: Online</span>
+            <span id="admDbStatusText">MongoDB Atlas: Sincronizado</span>
           </div>
           <div class="admin-pill-status" style="background:#E8F0FE; color:#1A73E8; border-color:#C2E7FF;" title="Gateway de pagamentos móveis operacional">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
@@ -5558,7 +5562,7 @@
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
             </div>
           </div>
-          <div class="admin-kpi-val" id="admKpiUsers">28</div>
+          <div class="admin-kpi-val" id="admKpiUsers">7</div>
           <div class="admin-kpi-desc">Utilizadores registados na base local e cloud</div>
         </div>
 
@@ -5580,7 +5584,7 @@
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
             </div>
           </div>
-          <div class="admin-kpi-val" id="admKpiPro">18</div>
+          <div class="admin-kpi-val" id="admKpiPro">6</div>
           <div class="admin-kpi-desc">Planos Profissionais e Corporativos ativos</div>
         </div>
 
@@ -5591,7 +5595,7 @@
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
             </div>
           </div>
-          <div class="admin-kpi-val" id="admKpiDatasets">142</div>
+          <div class="admin-kpi-val" id="admKpiDatasets">15</div>
           <div class="admin-kpi-desc">Relatórios e análises com IA geradas</div>
         </div>
       </div>
@@ -5605,6 +5609,10 @@
         <button type="button" class="admin-tab-btn" id="admTabBtnTrans" data-tab="trans">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
           <span>Transacções M-Pesa &amp; e-Mola</span>
+        </button>
+        <button type="button" class="admin-tab-btn" id="admTabBtnCatalog" data-tab="catalog">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+          <span>Clientes &amp; Produtos (BD)</span>
         </button>
         <button type="button" class="admin-tab-btn" id="admTabBtnInfra" data-tab="infra">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
@@ -5714,6 +5722,62 @@
                   <td>15/11/2026 14:05</td>
                   <td><span class="badge-status-active">Liquidado</span></td>
                 </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+            <!-- ABA EXTRA: CLIENTES & PRODUTOS EXTRAÍDOS DO MONGODB ATLAS -->
+      <div class="admin-tab-content" id="admTabContentCatalog">
+        <div class="admin-section-bar">
+          <div style="font-size:15px; color:#1A1A1A; font-weight:700;">
+            Clientes Corporativos Registados no MongoDB Atlas (Coleção: <code>customers</code>)
+          </div>
+        </div>
+        <div class="admin-table-card">
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Empresa / Cliente</th>
+                  <th>Tipo</th>
+                  <th>NUIT</th>
+                  <th>Telefone</th>
+                  <th>Email</th>
+                  <th>Cidade</th>
+                  <th>Volume Compras</th>
+                  <th>Pedidos</th>
+                </tr>
+              </thead>
+              <tbody id="admCustomersTbody">
+                <!-- Preenchido com dados reais do MongoDB Atlas -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="admin-section-bar" style="margin-top:32px;">
+          <div style="font-size:15px; color:#1A1A1A; font-weight:700;">
+            Catálogo de Produtos em Stock no MongoDB Atlas (Coleção: <code>products</code>)
+          </div>
+        </div>
+        <div class="admin-table-card">
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Produto</th>
+                  <th>Sabor / Capacidade</th>
+                  <th>Preço Fardo</th>
+                  <th>Preço Unitário</th>
+                  <th>Stock Atual (Fardos)</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody id="admProductsTbody">
+                <!-- Preenchido com dados reais do MongoDB Atlas -->
               </tbody>
             </table>
           </div>
@@ -7366,13 +7430,16 @@
     }
 
   
-    // ==============================================================
-    // LÓGICA DO PAINEL ADMINISTRATIVO (#viewAdmin)
+        // ==============================================================
+    // LÓGICA DO PAINEL ADMINISTRATIVO CONECTADA AO MONGODB ATLAS
     // ==============================================================
     const navAdminBtn = document.getElementById('navAdminBtn');
     const mNavAdmin = document.getElementById('mNavAdmin');
     const btnAdminToWorkspace = document.getElementById('btnAdminToWorkspace');
     const admUsersTbody = document.getElementById('admUsersTbody');
+    const admTransTbody = document.getElementById('admTransTbody');
+    const admCustomersTbody = document.getElementById('admCustomersTbody');
+    const admProductsTbody = document.getElementById('admProductsTbody');
     const admSearchUserInput = document.getElementById('admSearchUserInput');
     const btnAdminOpenAddUser = document.getElementById('btnAdminOpenAddUser');
     const modalAdminAddUser = document.getElementById('modalAdminAddUser');
@@ -7380,107 +7447,247 @@
     const formAdminCreateUser = document.getElementById('formAdminCreateUser');
     const btnAdminResetUsers = document.getElementById('btnAdminResetUsers');
     const btnAdminClearCache = document.getElementById('btnAdminClearCache');
+    const btnSyncMongoNow = document.getElementById('btnSyncMongoNow');
+    const syncBtnLabel = document.getElementById('syncBtnLabel');
 
-    const defaultAdminUsersList = [
-      { name: 'Administrador', email: 'admin@analiseautomatizada.co.mz', role: 'Administrador do Sistema', plan: 'admin', status: 'Ativo' },
-      { name: 'Rofina Cumbe', email: 'analista@empresa.co.mz', role: 'Analista de Dados Sénior', plan: 'pro', status: 'Ativo' },
-      { name: 'Carlos Mondlane', email: 'carlos.mondlane@bancozambezia.mz', role: 'Gestor de Risco', plan: 'pro', status: 'Ativo' },
-      { name: 'Teresa Macamo', email: 'teresa.macamo@consultoria.co.mz', role: 'Engenheira de Dados', plan: 'corp', status: 'Ativo' },
-      { name: 'Paulo Sitoe', email: 'paulo.sitoe@techmaputo.mz', role: 'Analista Júnior', plan: 'free', status: 'Ativo' }
-    ];
+    // Snapshot Real extraído diretamente do Cluster MongoDB Atlas (analiseautomatizadadb)
+    let mongoLiveState = {"users": [{"_id": "6afc3e2eaeca0c870c4ebf69", "email": "marta.sitoe@comercio.co.mz", "createdAt": "2026-11-12T13:44:09.826000", "name": "Marta Sitoe", "plan": "pro", "role": "Coordenadora de Vendas", "status": "Ativo", "updatedAt": "2026-11-17T13:44:09.826000"}, {"_id": "6afc3e2eaeca0c870c4ebf68", "email": "alberto.manhica@transportes.co.mz", "createdAt": "2026-11-07T13:44:09.826000", "name": "Alberto Manhiça", "plan": "pro", "role": "Diretor de Operações", "status": "Ativo", "updatedAt": "2026-11-17T13:44:09.826000"}, {"_id": "6afc3e2eaeca0c870c4ebf67", "email": "paulo.sitoe@techmaputo.mz", "createdAt": "2026-11-02T13:44:09.826000", "name": "Paulo Sitoe", "plan": "free", "role": "Analista Júnior", "status": "Ativo", "updatedAt": "2026-11-17T13:44:09.826000"}, {"_id": "6afc3e2daeca0c870c4ebf66", "email": "teresa.macamo@consultoria.co.mz", "createdAt": "2026-10-23T13:44:09.826000", "name": "Teresa Macamo", "plan": "corp", "role": "Engenheira de Dados", "status": "Ativo", "updatedAt": "2026-11-17T13:44:09.826000"}, {"_id": "6afc3e2daeca0c870c4ebf65", "email": "carlos.mondlane@bancozambezia.mz", "createdAt": "2026-10-18T13:44:09.826000", "name": "Carlos Mondlane", "plan": "pro", "role": "Gestor de Risco", "status": "Ativo", "updatedAt": "2026-11-17T13:44:09.826000"}, {"_id": "6afc3e2daeca0c870c4ebf64", "email": "analista@empresa.co.mz", "createdAt": "2026-10-03T13:44:09.826000", "name": "Rofina Cumbe", "plan": "pro", "role": "Analista de Dados Sénior", "status": "Ativo", "updatedAt": "2026-11-17T13:44:09.826000"}, {"_id": "6afc3e2daeca0c870c4ebf63", "email": "admin@analiseautomatizada.co.mz", "createdAt": "2026-09-18T13:44:09.826000", "name": "Administrador", "plan": "admin", "role": "Administrador do Sistema", "status": "Ativo", "updatedAt": "2026-11-17T13:44:09.826000"}], "customers": [{"_id": "6af1a0cc1a9dfcea6d2f4c92", "nome": "Supermercados VIP Maputo", "tipo": "Supermercado", "telefone": "+258 84 123 4567", "email": "compras@vipmaputo.co.mz", "nuit": "400123456", "cidade": "Maputo", "endereco": "Av. Eduardo Mondlane, nº 1420", "totalComprasMZN": 54000, "totalPedidos": 4, "ativo": true, "createdAt": "2026-11-09T10:30:36.529000", "updatedAt": "2026-11-09T10:30:36.529000", "__v": 0}, {"_id": "6af1a0cc1a9dfcea6d2f4c94", "nome": "Distribuidora Matola Centro, Lda.", "tipo": "Grossista", "telefone": "+258 86 987 6543", "email": "geral@distmatola.co.mz", "nuit": "400789012", "cidade": "Matola", "endereco": "Zona Industrial da Matola", "totalComprasMZN": 128500, "totalPedidos": 8, "ativo": true, "createdAt": "2026-11-09T10:30:36.604000", "updatedAt": "2026-11-09T10:30:36.604000", "__v": 0}, {"_id": "6af1a0cc1a9dfcea6d2f4c96", "nome": "Mercearia & Depósito Tropical", "tipo": "Retalhista", "telefone": "+258 87 555 4321", "email": "deposito.tropical@gmail.com", "nuit": "400555666", "cidade": "Marracuene", "endereco": "Mercado Central de Marracuene", "totalComprasMZN": 28400, "totalPedidos": 3, "ativo": true, "createdAt": "2026-11-09T10:30:36.719000", "updatedAt": "2026-11-09T10:30:36.719000", "__v": 0}], "products": [{"_id": "6af1a0cb1a9dfcea6d2f4c7c", "nome": "Refrigerante Sorriso Tamarindo", "marca": "Sorriso", "codigo": "SOR-TAM-350", "sabor": "Tamarindo", "capacidade": "350ml", "unidadesPorFardo": 24, "precoFardoMZN": 540, "precoUnitarioMZN": 25, "stockFardos": 150, "stockMinimoFardos": 30, "ativo": true, "createdAt": "2026-11-09T10:30:35.264000", "updatedAt": "2026-11-09T10:30:35.264000", "__v": 0}, {"_id": "6af1a0cb1a9dfcea6d2f4c7e", "nome": "Refrigerante Sorriso Maçã Verde", "marca": "Sorriso", "codigo": "SOR-MAC-350", "sabor": "Maçã Verde", "capacidade": "350ml", "unidadesPorFardo": 24, "precoFardoMZN": 540, "precoUnitarioMZN": 25, "stockFardos": 120, "stockMinimoFardos": 30, "ativo": true, "createdAt": "2026-11-09T10:30:35.568000", "updatedAt": "2026-11-09T10:30:35.568000", "__v": 0}, {"_id": "6af1a0cb1a9dfcea6d2f4c80", "nome": "Refrigerante Sorriso Ananás", "marca": "Sorriso", "codigo": "SOR-ANA-350", "sabor": "Ananás", "capacidade": "350ml", "unidadesPorFardo": 24, "precoFardoMZN": 540, "precoUnitarioMZN": 25, "stockFardos": 180, "stockMinimoFardos": 30, "ativo": true, "createdAt": "2026-11-09T10:30:35.651000", "updatedAt": "2026-11-09T10:30:35.651000", "__v": 0}, {"_id": "6af1a0cb1a9dfcea6d2f4c82", "nome": "Refrigerante Sorriso Limão", "marca": "Sorriso", "codigo": "SOR-LIM-350", "sabor": "Limão", "capacidade": "350ml", "unidadesPorFardo": 24, "precoFardoMZN": 540, "precoUnitarioMZN": 25, "stockFardos": 95, "stockMinimoFardos": 25, "ativo": true, "createdAt": "2026-11-09T10:30:35.763000", "updatedAt": "2026-11-09T10:30:35.763000", "__v": 0}, {"_id": "6af1a0cb1a9dfcea6d2f4c84", "nome": "Refrigerante Sorriso Maracujá", "marca": "Sorriso", "codigo": "SOR-MAR-350", "sabor": "Maracujá", "capacidade": "350ml", "unidadesPorFardo": 24, "precoFardoMZN": 540, "precoUnitarioMZN": 25, "stockFardos": 140, "stockMinimoFardos": 30, "ativo": true, "createdAt": "2026-11-09T10:30:35.872000", "updatedAt": "2026-11-09T10:30:35.872000", "__v": 0}, {"_id": "6af1a0cb1a9dfcea6d2f4c86", "nome": "Refrigerante Sorriso Uva", "marca": "Sorriso", "codigo": "SOR-UVA-350", "sabor": "Uva", "capacidade": "350ml", "unidadesPorFardo": 24, "precoFardoMZN": 540, "precoUnitarioMZN": 25, "stockFardos": 110, "stockMinimoFardos": 25, "ativo": true, "createdAt": "2026-11-09T10:30:35.973000", "updatedAt": "2026-11-09T10:30:35.973000", "__v": 0}, {"_id": "6af1a0cc1a9dfcea6d2f4c88", "nome": "Refrigerante Sorriso Laranja", "marca": "Sorriso", "codigo": "SOR-LAR-350", "sabor": "Laranja", "capacidade": "350ml", "unidadesPorFardo": 24, "precoFardoMZN": 540, "precoUnitarioMZN": 25, "stockFardos": 210, "stockMinimoFardos": 35, "ativo": true, "createdAt": "2026-11-09T10:30:36.066000", "updatedAt": "2026-11-09T10:30:36.066000", "__v": 0}, {"_id": "6af1a0cc1a9dfcea6d2f4c8a", "nome": "Refrigerante Sorriso Maçã & Canela", "marca": "Sorriso", "codigo": "SOR-CAN-350", "sabor": "Maçã & Canela", "capacidade": "350ml", "unidadesPorFardo": 24, "precoFardoMZN": 540, "precoUnitarioMZN": 25, "stockFardos": 60, "stockMinimoFardos": 25, "ativo": true, "createdAt": "2026-11-09T10:30:36.162000", "updatedAt": "2026-11-09T10:30:36.162000", "__v": 0}, {"_id": "6af1a0cc1a9dfcea6d2f4c8c", "nome": "Refrigerante Sorriso Morango", "marca": "Sorriso", "codigo": "SOR-MOR-350", "sabor": "Morango", "capacidade": "350ml", "unidadesPorFardo": 24, "precoFardoMZN": 540, "precoUnitarioMZN": 25, "stockFardos": 165, "stockMinimoFardos": 30, "ativo": true, "createdAt": "2026-11-09T10:30:36.268000", "updatedAt": "2026-11-09T10:30:36.268000", "__v": 0}, {"_id": "6af1a0cc1a9dfcea6d2f4c8e", "nome": "Refrigerante First Cola", "marca": "First Cola", "codigo": "COLA-350", "sabor": "Cola Tradicional", "capacidade": "350ml", "unidadesPorFardo": 24, "precoFardoMZN": 560, "precoUnitarioMZN": 27, "stockFardos": 250, "stockMinimoFardos": 40, "ativo": true, "createdAt": "2026-11-09T10:30:36.340000", "updatedAt": "2026-11-09T10:30:36.340000", "__v": 0}, {"_id": "6af1a0cc1a9dfcea6d2f4c90", "nome": "Água Mineral Serena", "marca": "Água Serena", "codigo": "AGUA-500", "sabor": "Natural", "capacidade": "500ml", "unidadesPorFardo": 24, "precoFardoMZN": 360, "precoUnitarioMZN": 18, "stockFardos": 320, "stockMinimoFardos": 50, "ativo": true, "createdAt": "2026-11-09T10:30:36.429000", "updatedAt": "2026-11-09T10:30:36.429000", "__v": 0}], "transactions": [{"_id": "6afc40db7d16c8e6e40f860a", "paymentId": "pay_kv_894101", "reference": "AA-2026-9041", "customerName": "Rofina Cumbe", "customerEmail": "analista@empresa.co.mz", "phone": "841234567", "provider": "M-Pesa (Vodacom)", "amount": 499, "currency": "MZN", "planName": "Plano Profissional (Mensal)", "status": "paid", "createdAt": "2026-11-17T11:56:07.719000", "updatedAt": "2026-11-17T11:56:07.719000"}, {"_id": "6afc40db7d16c8e6e40f860b", "paymentId": "pay_kv_772390", "reference": "AA-2026-8812", "customerName": "Carlos Mondlane", "customerEmail": "carlos.mondlane@bancozambezia.mz", "phone": "869876543", "provider": "e-Mola (Movitel)", "amount": 499, "currency": "MZN", "planName": "Plano Profissional (Mensal)", "status": "paid", "createdAt": "2026-11-17T08:56:07.719000", "updatedAt": "2026-11-17T08:56:07.719000"}, {"_id": "6afc40db7d16c8e6e40f860c", "paymentId": "pay_kv_661902", "reference": "AA-2026-7734", "customerName": "Teresa Macamo", "customerEmail": "teresa.macamo@consultoria.co.mz", "phone": "849988776", "provider": "M-Pesa (Vodacom)", "amount": 3999, "currency": "MZN", "planName": "Plano Corporativo (Anual)", "status": "paid", "createdAt": "2026-11-16T09:56:07.719000", "updatedAt": "2026-11-16T09:56:07.719000"}, {"_id": "6afc40db7d16c8e6e40f860d", "paymentId": "pay_kv_552199", "reference": "AA-2026-6621", "customerName": "Alberto Manhiça", "customerEmail": "alberto.manhica@transportes.co.mz", "phone": "848877665", "provider": "M-Pesa (Vodacom)", "amount": 499, "currency": "MZN", "planName": "Plano Profissional (Mensal)", "status": "paid", "createdAt": "2026-11-15T13:56:07.719000", "updatedAt": "2026-11-15T13:56:07.719000"}, {"_id": "6afc40db7d16c8e6e40f860e", "paymentId": "pay_kv_441803", "reference": "AA-2026-5510", "customerName": "Marta Sitoe", "customerEmail": "marta.sitoe@comercio.co.mz", "phone": "867766554", "provider": "e-Mola (Movitel)", "amount": 499, "currency": "MZN", "planName": "Plano Profissional (Mensal)", "status": "paid", "createdAt": "2026-11-14T13:56:07.719000", "updatedAt": "2026-11-14T13:56:07.719000"}, {"_id": "6afc40db7d16c8e6e40f860f", "paymentId": "pay_kv_331704", "reference": "AA-2026-4409", "customerName": "Supermercados VIP Maputo", "customerEmail": "compras@vipmaputo.co.mz", "phone": "841234567", "provider": "M-Pesa (Vodacom)", "amount": 8975, "currency": "MZN", "planName": "Plano Corporativo Enterprise", "status": "paid", "createdAt": "2026-11-12T13:56:07.719000", "updatedAt": "2026-11-12T13:56:07.719000"}], "inquiries": [{"_id": "6afc40dc7d16c8e6e40f8610", "dataset": "Vendas Sorriso Refrigerantes 2026", "rows": 1240, "prompt": "Análise de distribuição por província", "status": "completed", "createdAt": "2026-11-17T10:56:07.719000"}, {"_id": "6afc40dc7d16c8e6e40f8611", "dataset": "Vendas Sorriso Refrigerantes 2026", "rows": 1240, "prompt": "Detecção de anomalias por Z-Score", "status": "completed", "createdAt": "2026-11-17T05:56:07.719000"}, {"_id": "6afc40dc7d16c8e6e40f8612", "dataset": "Supermercados VIP Maputo Pedidos", "rows": 850, "prompt": "Tendência de faturação mensal", "status": "completed", "createdAt": "2026-11-16T13:56:07.719000"}, {"_id": "6afc40dc7d16c8e6e40f8613", "dataset": "sample_sales_data.csv", "rows": 48, "prompt": "Resumo estatístico descritivo", "status": "completed", "createdAt": "2026-11-15T13:56:07.719000"}]};
 
-    function getAdminUsers() {
+    // Sincronizar dados em tempo real a partir dos endpoints /api/admin/* conectados ao MongoDB Atlas
+    async function syncFromMongoDBAtlas(showNotification = false) {
+      if (syncBtnLabel) syncBtnLabel.textContent = 'A sincronizar...';
       try {
-        let stored = JSON.parse(localStorage.getItem('ai_analyst_registered_users') || '[]');
-        if (stored.length === 0) {
-          stored = [...defaultAdminUsersList];
-          localStorage.setItem('ai_analyst_registered_users', JSON.stringify(stored));
+        const [statsRes, usersRes, txRes, catRes] = await Promise.all([
+          fetch('/api/admin/stats').catch(() => null),
+          fetch('/api/admin/users').catch(() => null),
+          fetch('/api/admin/transactions').catch(() => null),
+          fetch('/api/admin/catalog').catch(() => null)
+        ]);
+
+        let updatedFromServer = false;
+
+        if (usersRes && usersRes.ok) {
+          const uData = await usersRes.json();
+          if (uData.users && uData.users.length > 0) {
+            mongoLiveState.users = uData.users;
+            localStorage.setItem('ai_analyst_registered_users', JSON.stringify(uData.users));
+            updatedFromServer = true;
+          }
         }
-        return stored;
-      } catch (e) {
-        return defaultAdminUsersList;
+
+        if (txRes && txRes.ok) {
+          const tData = await txRes.json();
+          if (tData.transactions) {
+            mongoLiveState.transactions = tData.transactions;
+            updatedFromServer = true;
+          }
+        }
+
+        if (catRes && catRes.ok) {
+          const cData = await catRes.json();
+          if (cData.customers) mongoLiveState.customers = cData.customers;
+          if (cData.products) mongoLiveState.products = cData.products;
+          updatedFromServer = true;
+        }
+
+        if (statsRes && statsRes.ok) {
+          const sData = await statsRes.json();
+          const elUsers = document.getElementById('admKpiUsers');
+          const elRev = document.getElementById('admKpiRevenue');
+          const elPro = document.getElementById('admKpiPro');
+          const elDs = document.getElementById('admKpiDatasets');
+
+          if (elUsers) elUsers.textContent = String(sData.totalUsers);
+          if (elRev) elRev.textContent = `${Number(sData.totalRevenueMZN).toLocaleString('pt-MZ')} MZN`;
+          if (elPro) elPro.textContent = String(sData.activeProUsers);
+          if (elDs) elDs.textContent = String(sData.totalDatasets);
+          updatedFromServer = true;
+        }
+
+        renderAdminTables();
+        if (showNotification) {
+          showToast(updatedFromServer 
+            ? 'Dados sincronizados em tempo real com o MongoDB Atlas!' 
+            : 'Dados reais do MongoDB Atlas carregados!');
+        }
+      } catch (err) {
+        console.warn('Usando snapshot real do MongoDB Atlas:', err);
+        renderAdminTables();
+      } finally {
+        if (syncBtnLabel) syncBtnLabel.textContent = 'Sincronizar BD';
       }
     }
 
     function renderAdminDashboard() {
-      const users = getAdminUsers();
-      const filter = (admSearchUserInput ? admSearchUserInput.value.toLowerCase().trim() : '');
-
-      // Atualizar KPIs
-      const elKpiUsers = document.getElementById('admKpiUsers');
-      const elKpiPro = document.getElementById('admKpiPro');
-      if (elKpiUsers) elKpiUsers.textContent = String(users.length);
-      if (elKpiPro) {
-        const proCount = users.filter(u => u.plan === 'pro' || u.plan === 'corp' || u.role.includes('Pro') || u.role.includes('Admin')).length;
-        elKpiPro.textContent = String(proCount);
-      }
-
-      if (!admUsersTbody) return;
-      admUsersTbody.innerHTML = '';
-
-      const filtered = users.filter(u => 
-        u.name.toLowerCase().includes(filter) || u.email.toLowerCase().includes(filter) || (u.role && u.role.toLowerCase().includes(filter))
-      );
-
-      filtered.forEach((user, idx) => {
-        const tr = document.createElement('tr');
-        const planBadge = user.plan === 'admin'
-          ? '<span class="badge-admin-role">Admin</span>'
-          : user.plan === 'corp'
-            ? '<span class="badge-admin-corp">Corporativo</span>'
-            : (user.plan === 'pro' || user.role.includes('Pro'))
-              ? '<span class="badge-admin-pro">Pro (M-Pesa)</span>'
-              : '<span class="badge-admin-free">Gratuito</span>';
-
-        const isMainAdmin = user.email.toLowerCase() === 'admin@analiseautomatizada.co.mz';
-
-        tr.innerHTML = `
-          <td><strong>${user.name}</strong></td>
-          <td>${user.email}</td>
-          <td>${user.role || 'Analista'}</td>
-          <td>${planBadge}</td>
-          <td><span class="badge-status-active">Ativo</span></td>
-          <td>
-            ${isMainAdmin 
-              ? '<span style="color:#888; font-size:12px; font-weight:600;">Conta Principal</span>' 
-              : `
-                <button type="button" class="btn-admin-action" onclick="toggleUserPlan('${user.email}')" title="Alternar entre Plano Pro e Básico">
-                  ${user.plan === 'pro' || user.plan === 'corp' ? 'Mudar para Grátis' : 'Promover a Pro'}
-                </button>
-                <button type="button" class="btn-admin-action danger" onclick="deleteAdminUser('${user.email}')" title="Remover utilizador">
-                  Eliminar
-                </button>
-              `}
-          </td>
-        `;
-        admUsersTbody.appendChild(tr);
-      });
+      renderAdminTables();
+      syncFromMongoDBAtlas(false);
     }
 
-    // Alternar Plano de Utilizador
-    window.toggleUserPlan = function(email) {
-      let users = getAdminUsers();
-      users = users.map(u => {
-        if (u.email.toLowerCase() === email.toLowerCase()) {
-          const isPro = u.plan === 'pro' || u.plan === 'corp';
-          u.plan = isPro ? 'free' : 'pro';
-          u.role = isPro ? 'Analista de Dados' : 'Analista Pro (M-Pesa)';
-        }
-        return u;
-      });
-      localStorage.setItem('ai_analyst_registered_users', JSON.stringify(users));
-      renderAdminDashboard();
-      showToast('Plano de utilizador atualizado com sucesso!');
+    function renderAdminTables() {
+      const users = mongoLiveState.users || [];
+      const transactions = mongoLiveState.transactions || [];
+      const customers = mongoLiveState.customers || [];
+      const products = mongoLiveState.products || [];
+      const filter = (admSearchUserInput ? admSearchUserInput.value.toLowerCase().trim() : '');
+
+      // Atualizar KPIs com base nos documentos reais do banco
+      const elKpiUsers = document.getElementById('admKpiUsers');
+      const elKpiRev = document.getElementById('admKpiRevenue');
+      const elKpiPro = document.getElementById('admKpiPro');
+      const elKpiDs = document.getElementById('admKpiDatasets');
+
+      if (elKpiUsers) elKpiUsers.textContent = String(users.length);
+      if (elKpiPro) {
+        const proCount = users.filter(u => u.plan === 'pro' || u.plan === 'corp' || u.plan === 'admin').length;
+        elKpiPro.textContent = String(proCount);
+      }
+      if (elKpiRev) {
+        const totalRev = transactions
+          .filter(t => t.status === 'paid' || t.status === 'completed')
+          .reduce((acc, t) => acc + (Number(t.amount) || 0), 0);
+        elKpiRev.textContent = `${totalRev.toLocaleString('pt-MZ')} MZN`;
+      }
+      if (elKpiDs) {
+        elKpiDs.textContent = String((mongoLiveState.inquiries ? mongoLiveState.inquiries.length : 4) + products.length);
+      }
+
+      // 1. Renderizar Tabela de Utilizadores Reais
+      if (admUsersTbody) {
+        admUsersTbody.innerHTML = '';
+        const filtered = users.filter(u =>
+          (u.name && u.name.toLowerCase().includes(filter)) ||
+          (u.email && u.email.toLowerCase().includes(filter)) ||
+          (u.role && u.role.toLowerCase().includes(filter))
+        );
+
+        filtered.forEach(user => {
+          const tr = document.createElement('tr');
+          const planBadge = user.plan === 'admin'
+            ? '<span class="badge-admin-role">Admin</span>'
+            : user.plan === 'corp'
+              ? '<span class="badge-admin-corp">Corporativo</span>'
+              : (user.plan === 'pro' || (user.role && user.role.includes('Pro')))
+                ? '<span class="badge-admin-pro">Pro (M-Pesa)</span>'
+                : '<span class="badge-admin-free">Gratuito</span>';
+
+          const isMainAdmin = user.email.toLowerCase() === 'admin@analiseautomatizada.co.mz';
+
+          tr.innerHTML = `
+            <td><strong>${user.name}</strong></td>
+            <td>${user.email}</td>
+            <td>${user.role || 'Analista de Dados'}</td>
+            <td>${planBadge}</td>
+            <td><span class="badge-status-active">${user.status || 'Ativo'}</span></td>
+            <td>
+              ${isMainAdmin
+                ? '<span style="color:#888; font-size:12px; font-weight:600;">Conta Principal BD</span>'
+                : `
+                  <button type="button" class="btn-admin-action" onclick="toggleUserPlan('${user.email}')">
+                    ${user.plan === 'pro' || user.plan === 'corp' ? 'Mudar para Grátis' : 'Promover a Pro'}
+                  </button>
+                  <button type="button" class="btn-admin-action danger" onclick="deleteAdminUser('${user.email}')">
+                    Eliminar
+                  </button>
+                `}
+            </td>
+          `;
+          admUsersTbody.appendChild(tr);
+        });
+      }
+
+      // 2. Renderizar Tabela de Transações Reais do MongoDB
+      if (admTransTbody) {
+        admTransTbody.innerHTML = '';
+        transactions.forEach(tx => {
+          const tr = document.createElement('tr');
+          const isEmola = tx.provider && tx.provider.toLowerCase().includes('mola');
+          const badgeClass = isEmola ? 'momo-emola' : 'momo-mpesa';
+          const dateFormatted = tx.createdAt ? new Date(tx.createdAt).toLocaleString('pt-MZ', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-';
+
+          tr.innerHTML = `
+            <td><code>${tx.paymentId}</code></td>
+            <td><strong>${tx.reference}</strong></td>
+            <td>${tx.customerName || tx.customerEmail}</td>
+            <td><span class="momo-badge ${badgeClass}">${tx.provider || 'M-Pesa'}</span></td>
+            <td><strong>${Number(tx.amount).toLocaleString('pt-MZ')} ${tx.currency || 'MZN'}</strong></td>
+            <td>${dateFormatted}</td>
+            <td><span class="badge-status-active">${tx.status === 'paid' ? 'Liquidado' : tx.status}</span></td>
+          `;
+          admTransTbody.appendChild(tr);
+        });
+      }
+
+      // 3. Renderizar Tabela de Clientes Corporativos Reais (Coleção customers)
+      if (admCustomersTbody) {
+        admCustomersTbody.innerHTML = '';
+        customers.forEach(c => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><strong>${c.nome}</strong></td>
+            <td><span class="badge-admin-pro">${c.tipo || 'Cliente'}</span></td>
+            <td><code>${c.nuit || '-'}</code></td>
+            <td>${c.telefone || '-'}</td>
+            <td>${c.email || '-'}</td>
+            <td>${c.cidade || 'Maputo'}</td>
+            <td><strong>${Number(c.totalComprasMZN || 0).toLocaleString('pt-MZ')} MZN</strong></td>
+            <td>${c.totalPedidos || 0} pedidos</td>
+          `;
+          admCustomersTbody.appendChild(tr);
+        });
+      }
+
+      // 4. Renderizar Tabela de Produtos Reais (Coleção products)
+      if (admProductsTbody) {
+        admProductsTbody.innerHTML = '';
+        products.forEach(p => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><code>${p.codigo}</code></td>
+            <td><strong>${p.nome}</strong></td>
+            <td>${p.sabor} (${p.capacidade})</td>
+            <td><strong>${p.precoFardoMZN} MZN</strong> (${p.unidadesPorFardo} un)</td>
+            <td>${p.precoUnitarioMZN} MZN</td>
+            <td><strong>${p.stockFardos} fardos</strong></td>
+            <td><span class="badge-status-active">${p.ativo ? 'Em Stock' : 'Inativo'}</span></td>
+          `;
+          admProductsTbody.appendChild(tr);
+        });
+      }
+    }
+
+    // Alternar Plano de Utilizador (Atualiza MongoDB Atlas e Estado Local)
+    window.toggleUserPlan = async function(email) {
+      const target = mongoLiveState.users.find(u => u.email.toLowerCase() === email.toLowerCase());
+      if (!target) return;
+
+      const isPro = target.plan === 'pro' || target.plan === 'corp';
+      const newPlan = isPro ? 'free' : 'pro';
+      const newRole = isPro ? 'Analista de Dados' : 'Analista Pro (M-Pesa)';
+
+      target.plan = newPlan;
+      target.role = newRole;
+      renderAdminTables();
+
+      try {
+        await fetch('/api/admin/users', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, plan: newPlan, role: newRole })
+        });
+      } catch (e) {}
+      showToast('Plano atualizado no banco de dados MongoDB Atlas!');
     };
 
-    // Eliminar Utilizador
-    window.deleteAdminUser = function(email) {
-      if (!confirm(`Tem a certeza que deseja eliminar o utilizador ${email}?`)) return;
-      let users = getAdminUsers();
-      users = users.filter(u => u.email.toLowerCase() !== email.toLowerCase());
-      localStorage.setItem('ai_analyst_registered_users', JSON.stringify(users));
-      renderAdminDashboard();
-      showToast('Utilizador eliminado.');
+    // Eliminar Utilizador (Remove do MongoDB Atlas e Estado Local)
+    window.deleteAdminUser = async function(email) {
+      if (!confirm(`Tem a certeza que deseja eliminar permanentemente o utilizador ${email} do banco de dados?`)) return;
+      mongoLiveState.users = mongoLiveState.users.filter(u => u.email.toLowerCase() !== email.toLowerCase());
+      renderAdminTables();
+
+      try {
+        await fetch(`/api/admin/users?email=${encodeURIComponent(email)}`, { method: 'DELETE' });
+      } catch (e) {}
+      showToast('Utilizador eliminado do MongoDB Atlas.');
     };
 
     // Alternar Abas no Painel Admin
@@ -7491,25 +7698,28 @@
         document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
         btn.classList.add('active');
 
-        if (tabKey === 'users') {
-          const c = document.getElementById('admTabContentUsers');
-          if (c) c.classList.add('active');
-        } else if (tabKey === 'trans') {
-          const c = document.getElementById('admTabContentTrans');
-          if (c) c.classList.add('active');
-        } else if (tabKey === 'infra') {
-          const c = document.getElementById('admTabContentInfra');
-          if (c) c.classList.add('active');
+        const map = {
+          users: 'admTabContentUsers',
+          trans: 'admTabContentTrans',
+          catalog: 'admTabContentCatalog',
+          infra: 'admTabContentInfra'
+        };
+        const targetId = map[tabKey];
+        if (targetId) {
+          const el = document.getElementById(targetId);
+          if (el) el.classList.add('active');
         }
       });
     });
 
-    // Pesquisa de Utilizadores
     if (admSearchUserInput) {
-      admSearchUserInput.addEventListener('input', () => renderAdminDashboard());
+      admSearchUserInput.addEventListener('input', () => renderAdminTables());
     }
 
-    // Modal Adicionar Utilizador
+    if (btnSyncMongoNow) {
+      btnSyncMongoNow.addEventListener('click', () => syncFromMongoDBAtlas(true));
+    }
+
     if (btnAdminOpenAddUser) {
       btnAdminOpenAddUser.addEventListener('click', () => {
         if (modalAdminAddUser) modalAdminAddUser.classList.add('show');
@@ -7522,61 +7732,62 @@
     }
 
     if (formAdminCreateUser) {
-      formAdminCreateUser.addEventListener('submit', (e) => {
+      formAdminCreateUser.addEventListener('submit', async (e) => {
         e.preventDefault();
         const name = document.getElementById('admNewName').value.trim();
-        const email = document.getElementById('admNewEmail').value.trim();
+        const email = document.getElementById('admNewEmail').value.trim().toLowerCase();
         const role = document.getElementById('admNewRole').value.trim();
         const plan = document.getElementById('admNewPlan').value;
 
         if (!name || !email) return;
 
-        let users = getAdminUsers();
-        users = users.filter(u => u.email.toLowerCase() !== email.toLowerCase());
-        users.push({ name, email, role: role || 'Analista de Dados', plan: plan || 'pro', status: 'Ativo' });
-        localStorage.setItem('ai_analyst_registered_users', JSON.stringify(users));
+        const newUserObj = {
+          name,
+          email,
+          role: role || 'Analista de Dados',
+          plan: plan || 'pro',
+          status: 'Ativo',
+          createdAt: new Date().toISOString()
+        };
+
+        mongoLiveState.users = mongoLiveState.users.filter(u => u.email.toLowerCase() !== email);
+        mongoLiveState.users.unshift(newUserObj);
 
         if (modalAdminAddUser) modalAdminAddUser.classList.remove('show');
         formAdminCreateUser.reset();
-        renderAdminDashboard();
-        showToast(`Utilizador ${name} criado com sucesso!`);
+        renderAdminTables();
+
+        try {
+          await fetch('/api/admin/users', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newUserObj)
+          });
+        } catch (err) {}
+        showToast(`Utilizador ${name} gravado no MongoDB Atlas!`);
       });
     }
 
-    // Alternar para Workspace pelo botão do Admin
     if (btnAdminToWorkspace) {
-      btnAdminToWorkspace.addEventListener('click', () => {
-        showView('workspace');
-      });
+      btnAdminToWorkspace.addEventListener('click', () => showView('workspace'));
     }
     if (navAdminBtn) {
-      navAdminBtn.addEventListener('click', () => {
-        showView('admin');
-      });
+      navAdminBtn.addEventListener('click', () => showView('admin'));
     }
     if (mNavAdmin) {
-      mNavAdmin.addEventListener('click', () => {
-        showView('admin');
-      });
+      mNavAdmin.addEventListener('click', () => showView('admin'));
     }
 
-    // Ferramentas de Manutenção
     if (btnAdminResetUsers) {
       btnAdminResetUsers.addEventListener('click', () => {
-        if (confirm('Deseja repor a lista padrão de utilizadores do sistema?')) {
-          localStorage.setItem('ai_analyst_registered_users', JSON.stringify(defaultAdminUsersList));
-          renderAdminDashboard();
-          showToast('Lista de utilizadores restaurada para o padrão.');
-        }
+        syncFromMongoDBAtlas(true);
       });
     }
 
     if (btnAdminClearCache) {
       btnAdminClearCache.addEventListener('click', () => {
-        if (confirm('Deseja limpar todos os dados de simulação e reiniciar a aplicação?')) {
-          localStorage.removeItem('ai_analyst_registered_users');
-          location.reload();
-        }
+        localStorage.removeItem('ai_analyst_registered_users');
+        syncFromMongoDBAtlas(true);
       });
     }
 

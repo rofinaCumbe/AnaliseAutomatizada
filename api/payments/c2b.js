@@ -1,11 +1,11 @@
 /**
- * API Serverless Endpoint: Iniciar Cobrança C2B via Kivora Payments
+ * API Serverless Endpoint: Iniciar Cobrança C2B via Kivora Payments & Gravar no MongoDB Atlas
  * Suporta M-Pesa (Vodacom: 84/85) e e-Mola (Movitel: 86/87)
  * Rota: POST /api/payments/c2b
  */
+const { connectToDatabase } = require('../lib/mongodb');
 
 module.exports = async function handler(req, res) {
-  // Configuração de CORS
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -26,7 +26,7 @@ module.exports = async function handler(req, res) {
 
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
-    let { phone, amount, reference, description, planName, customerEmail } = body;
+    let { phone, amount, reference, description, planName, customerName, customerEmail } = body;
 
     if (!phone) {
       return res.status(400).json({
@@ -72,63 +72,76 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    // Gerar chave de idempotência obrigatória se não fornecida
     const cleanReference = reference || `AA-${Date.now()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
     const cleanDescription = description || `Subscrição ${planName || 'Análise Automatizada Pro'}`;
 
     const kivoraKey = process.env.KIVORA_SECRET_KEY;
     const kivoraUrl = (process.env.KIVORA_API_URL || 'https://www.kivorapayments.com').replace(/\/+$/, '');
 
-    // Modo Simulação/Demonstração caso a chave de produção/teste ainda não esteja no servidor
+    let paymentId = `pay_kv_${Date.now()}`;
+    let paymentStatus = 'pending';
+    let isSimulated = false;
+
     if (!kivoraKey || kivoraKey.includes('sua_chave') || kivoraKey === 'sk_test_sua_chave_secreta_aqui') {
-      const mockId = `pay_sim_${Date.now()}`;
-      return res.status(200).json({
-        success: true,
-        isSimulated: true,
-        paymentId: mockId,
-        status: 'pending',
-        provider,
-        phone: cleanPhone,
-        amount: Number(amount),
-        currency: 'MZN',
-        reference: cleanReference,
-        message: `Pedido ${provider} iniciado com sucesso! (Modo Simulação Ativo - configure KIVORA_SECRET_KEY na Vercel para live)`
+      isSimulated = true;
+      paymentId = `pay_sim_${Date.now()}`;
+    } else {
+      const response = await fetch(`${kivoraUrl}/v1/c2b`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${kivoraKey}`
+        },
+        body: JSON.stringify({
+          phone: cleanPhone,
+          amount: Number(amount),
+          currency: 'MZN',
+          reference: cleanReference,
+          description: cleanDescription
+        })
       });
+
+      const data = await response.json();
+      if (!response.ok) {
+        return res.status(response.status).json(data);
+      }
+      paymentId = data.id;
+      paymentStatus = data.status || 'pending';
     }
 
-    // Chamada oficial à API Kivora Payments
-    const response = await fetch(`${kivoraUrl}/v1/c2b`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${kivoraKey}`
-      },
-      body: JSON.stringify({
+    // Gravar transação no MongoDB Atlas
+    try {
+      const { db } = await connectToDatabase();
+      const now = new Date();
+      await db.collection('transactions').insertOne({
+        paymentId,
+        reference: cleanReference,
+        customerName: customerName || 'Subscritor',
+        customerEmail: customerEmail || '',
         phone: cleanPhone,
+        provider,
         amount: Number(amount),
         currency: 'MZN',
-        reference: cleanReference,
-        description: cleanDescription
-      })
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      return res.status(response.status).json(data);
+        planName: planName || 'Plano Profissional',
+        status: paymentStatus,
+        createdAt: now,
+        updatedAt: now
+      });
+    } catch (dbErr) {
+      console.warn('Aviso ao gravar transação no MongoDB:', dbErr.message);
     }
 
     return res.status(200).json({
       success: true,
-      isSimulated: false,
-      paymentId: data.id,
-      status: data.status || 'pending',
+      isSimulated,
+      paymentId,
+      status: paymentStatus,
       provider,
       phone: cleanPhone,
-      amount: data.amount,
-      currency: data.currency || 'MZN',
-      reference: data.reference,
-      message: `Solicitação de pagamento enviada com sucesso para ${provider}. Aguarde o prompt USSD no seu telemóvel.`
+      amount: Number(amount),
+      currency: 'MZN',
+      reference: cleanReference,
+      message: `Solicitação enviada para ${provider}. Aguarde o prompt USSD no seu telemóvel.`
     });
 
   } catch (err) {

@@ -1,0 +1,24 @@
+{
+  "name": "analise-automatizada",
+  "version": "1.0.0",
+  "description": "Plataforma de inteligência e análise automatizada de dados em Moçambique com pagamentos M-Pesa e e-Mola",
+  "main": "api/lib/mongodb.js",
+  "scripts": {
+    "start": "node server.js",
+    "seed": "python scratch/seed_database.py"
+  },
+  "dependencies": {
+    "mongodb": "^6.10.0"
+  },
+  "keywords": [
+    "analise",
+    "dados",
+    "mpesa",
+    "emola",
+    "kivora",
+    "mongodb",
+    "mozambique"
+  ],
+  "author": "Rofina Cumbe",
+  "license": "ISC"
+}
