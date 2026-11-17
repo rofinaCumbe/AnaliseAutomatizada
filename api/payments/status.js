@@ -64,7 +64,7 @@ module.exports = async function handler(req, res) {
       currentStatus = data.status;
     }
 
-    // Atualizar status no MongoDB Atlas se mudou para paid/completed (mantendo o role salvo no banco)
+    // Atualizar status no MongoDB Atlas se mudou para paid/completed (mantendo role estritamente 'user' ou 'admin')
     if (currentStatus === 'paid' || currentStatus === 'completed') {
       try {
         const { db } = await connectToDatabase();
@@ -74,15 +74,24 @@ module.exports = async function handler(req, res) {
           { returnDocument: 'after' }
         );
         if (tx && tx.customerEmail) {
+          const emailLower = tx.customerEmail.toLowerCase();
+          const roleToSave = emailLower === 'admin@analiseautomatizada.co.mz' ? 'admin' : 'user';
           await db.collection('users').updateOne(
-            { email: tx.customerEmail.toLowerCase() },
+            { email: emailLower },
             {
               $set: {
                 plan: 'pro',
+                role: roleToSave,
                 status: 'Ativo',
                 updatedAt: new Date()
+              },
+              $setOnInsert: {
+                name: tx.customerName || 'Subscritor Pro',
+                email: emailLower,
+                createdAt: new Date()
               }
-            }
+            },
+            { upsert: true }
           );
         }
       } catch (dbErr) {

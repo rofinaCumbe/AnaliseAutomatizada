@@ -4799,12 +4799,8 @@
             <div class="auth-input-wrapper">
               <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
               <select id="regRole" class="auth-input" style="cursor: pointer;">
-                <option value="Analista Júnior">Analista Júnior</option>
-                <option value="Analista de Dados Sénior">Analista de Dados Sénior</option>
-                <option value="Coordenadora de Vendas">Coordenadora de Vendas</option>
-                <option value="Diretor de Operações">Diretor de Operações</option>
-                <option value="Engenheira de Dados">Engenheira de Dados</option>
-                <option value="Gestor de Risco">Gestor de Risco</option>
+                <option value="user">Utilizador (user)</option>
+                <option value="admin">Administrador (admin)</option>
               </select>
             </div>
           </div>
@@ -5846,13 +5842,8 @@
           <div style="margin-bottom:16px;">
             <label class="checkout-field-label">Função / Cargo</label>
             <select class="checkout-text-input" id="admNewRole" style="cursor:pointer;" required>
-              <option value="Administrador do Sistema">Administrador do Sistema</option>
-              <option value="Analista Júnior">Analista Júnior</option>
-              <option value="Analista de Dados Sénior">Analista de Dados Sénior</option>
-              <option value="Coordenadora de Vendas">Coordenadora de Vendas</option>
-              <option value="Diretor de Operações">Diretor de Operações</option>
-              <option value="Engenheira de Dados">Engenheira de Dados</option>
-              <option value="Gestor de Risco">Gestor de Risco</option>
+              <option value="user">Utilizador (user)</option>
+              <option value="admin">Administrador (admin)</option>
             </select>
           </div>
           <div style="margin-bottom:20px;">
@@ -6064,7 +6055,7 @@
         const initials = parts.length > 1 ? (parts[0][0] + parts[parts.length - 1][0]) : (currentUser.name.slice(0, 2));
         if (topbarUserAvatar) topbarUserAvatar.textContent = initials.toUpperCase();
 
-        const isAdmin = currentUser.role === 'Administrador do Sistema' || currentUser.email.toLowerCase() === 'admin@analiseautomatizada.co.mz';
+        const isAdmin = currentUser.role === 'admin' || currentUser.email.toLowerCase() === 'admin@analiseautomatizada.co.mz';
         const navAdm = document.getElementById('navAdminBtn');
         const mNavAdm = document.getElementById('mNavAdmin');
         if (navAdm) navAdm.style.display = isAdmin ? 'inline-flex' : 'none';
@@ -6182,7 +6173,7 @@
           name: 'Administrador',
           email: 'admin@analiseautomatizada.co.mz',
           password: 'admin123',
-          role: 'Administrador do Sistema'
+          role: 'admin'
         });
         localStorage.setItem('ai_analyst_registered_users', JSON.stringify(regList));
       }
@@ -6215,7 +6206,7 @@
           const adminUser = {
             name: 'Administrador',
             email: 'admin@analiseautomatizada.co.mz',
-            role: 'Administrador do Sistema'
+            role: 'admin'
           };
           setCurrentUser(adminUser, remember);
           showToast('Bem-vindo, Administrador do Sistema!');
@@ -6277,7 +6268,7 @@
         const adminUser = {
           name: 'Administrador',
           email: 'admin@analiseautomatizada.co.mz',
-          role: 'Administrador do Sistema'
+          role: 'admin'
         };
         setCurrentUser(adminUser, true);
         showToast('Sessão de Administrador iniciada com sucesso!');
@@ -6292,7 +6283,7 @@
         const demoUser = {
           name: 'Rofina Cumbe',
           email: 'analista@empresa.co.mz',
-          role: 'Analista de Dados Sénior'
+          role: 'user'
         };
         setCurrentUser(demoUser, true);
         showToast('Sessão de demonstração iniciada com sucesso!');
@@ -7399,7 +7390,7 @@
     }
 
   
-                // ==============================================================
+                    // ==============================================================
     // LÓGICA DO PAINEL ADMINISTRATIVO CONECTADA AO MONGODB ATLAS
     // ==============================================================
     const navAdminBtn = document.getElementById('navAdminBtn');
@@ -7417,60 +7408,35 @@
     const btnSyncMongoNow = document.getElementById('btnSyncMongoNow');
     const syncBtnLabel = document.getElementById('syncBtnLabel');
 
-    // Dados Reais extraídos diretamente do Cluster MongoDB Atlas (analiseautomatizadadb)
-    let mongoLiveState = {"roles": [{"_id": "6afc8ea05d43010f299b01e7", "name": "Administrador do Sistema", "code": "admin", "isAdmin": true, "active": true, "createdAt": "2026-11-17T19:27:39.219000"}, {"_id": "6afc8ea05d43010f299b01eb", "name": "Analista Júnior", "code": "role_4", "isAdmin": false, "active": true, "createdAt": "2026-11-17T19:27:39.219000"}, {"_id": "6afc8ea05d43010f299b01e8", "name": "Analista de Dados Sénior", "code": "role_1", "isAdmin": false, "active": true, "createdAt": "2026-11-17T19:27:39.219000"}, {"_id": "6afc8ea05d43010f299b01ed", "name": "Coordenadora de Vendas", "code": "role_6", "isAdmin": false, "active": true, "createdAt": "2026-11-17T19:27:39.219000"}, {"_id": "6afc8ea05d43010f299b01ec", "name": "Diretor de Operações", "code": "role_5", "isAdmin": false, "active": true, "createdAt": "2026-11-17T19:27:39.219000"}, {"_id": "6afc8ea05d43010f299b01ea", "name": "Engenheira de Dados", "code": "role_3", "isAdmin": false, "active": true, "createdAt": "2026-11-17T19:27:39.219000"}, {"_id": "6afc8ea05d43010f299b01e9", "name": "Gestor de Risco", "code": "role_2", "isAdmin": false, "active": true, "createdAt": "2026-11-17T19:27:39.219000"}], "users": [{"_id": "6afc3e2eaeca0c870c4ebf69", "email": "marta.sitoe@comercio.co.mz", "createdAt": "2026-11-12T13:44:09.826000", "name": "Marta Sitoe", "plan": "pro", "role": "Coordenadora de Vendas", "status": "Ativo", "updatedAt": "2026-11-17T13:44:09.826000"}, {"_id": "6afc3e2eaeca0c870c4ebf68", "email": "alberto.manhica@transportes.co.mz", "createdAt": "2026-11-07T13:44:09.826000", "name": "Alberto Manhiça", "plan": "pro", "role": "Diretor de Operações", "status": "Ativo", "updatedAt": "2026-11-17T13:44:09.826000"}, {"_id": "6afc3e2eaeca0c870c4ebf67", "email": "paulo.sitoe@techmaputo.mz", "createdAt": "2026-11-02T13:44:09.826000", "name": "Paulo Sitoe", "plan": "free", "role": "Analista Júnior", "status": "Ativo", "updatedAt": "2026-11-17T13:44:09.826000"}, {"_id": "6afc3e2daeca0c870c4ebf66", "email": "teresa.macamo@consultoria.co.mz", "createdAt": "2026-10-23T13:44:09.826000", "name": "Teresa Macamo", "plan": "corp", "role": "Engenheira de Dados", "status": "Ativo", "updatedAt": "2026-11-17T13:44:09.826000"}, {"_id": "6afc3e2daeca0c870c4ebf65", "email": "carlos.mondlane@bancozambezia.mz", "createdAt": "2026-10-18T13:44:09.826000", "name": "Carlos Mondlane", "plan": "pro", "role": "Gestor de Risco", "status": "Ativo", "updatedAt": "2026-11-17T13:44:09.826000"}, {"_id": "6afc3e2daeca0c870c4ebf64", "email": "analista@empresa.co.mz", "createdAt": "2026-10-03T13:44:09.826000", "name": "Rofina Cumbe", "plan": "pro", "role": "Analista de Dados Sénior", "status": "Ativo", "updatedAt": "2026-11-17T13:44:09.826000"}, {"_id": "6afc3e2daeca0c870c4ebf63", "email": "admin@analiseautomatizada.co.mz", "createdAt": "2026-09-18T13:44:09.826000", "name": "Administrador", "plan": "admin", "role": "Administrador do Sistema", "status": "Ativo", "updatedAt": "2026-11-17T13:44:09.826000"}], "transactions": [{"_id": "6afc40db7d16c8e6e40f860a", "paymentId": "pay_kv_894101", "reference": "AA-2026-9041", "customerName": "Rofina Cumbe", "customerEmail": "analista@empresa.co.mz", "phone": "841234567", "provider": "M-Pesa (Vodacom)", "amount": 499, "currency": "MZN", "planName": "Plano Profissional (Mensal)", "status": "paid", "createdAt": "2026-11-17T11:56:07.719000", "updatedAt": "2026-11-17T11:56:07.719000"}, {"_id": "6afc40db7d16c8e6e40f860b", "paymentId": "pay_kv_772390", "reference": "AA-2026-8812", "customerName": "Carlos Mondlane", "customerEmail": "carlos.mondlane@bancozambezia.mz", "phone": "869876543", "provider": "e-Mola (Movitel)", "amount": 499, "currency": "MZN", "planName": "Plano Profissional (Mensal)", "status": "paid", "createdAt": "2026-11-17T08:56:07.719000", "updatedAt": "2026-11-17T08:56:07.719000"}, {"_id": "6afc40db7d16c8e6e40f860c", "paymentId": "pay_kv_661902", "reference": "AA-2026-7734", "customerName": "Teresa Macamo", "customerEmail": "teresa.macamo@consultoria.co.mz", "phone": "849988776", "provider": "M-Pesa (Vodacom)", "amount": 3999, "currency": "MZN", "planName": "Plano Corporativo (Anual)", "status": "paid", "createdAt": "2026-11-16T09:56:07.719000", "updatedAt": "2026-11-16T09:56:07.719000"}, {"_id": "6afc40db7d16c8e6e40f860d", "paymentId": "pay_kv_552199", "reference": "AA-2026-6621", "customerName": "Alberto Manhiça", "customerEmail": "alberto.manhica@transportes.co.mz", "phone": "848877665", "provider": "M-Pesa (Vodacom)", "amount": 499, "currency": "MZN", "planName": "Plano Profissional (Mensal)", "status": "paid", "createdAt": "2026-11-15T13:56:07.719000", "updatedAt": "2026-11-15T13:56:07.719000"}, {"_id": "6afc40db7d16c8e6e40f860e", "paymentId": "pay_kv_441803", "reference": "AA-2026-5510", "customerName": "Marta Sitoe", "customerEmail": "marta.sitoe@comercio.co.mz", "phone": "867766554", "provider": "e-Mola (Movitel)", "amount": 499, "currency": "MZN", "planName": "Plano Profissional (Mensal)", "status": "paid", "createdAt": "2026-11-14T13:56:07.719000", "updatedAt": "2026-11-14T13:56:07.719000"}], "inquiries": [{"_id": "6afc47813eff51a3f764b87b", "dataset": "sample_sales_data.csv", "rows": 48, "prompt": "Resumo estatístico descritivo e KPIs", "status": "completed", "createdAt": "2026-11-17T12:24:33.193000"}, {"_id": "6afc47813eff51a3f764b87c", "dataset": "indicadores_financeiros_mz.csv", "rows": 520, "prompt": "Detecção de outliers por Z-Score robusto", "status": "completed", "createdAt": "2026-11-17T08:24:33.193000"}, {"_id": "6afc47813eff51a3f764b87d", "dataset": "desempenho_regional_2026.csv", "rows": 310, "prompt": "Análise de distribuição provincial", "status": "completed", "createdAt": "2026-11-16T14:24:33.193000"}, {"_id": "6afc47813eff51a3f764b87e", "dataset": "metricas_operacionais.csv", "rows": 890, "prompt": "Tendência temporal e previsões", "status": "completed", "createdAt": "2026-11-15T14:24:33.193000"}]};
+    // Dados Reais extraídos diretamente do Cluster MongoDB Atlas (Apenas 2 roles: 'admin' e 'user')
+    let mongoLiveState = {"users": [{"_id": "6afc3e2eaeca0c870c4ebf69", "email": "marta.sitoe@comercio.co.mz", "createdAt": "2026-11-12T13:44:09.826000", "name": "Marta Sitoe", "plan": "pro", "role": "user", "status": "Ativo", "updatedAt": "2026-11-17T13:44:09.826000"}, {"_id": "6afc3e2eaeca0c870c4ebf68", "email": "alberto.manhica@transportes.co.mz", "createdAt": "2026-11-07T13:44:09.826000", "name": "Alberto Manhiça", "plan": "pro", "role": "user", "status": "Ativo", "updatedAt": "2026-11-17T13:44:09.826000"}, {"_id": "6afc3e2eaeca0c870c4ebf67", "email": "paulo.sitoe@techmaputo.mz", "createdAt": "2026-11-02T13:44:09.826000", "name": "Paulo Sitoe", "plan": "free", "role": "user", "status": "Ativo", "updatedAt": "2026-11-17T13:44:09.826000"}, {"_id": "6afc3e2daeca0c870c4ebf66", "email": "teresa.macamo@consultoria.co.mz", "createdAt": "2026-10-23T13:44:09.826000", "name": "Teresa Macamo", "plan": "corp", "role": "user", "status": "Ativo", "updatedAt": "2026-11-17T13:44:09.826000"}, {"_id": "6afc3e2daeca0c870c4ebf65", "email": "carlos.mondlane@bancozambezia.mz", "createdAt": "2026-10-18T13:44:09.826000", "name": "Carlos Mondlane", "plan": "pro", "role": "user", "status": "Ativo", "updatedAt": "2026-11-17T13:44:09.826000"}, {"_id": "6afc3e2daeca0c870c4ebf64", "email": "analista@empresa.co.mz", "createdAt": "2026-10-03T13:44:09.826000", "name": "Rofina Cumbe", "plan": "pro", "role": "user", "status": "Ativo", "updatedAt": "2026-11-17T13:44:09.826000"}, {"_id": "6afc3e2daeca0c870c4ebf63", "email": "admin@analiseautomatizada.co.mz", "createdAt": "2026-09-18T13:44:09.826000", "name": "Administrador", "plan": "admin", "role": "admin", "status": "Ativo", "updatedAt": "2026-11-17T13:44:09.826000"}], "transactions": [{"_id": "6afc40db7d16c8e6e40f860a", "paymentId": "pay_kv_894101", "reference": "AA-2026-9041", "customerName": "Rofina Cumbe", "customerEmail": "analista@empresa.co.mz", "phone": "841234567", "provider": "M-Pesa (Vodacom)", "amount": 499, "currency": "MZN", "planName": "Plano Profissional (Mensal)", "status": "paid", "createdAt": "2026-11-17T11:56:07.719000", "updatedAt": "2026-11-17T11:56:07.719000"}, {"_id": "6afc40db7d16c8e6e40f860b", "paymentId": "pay_kv_772390", "reference": "AA-2026-8812", "customerName": "Carlos Mondlane", "customerEmail": "carlos.mondlane@bancozambezia.mz", "phone": "869876543", "provider": "e-Mola (Movitel)", "amount": 499, "currency": "MZN", "planName": "Plano Profissional (Mensal)", "status": "paid", "createdAt": "2026-11-17T08:56:07.719000", "updatedAt": "2026-11-17T08:56:07.719000"}, {"_id": "6afc40db7d16c8e6e40f860c", "paymentId": "pay_kv_661902", "reference": "AA-2026-7734", "customerName": "Teresa Macamo", "customerEmail": "teresa.macamo@consultoria.co.mz", "phone": "849988776", "provider": "M-Pesa (Vodacom)", "amount": 3999, "currency": "MZN", "planName": "Plano Corporativo (Anual)", "status": "paid", "createdAt": "2026-11-16T09:56:07.719000", "updatedAt": "2026-11-16T09:56:07.719000"}, {"_id": "6afc40db7d16c8e6e40f860d", "paymentId": "pay_kv_552199", "reference": "AA-2026-6621", "customerName": "Alberto Manhiça", "customerEmail": "alberto.manhica@transportes.co.mz", "phone": "848877665", "provider": "M-Pesa (Vodacom)", "amount": 499, "currency": "MZN", "planName": "Plano Profissional (Mensal)", "status": "paid", "createdAt": "2026-11-15T13:56:07.719000", "updatedAt": "2026-11-15T13:56:07.719000"}, {"_id": "6afc40db7d16c8e6e40f860e", "paymentId": "pay_kv_441803", "reference": "AA-2026-5510", "customerName": "Marta Sitoe", "customerEmail": "marta.sitoe@comercio.co.mz", "phone": "867766554", "provider": "e-Mola (Movitel)", "amount": 499, "currency": "MZN", "planName": "Plano Profissional (Mensal)", "status": "paid", "createdAt": "2026-11-14T13:56:07.719000", "updatedAt": "2026-11-14T13:56:07.719000"}], "inquiries": [{"_id": "6afc47813eff51a3f764b87b", "dataset": "sample_sales_data.csv", "rows": 48, "prompt": "Resumo estatístico descritivo e KPIs", "status": "completed", "createdAt": "2026-11-17T12:24:33.193000"}, {"_id": "6afc47813eff51a3f764b87c", "dataset": "indicadores_financeiros_mz.csv", "rows": 520, "prompt": "Detecção de outliers por Z-Score robusto", "status": "completed", "createdAt": "2026-11-17T08:24:33.193000"}, {"_id": "6afc47813eff51a3f764b87d", "dataset": "desempenho_regional_2026.csv", "rows": 310, "prompt": "Análise de distribuição provincial", "status": "completed", "createdAt": "2026-11-16T14:24:33.193000"}, {"_id": "6afc47813eff51a3f764b87e", "dataset": "metricas_operacionais.csv", "rows": 890, "prompt": "Tendência temporal e previsões", "status": "completed", "createdAt": "2026-11-15T14:24:33.193000"}]};
 
-    // Popular os seletores de Role (#regRole e #admNewRole) exclusivamente com os roles salvos no banco de dados
-    function populateDatabaseRoles() {
-      const rolesList = (mongoLiveState.roles || []).map(r => typeof r === 'string' ? { name: r, isAdmin: r === 'Administrador do Sistema' } : r);
-      if (rolesList.length === 0) return;
-
-      const regSelect = document.getElementById('regRole');
-      if (regSelect) {
-        const currentVal = regSelect.value;
-        const nonAdmin = rolesList.filter(r => !r.isAdmin && r.name !== 'Administrador do Sistema');
-        regSelect.innerHTML = nonAdmin.map(r => `<option value="${r.name}">${r.name}</option>`).join('');
-        if (nonAdmin.some(r => r.name === currentVal)) regSelect.value = currentVal;
-      }
-
-      const admSelect = document.getElementById('admNewRole');
-      if (admSelect) {
-        const currentVal = admSelect.value;
-        admSelect.innerHTML = rolesList.map(r => `<option value="${r.name}">${r.name}</option>`).join('');
-        if (rolesList.some(r => r.name === currentVal)) admSelect.value = currentVal;
-      }
+    function normalizeSystemRole(role, email) {
+      if (email && email.toLowerCase() === 'admin@analiseautomatizada.co.mz') return 'admin';
+      return (role === 'admin') ? 'admin' : 'user';
     }
 
-    // Sincronizar dados e roles em tempo real a partir dos endpoints /api/admin/* conectados ao MongoDB Atlas
+    // Sincronizar dados em tempo real a partir dos endpoints /api/admin/* conectados ao MongoDB Atlas
     async function syncFromMongoDBAtlas(showNotification = false) {
       if (syncBtnLabel) syncBtnLabel.textContent = 'A sincronizar...';
       try {
-        const [statsRes, usersRes, txRes, rolesRes] = await Promise.all([
+        const [statsRes, usersRes, txRes] = await Promise.all([
           fetch('/api/admin/stats').catch(() => null),
           fetch('/api/admin/users').catch(() => null),
-          fetch('/api/admin/transactions').catch(() => null),
-          fetch('/api/admin/roles').catch(() => null)
+          fetch('/api/admin/transactions').catch(() => null)
         ]);
 
         let updatedFromServer = false;
 
-        if (rolesRes && rolesRes.ok) {
-          const rData = await rolesRes.json();
-          if (rData.roles && rData.roles.length > 0) {
-            mongoLiveState.roles = rData.roles;
-            updatedFromServer = true;
-          }
-        }
-
         if (usersRes && usersRes.ok) {
           const uData = await usersRes.json();
           if (uData.users && uData.users.length > 0) {
-            mongoLiveState.users = uData.users;
-            localStorage.setItem('ai_analyst_registered_users', JSON.stringify(uData.users));
+            mongoLiveState.users = uData.users.map(u => ({
+              ...u,
+              role: normalizeSystemRole(u.role, u.email)
+            }));
+            localStorage.setItem('ai_analyst_registered_users', JSON.stringify(mongoLiveState.users));
             updatedFromServer = true;
-          }
-          if (uData.roles && uData.roles.length > 0) {
-            mongoLiveState.roles = uData.roles;
           }
         }
 
@@ -7496,15 +7462,13 @@
           updatedFromServer = true;
         }
 
-        populateDatabaseRoles();
         renderAdminTables();
         if (showNotification) {
           showToast(updatedFromServer 
-            ? 'Dados e roles sincronizados em tempo real com o MongoDB Atlas!' 
-            : 'Dados e roles reais do MongoDB Atlas carregados!');
+            ? 'Dados sincronizados em tempo real com o MongoDB Atlas!' 
+            : 'Dados reais do MongoDB Atlas carregados!');
         }
       } catch (err) {
-        populateDatabaseRoles();
         renderAdminTables();
       } finally {
         if (syncBtnLabel) syncBtnLabel.textContent = 'Sincronizar BD';
@@ -7512,7 +7476,6 @@
     }
 
     function renderAdminDashboard() {
-      populateDatabaseRoles();
       renderAdminTables();
       syncFromMongoDBAtlas(false);
     }
@@ -7523,6 +7486,7 @@
       const inquiries = mongoLiveState.inquiries || [];
       const filter = (admSearchUserInput ? admSearchUserInput.value.toLowerCase().trim() : '');
 
+      // Atualizar KPIs com base nos documentos reais do banco
       const elKpiUsers = document.getElementById('admKpiUsers');
       const elKpiRev = document.getElementById('admKpiRevenue');
       const elKpiPro = document.getElementById('admKpiPro');
@@ -7543,7 +7507,7 @@
         elKpiDs.textContent = String(inquiries.length);
       }
 
-      // 1. Renderizar Tabela de Utilizadores Reais (exibindo estritamente o role salvo no banco)
+      // 1. Renderizar Tabela de Utilizadores Reais (Apenas 2 roles: 'admin' e 'user')
       if (admUsersTbody) {
         admUsersTbody.innerHTML = '';
         const filtered = users.filter(u =>
@@ -7554,6 +7518,11 @@
 
         filtered.forEach(user => {
           const tr = document.createElement('tr');
+          const cleanRole = normalizeSystemRole(user.role, user.email);
+          const roleBadge = cleanRole === 'admin'
+            ? '<span class="badge-admin-role">admin</span>'
+            : '<span class="badge-admin-free">user</span>';
+
           const planBadge = user.plan === 'admin'
             ? '<span class="badge-admin-role">Admin</span>'
             : user.plan === 'corp'
@@ -7567,7 +7536,7 @@
           tr.innerHTML = `
             <td><strong>${user.name}</strong></td>
             <td>${user.email}</td>
-            <td>${user.role}</td>
+            <td>${roleBadge}</td>
             <td>${planBadge}</td>
             <td><span class="badge-status-active">${user.status || 'Ativo'}</span></td>
             <td>
@@ -7610,28 +7579,30 @@
       }
     }
 
-    // Alternar Plano de Utilizador (Altera apenas o plano, preservando o role salvo no banco de dados)
+    // Alternar Plano de Utilizador (Mantendo role estritamente 'user' ou 'admin')
     window.toggleUserPlan = async function(email) {
       const target = mongoLiveState.users.find(u => u.email.toLowerCase() === email.toLowerCase());
       if (!target) return;
 
       const isPro = target.plan === 'pro' || target.plan === 'corp';
       const newPlan = isPro ? 'free' : 'pro';
+      const validRole = normalizeSystemRole(target.role, email);
 
       target.plan = newPlan;
+      target.role = validRole;
       renderAdminTables();
 
       try {
         await fetch('/api/admin/users', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, plan: newPlan })
+          body: JSON.stringify({ email, plan: newPlan, role: validRole })
         });
       } catch (e) {}
       showToast('Plano atualizado no banco de dados MongoDB Atlas!');
     };
 
-    // Eliminar Utilizador
+    // Eliminar Utilizador (Remove do MongoDB Atlas e Estado Local)
     window.deleteAdminUser = async function(email) {
       if (!confirm(`Tem a certeza que deseja eliminar permanentemente o utilizador ${email} do banco de dados?`)) return;
       mongoLiveState.users = mongoLiveState.users.filter(u => u.email.toLowerCase() !== email.toLowerCase());
@@ -7674,7 +7645,6 @@
 
     if (btnAdminOpenAddUser) {
       btnAdminOpenAddUser.addEventListener('click', () => {
-        populateDatabaseRoles();
         if (modalAdminAddUser) modalAdminAddUser.classList.add('show');
       });
     }
@@ -7689,16 +7659,18 @@
         e.preventDefault();
         const name = document.getElementById('admNewName').value.trim();
         const email = document.getElementById('admNewEmail').value.trim().toLowerCase();
-        const role = document.getElementById('admNewRole').value.trim();
+        const roleInputVal = document.getElementById('admNewRole').value;
         const plan = document.getElementById('admNewPlan').value;
 
-        if (!name || !email || !role) return;
+        if (!name || !email) return;
+
+        const validRole = normalizeSystemRole(roleInputVal, email);
 
         const newUserObj = {
           name,
           email,
-          role,
-          plan: plan || 'pro',
+          role: validRole,
+          plan: validRole === 'admin' ? 'admin' : (plan || 'pro'),
           status: 'Ativo',
           createdAt: new Date().toISOString()
         };
@@ -7717,7 +7689,7 @@
             body: JSON.stringify(newUserObj)
           });
         } catch (err) {}
-        showToast(`Utilizador ${name} gravado no MongoDB Atlas com o role ${role}!`);
+        showToast(`Utilizador ${name} gravado no MongoDB Atlas com role '${validRole}'!`);
       });
     }
 
@@ -7743,9 +7715,6 @@
         syncFromMongoDBAtlas(true);
       });
     }
-
-    // Inicializar os selects de roles com os dados do banco logo ao carregar
-    populateDatabaseRoles();
 
   </script>
   <!-- MODAL DE CHECKOUT M-PESA & E-MOLA (KIVORA PAYMENTS) -->

@@ -1,9 +1,17 @@
 /**
  * API Serverless Endpoint: Gestão Real de Utilizadores no MongoDB Atlas
- * Garante que apenas roles salvos no banco de dados sejam atribuídos.
+ * Garante que apenas 2 roles ('admin' e 'user') sejam salvos no banco de dados.
  * Rota: GET, POST, PUT, DELETE /api/admin/users
  */
 const { connectToDatabase } = require('../lib/mongodb');
+
+function normalizeRole(role, email) {
+  if (email && String(email).trim().toLowerCase() === 'admin@analiseautomatizada.co.mz') {
+    return 'admin';
+  }
+  const r = String(role || '').trim().toLowerCase();
+  return (r === 'admin' || r === 'administrador' || r === 'administrador do sistema') ? 'admin' : 'user';
+}
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', true);
@@ -18,13 +26,8 @@ module.exports = async function handler(req, res) {
   try {
     const { db } = await connectToDatabase();
     const usersCol = db.collection('users');
-    const rolesCol = db.collection('roles');
 
-    // Obter lista de roles válidos salvos no banco de dados
-    const savedRolesDocs = await rolesCol.find({ active: { $ne: false } }).toArray();
-    const validRoleNames = savedRolesDocs.map(r => r.name);
-
-    // 1. GET: Listar todos os utilizadores e roles reais do MongoDB Atlas
+    // 1. GET: Listar todos os utilizadores reais do MongoDB Atlas
     if (req.method === 'GET') {
       const users = await usersCol
         .find({}, { projection: { password: 0 } })
@@ -34,40 +37,32 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({
         success: true,
         source: 'mongodb_atlas',
+        allowedRoles: ['admin', 'user'],
         count: users.length,
-        roles: savedRolesDocs,
         users
       });
     }
 
-    // 2. POST: Criar ou atualizar utilizador no MongoDB Atlas (apenas com role salvo no BD)
+    // 2. POST: Criar ou atualizar utilizador no MongoDB Atlas (apenas 'admin' ou 'user')
     if (req.method === 'POST') {
       const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
       const { name, email, role, plan, password } = body;
 
-      if (!name || !email || !role) {
+      if (!name || !email) {
         return res.status(400).json({
-          error: { code: 'MISSING_FIELDS', message: 'Nome, email e cargo (role do banco de dados) são obrigatórios.' }
-        });
-      }
-
-      if (validRoleNames.length > 0 && !validRoleNames.includes(role.trim())) {
-        return res.status(400).json({
-          error: {
-            code: 'INVALID_ROLE',
-            message: `O cargo '${role}' não existe no banco de dados. Roles permitidos: ${validRoleNames.join(', ')}`
-          }
+          error: { code: 'MISSING_FIELDS', message: 'Nome e email são obrigatórios.' }
         });
       }
 
       const cleanEmail = email.trim().toLowerCase();
+      const validRole = normalizeRole(role, cleanEmail);
       const now = new Date();
 
       const newUser = {
         name: name.trim(),
         email: cleanEmail,
-        role: role.trim(),
-        plan: plan || 'free',
+        role: validRole,
+        plan: validRole === 'admin' ? 'admin' : (plan || 'pro'),
         status: 'Ativo',
         updatedAt: now
       };
@@ -89,7 +84,7 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    // 3. PUT: Atualizar plano ou cargo de um utilizador no MongoDB Atlas
+    // 3. PUT: Atualizar plano ou role de um utilizador (mantendo apenas 'admin' ou 'user')
     if (req.method === 'PUT') {
       const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
       const { email, plan, role, status } = body;
@@ -100,16 +95,10 @@ module.exports = async function handler(req, res) {
         });
       }
 
-      if (role && validRoleNames.length > 0 && !validRoleNames.includes(role.trim())) {
-        return res.status(400).json({
-          error: { code: 'INVALID_ROLE', message: `O role '${role}' não está registado no banco de dados.` }
-        });
-      }
-
       const cleanEmail = email.trim().toLowerCase();
       const updateDoc = { updatedAt: new Date() };
       if (plan) updateDoc.plan = plan;
-      if (role) updateDoc.role = role.trim();
+      if (role) updateDoc.role = normalizeRole(role, cleanEmail);
       if (status) updateDoc.status = status;
 
       await usersCol.updateOne({ email: cleanEmail }, { $set: updateDoc });
