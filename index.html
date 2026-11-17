@@ -2190,6 +2190,30 @@
       background: var(--border-light);
     }
 
+        .btn-admin-quick-login {
+      width: 100%;
+      height: 46px;
+      border-radius: 12px;
+      border: 1px solid #1A1A1A;
+      background: #1A1A1A;
+      color: #FFFFFF;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all var(--transition-fast);
+      margin-bottom: 10px;
+    }
+    .btn-admin-quick-login:hover {
+      background: #333333;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
     .btn-demo-quick-login {
       width: 100%;
       height: 46px;
@@ -4188,7 +4212,7 @@
             <label class="auth-label" for="loginEmail">Email Corporativo</label>
             <div class="auth-input-wrapper">
               <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-              <input type="email" id="loginEmail" class="auth-input" placeholder="ex: analista@empresa.co.mz" required autocomplete="email" />
+              <input type="email" id="loginEmail" class="auth-input" placeholder="ex: admin@analiseautomatizada.co.mz" required autocomplete="email" />
             </div>
           </div>
 
@@ -4217,6 +4241,12 @@
           </button>
 
           <div class="auth-divider-text">Acesso Rápido de Teste</div>
+
+          <!-- BOTÃO ADMIN (1-CLIQUE) -->
+          <button type="button" class="btn-admin-quick-login" id="btnAdminQuickLogin" title="Entrar diretamente com a Conta de Administrador">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F1C40F" stroke-width="2.2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+            <span>Entrar como Administrador (admin123)</span>
+          </button>
 
           <!-- BOTÃO DEMO DE 1 CLIQUE -->
           <button type="button" class="btn-demo-quick-login" id="btnDemoQuickLogin">
@@ -5249,6 +5279,20 @@
       });
     }
 
+    // Garantir conta Admin no registo local
+    try {
+      let regList = JSON.parse(localStorage.getItem('ai_analyst_registered_users') || '[]');
+      if (!regList.some(u => u.email.toLowerCase() === 'admin@analiseautomatizada.co.mz')) {
+        regList.push({
+          name: 'Administrador',
+          email: 'admin@analiseautomatizada.co.mz',
+          password: 'admin123',
+          role: 'Administrador do Sistema'
+        });
+        localStorage.setItem('ai_analyst_registered_users', JSON.stringify(regList));
+      }
+    } catch (err) {}
+
     // Submissão de Login
     if (formLogin) {
       formLogin.addEventListener('submit', (e) => {
@@ -5266,12 +5310,39 @@
           return;
         }
 
+        // 1. Verificação da Conta Administrador
+        if (email.toLowerCase() === 'admin@analiseautomatizada.co.mz') {
+          if (password !== 'admin123') {
+            showToast('Palavra-passe incorreta para a conta de administrador.');
+            if (pwdInput) { pwdInput.focus(); pwdInput.select(); }
+            return;
+          }
+          const adminUser = {
+            name: 'Administrador',
+            email: 'admin@analiseautomatizada.co.mz',
+            role: 'Administrador do Sistema'
+          };
+          setCurrentUser(adminUser, remember);
+          showToast('Bem-vindo, Administrador do Sistema!');
+          showView('workspace');
+          return;
+        }
+
+        // 2. Verificação de Utilizadores Registados
         let registeredUsers = [];
         try {
           registeredUsers = JSON.parse(localStorage.getItem('ai_analyst_registered_users') || '[]');
         } catch (err) {}
 
         const found = registeredUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
+
+        // Se o utilizador tem palavra-passe guardada, valida
+        if (found && found.password && found.password !== password) {
+          showToast('Palavra-passe incorreta para este utilizador.');
+          if (pwdInput) { pwdInput.focus(); pwdInput.select(); }
+          return;
+        }
+
         const userName = found ? found.name : email.split('@')[0].replace(/[._]/g, ' ');
         const userRole = found ? found.role : 'Analista de Dados';
 
@@ -5283,6 +5354,26 @@
 
         setCurrentUser(userObj, remember);
         showToast(`Bem-vindo de volta, ${userObj.name}!`);
+        showView('workspace');
+      });
+    }
+
+    // Acesso Rápido Admin (1-Clique)
+    const btnAdminQuickLogin = document.getElementById('btnAdminQuickLogin');
+    if (btnAdminQuickLogin) {
+      btnAdminQuickLogin.addEventListener('click', () => {
+        const emailInput = document.getElementById('loginEmail');
+        const pwdInput = document.getElementById('loginPassword');
+        if (emailInput) emailInput.value = 'admin@analiseautomatizada.co.mz';
+        if (pwdInput) pwdInput.value = 'admin123';
+
+        const adminUser = {
+          name: 'Administrador',
+          email: 'admin@analiseautomatizada.co.mz',
+          role: 'Administrador do Sistema'
+        };
+        setCurrentUser(adminUser, true);
+        showToast('Sessão de Administrador iniciada com sucesso!');
         showView('workspace');
       });
     }
