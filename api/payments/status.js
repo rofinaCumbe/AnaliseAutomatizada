@@ -64,7 +64,7 @@ module.exports = async function handler(req, res) {
       currentStatus = data.status;
     }
 
-    // Atualizar status no MongoDB Atlas se mudou para paid/completed
+    // Atualizar status no MongoDB Atlas se mudou para paid/completed (mantendo o role salvo no banco)
     if (currentStatus === 'paid' || currentStatus === 'completed') {
       try {
         const { db } = await connectToDatabase();
@@ -79,17 +79,10 @@ module.exports = async function handler(req, res) {
             {
               $set: {
                 plan: 'pro',
-                role: 'Analista Pro (M-Pesa)',
                 status: 'Ativo',
                 updatedAt: new Date()
-              },
-              $setOnInsert: {
-                name: tx.customerName || 'Subscritor Pro',
-                email: tx.customerEmail.toLowerCase(),
-                createdAt: new Date()
               }
-            },
-            { upsert: true }
+            }
           );
         }
       } catch (dbErr) {

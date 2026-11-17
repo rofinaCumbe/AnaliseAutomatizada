@@ -1,5 +1,6 @@
 /**
  * API Serverless Endpoint: Gestão Real de Utilizadores no MongoDB Atlas
+ * Garante que apenas roles salvos no banco de dados sejam atribuídos.
  * Rota: GET, POST, PUT, DELETE /api/admin/users
  */
 const { connectToDatabase } = require('../lib/mongodb');
@@ -17,8 +18,13 @@ module.exports = async function handler(req, res) {
   try {
     const { db } = await connectToDatabase();
     const usersCol = db.collection('users');
+    const rolesCol = db.collection('roles');
 
-    // 1. GET: Listar todos os utilizadores reais do MongoDB Atlas
+    // Obter lista de roles válidos salvos no banco de dados
+    const savedRolesDocs = await rolesCol.find({ active: { $ne: false } }).toArray();
+    const validRoleNames = savedRolesDocs.map(r => r.name);
+
+    // 1. GET: Listar todos os utilizadores e roles reais do MongoDB Atlas
     if (req.method === 'GET') {
       const users = await usersCol
         .find({}, { projection: { password: 0 } })
@@ -29,18 +35,28 @@ module.exports = async function handler(req, res) {
         success: true,
         source: 'mongodb_atlas',
         count: users.length,
+        roles: savedRolesDocs,
         users
       });
     }
 
-    // 2. POST: Criar ou atualizar utilizador no MongoDB Atlas
+    // 2. POST: Criar ou atualizar utilizador no MongoDB Atlas (apenas com role salvo no BD)
     if (req.method === 'POST') {
       const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
       const { name, email, role, plan, password } = body;
 
-      if (!name || !email) {
+      if (!name || !email || !role) {
         return res.status(400).json({
-          error: { code: 'MISSING_FIELDS', message: 'Nome e email são obrigatórios.' }
+          error: { code: 'MISSING_FIELDS', message: 'Nome, email e cargo (role do banco de dados) são obrigatórios.' }
+        });
+      }
+
+      if (validRoleNames.length > 0 && !validRoleNames.includes(role.trim())) {
+        return res.status(400).json({
+          error: {
+            code: 'INVALID_ROLE',
+            message: `O cargo '${role}' não existe no banco de dados. Roles permitidos: ${validRoleNames.join(', ')}`
+          }
         });
       }
 
@@ -50,8 +66,8 @@ module.exports = async function handler(req, res) {
       const newUser = {
         name: name.trim(),
         email: cleanEmail,
-        role: role || 'Analista de Dados',
-        plan: plan || 'pro',
+        role: role.trim(),
+        plan: plan || 'free',
         status: 'Ativo',
         updatedAt: now
       };
@@ -84,10 +100,16 @@ module.exports = async function handler(req, res) {
         });
       }
 
+      if (role && validRoleNames.length > 0 && !validRoleNames.includes(role.trim())) {
+        return res.status(400).json({
+          error: { code: 'INVALID_ROLE', message: `O role '${role}' não está registado no banco de dados.` }
+        });
+      }
+
       const cleanEmail = email.trim().toLowerCase();
       const updateDoc = { updatedAt: new Date() };
       if (plan) updateDoc.plan = plan;
-      if (role) updateDoc.role = role;
+      if (role) updateDoc.role = role.trim();
       if (status) updateDoc.status = status;
 
       await usersCol.updateOne({ email: cleanEmail }, { $set: updateDoc });
