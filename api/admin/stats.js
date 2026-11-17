@@ -21,9 +21,8 @@ module.exports = async function handler(req, res) {
   try {
     const { db } = await connectToDatabase();
 
-    // 1. Contagem real de utilizadores e clientes
+    // 1. Contagem real de utilizadores
     const usersCount = await db.collection('users').countDocuments({});
-    const customersCount = await db.collection('customers').countDocuments({});
 
     // 2. Soma real da receita em MZN das transações M-Pesa e e-Mola
     const txAggregation = await db.collection('transactions').aggregate([
@@ -39,21 +38,18 @@ module.exports = async function handler(req, res) {
       plan: { $in: ['pro', 'corp', 'admin'] }
     });
 
-    // 4. Contagem real de datasets, análises e produtos
+    // 4. Contagem real de datasets e análises processadas
     const inquiriesCount = await db.collection('inquiries').countDocuments({});
-    const productsCount = await db.collection('products').countDocuments({});
 
     return res.status(200).json({
       success: true,
       source: 'mongodb_atlas',
       totalUsers: usersCount,
-      totalCustomers: customersCount,
       totalRevenueMZN,
       paidTransactions: paidTxCount,
       activeProUsers: proUsersCount,
-      totalDatasets: inquiriesCount + productsCount,
+      totalDatasets: inquiriesCount,
       inquiriesCount,
-      productsCount,
       timestamp: new Date().toISOString()
     });
   } catch (err) {
