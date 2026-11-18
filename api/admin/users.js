@@ -1,5 +1,5 @@
 /**
- * API Serverless Endpoint: Gestão Real de Utilizadores no MongoDB Atlas
+ * API Serverless Endpoint: Gestão Completa de Clientes/Utilizadores no MongoDB Atlas
  * Garante que apenas 2 roles ('admin' e 'user') sejam salvos no banco de dados.
  * Rota: GET, POST, PUT, DELETE /api/admin/users
  */
@@ -11,6 +11,10 @@ function normalizeRole(role, email) {
   }
   const r = String(role || '').trim().toLowerCase();
   return (r === 'admin' || r === 'administrador' || r === 'administrador do sistema') ? 'admin' : 'user';
+}
+
+function normalizeStatus(status) {
+  return String(status || '').trim().toLowerCase() === 'suspenso' ? 'Suspenso' : 'Ativo';
 }
 
 module.exports = async function handler(req, res) {
@@ -27,7 +31,7 @@ module.exports = async function handler(req, res) {
     const { db } = await connectToDatabase();
     const usersCol = db.collection('users');
 
-    // 1. GET: Listar todos os utilizadores reais do MongoDB Atlas
+    // 1. GET: Listar todos os clientes/utilizadores reais do MongoDB Atlas
     if (req.method === 'GET') {
       const users = await usersCol
         .find({}, { projection: { password: 0 } })
@@ -43,10 +47,10 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    // 2. POST: Criar ou atualizar utilizador no MongoDB Atlas (apenas 'admin' ou 'user')
+    // 2. POST: Criar novo cliente/utilizador no MongoDB Atlas
     if (req.method === 'POST') {
       const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
-      const { name, email, role, plan, password } = body;
+      const { name, email, role, plan, password, status } = body;
 
       if (!name || !email) {
         return res.status(400).json({
@@ -56,6 +60,7 @@ module.exports = async function handler(req, res) {
 
       const cleanEmail = email.trim().toLowerCase();
       const validRole = normalizeRole(role, cleanEmail);
+      const validStatus = cleanEmail === 'admin@analiseautomatizada.co.mz' ? 'Ativo' : normalizeStatus(status);
       const now = new Date();
 
       const newUser = {
@@ -63,7 +68,7 @@ module.exports = async function handler(req, res) {
         email: cleanEmail,
         role: validRole,
         plan: validRole === 'admin' ? 'admin' : (plan || 'pro'),
-        status: 'Ativo',
+        status: validStatus,
         updatedAt: now
       };
 
@@ -84,10 +89,10 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    // 3. PUT: Atualizar plano ou role de um utilizador (mantendo apenas 'admin' ou 'user')
+    // 3. PUT: Editar dados completos do cliente (nome, role, plano, estado)
     if (req.method === 'PUT') {
       const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
-      const { email, plan, role, status } = body;
+      const { email, name, plan, role, status } = body;
 
       if (!email) {
         return res.status(400).json({
@@ -96,20 +101,24 @@ module.exports = async function handler(req, res) {
       }
 
       const cleanEmail = email.trim().toLowerCase();
+      const isMainAdmin = cleanEmail === 'admin@analiseautomatizada.co.mz';
       const updateDoc = { updatedAt: new Date() };
-      if (plan) updateDoc.plan = plan;
+
+      if (name && name.trim()) updateDoc.name = name.trim();
+      if (plan && !isMainAdmin) updateDoc.plan = plan;
       if (role) updateDoc.role = normalizeRole(role, cleanEmail);
-      if (status) updateDoc.status = status;
+      if (status) updateDoc.status = isMainAdmin ? 'Ativo' : normalizeStatus(status);
 
       await usersCol.updateOne({ email: cleanEmail }, { $set: updateDoc });
 
       return res.status(200).json({
         success: true,
-        message: 'Utilizador atualizado no MongoDB Atlas.'
+        message: 'Dados do cliente atualizados no MongoDB Atlas.',
+        updated: updateDoc
       });
     }
 
-    // 4. DELETE: Eliminar utilizador do MongoDB Atlas
+    // 4. DELETE: Eliminar cliente/utilizador do MongoDB Atlas
     if (req.method === 'DELETE') {
       const email = req.query.email || (req.body && req.body.email);
 

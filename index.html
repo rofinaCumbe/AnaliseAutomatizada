@@ -4238,6 +4238,181 @@
       }
     }
 
+  
+    /* Gestão Completa de Clientes 360° */
+    .admin-filters-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      flex: 1;
+    }
+    .admin-filter-select {
+      height: 42px;
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      padding: 0 12px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: #444;
+      background: #FFFFFF;
+      cursor: pointer;
+      outline: none;
+    }
+    .admin-filter-select:focus {
+      border-color: #1A73E8;
+    }
+    .admin-actions-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .btn-admin-export-csv {
+      background: #FFFFFF;
+      color: #137333;
+      border: 1px solid #CEEAD6;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: all var(--transition-fast);
+    }
+    .btn-admin-export-csv:hover {
+      background: #E6F4EA;
+      border-color: #137333;
+    }
+    .badge-status-suspended {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: #C5221F;
+      background: #FCE8E6;
+      padding: 3px 9px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 11.5px;
+    }
+    .badge-status-suspended::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #C5221F;
+    }
+    .admin-user-link {
+      color: #1A1A1A;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .admin-user-link:hover {
+      color: #1A73E8;
+      text-decoration: underline;
+    }
+    .btn-admin-action.primary {
+      color: #1A73E8;
+      background: #E8F0FE;
+      border-color: #C2E7FF;
+    }
+    .btn-admin-action.primary:hover {
+      background: #D2E3FC;
+    }
+    .btn-admin-action.warning {
+      color: #B06000;
+      background: #FEF7E0;
+      border-color: #FDE293;
+    }
+    .btn-admin-action.warning:hover {
+      background: #FEEFC3;
+    }
+
+    /* Modal Ficha 360° do Cliente */
+    .admin-modal.modal-wide {
+      max-width: 660px;
+    }
+    .client-detail-top {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding-bottom: 18px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .client-detail-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1A73E8, #0D47A1);
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    .client-detail-kpis {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .client-detail-kpi {
+      background: #F8F9FA;
+      border: 1px solid var(--border-light);
+      border-radius: 14px;
+      padding: 14px;
+      text-align: center;
+    }
+    .client-detail-kpi-label {
+      font-size: 11.5px;
+      color: #666;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .client-detail-kpi-val {
+      font-size: 18px;
+      font-weight: 800;
+      color: #1A1A1A;
+    }
+    .client-tx-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+    }
+    .client-tx-table th, .client-tx-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-light);
+      text-align: left;
+    }
+    .client-tx-table th {
+      background: #F8F9FA;
+      color: #555;
+      font-weight: 700;
+    }
+    @media (max-width: 600px) {
+      .client-detail-kpis {
+        grid-template-columns: 1fr;
+      }
+      .admin-filters-group, .admin-actions-right {
+        width: 100%;
+      }
+      .admin-search-wrap, .admin-filter-select, .btn-admin-export-csv, .btn-admin-add-user {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -5613,17 +5788,37 @@
         </button>
       </div>
 
-      <!-- ABA 1: GESTÃO DE UTILIZADORES -->
+      <!-- ABA 1: GESTÃO DE CLIENTES E UTILIZADORES -->
       <div class="admin-tab-content active" id="admTabContentUsers">
         <div class="admin-section-bar">
-          <div class="admin-search-wrap">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" style="margin-right:8px;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input type="text" class="admin-search-input" id="admSearchUserInput" placeholder="Pesquisar por nome ou email...">
+          <div class="admin-filters-group">
+            <div class="admin-search-wrap">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" style="margin-right:8px;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              <input type="text" class="admin-search-input" id="admSearchUserInput" placeholder="Pesquisar cliente por nome ou email...">
+            </div>
+            <select class="admin-filter-select" id="admFilterPlan" title="Filtrar por plano">
+              <option value="all">Todos os Planos</option>
+              <option value="pro">Plano Pro</option>
+              <option value="corp">Corporativo</option>
+              <option value="free">Gratuito</option>
+              <option value="admin">Admin</option>
+            </select>
+            <select class="admin-filter-select" id="admFilterStatus" title="Filtrar por estado">
+              <option value="all">Todos os Estados</option>
+              <option value="Ativo">Ativos</option>
+              <option value="Suspenso">Suspensos</option>
+            </select>
           </div>
-          <button type="button" class="btn-admin-add-user" id="btnAdminOpenAddUser">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            <span>Adicionar Novo Utilizador</span>
-          </button>
+          <div class="admin-actions-right">
+            <button type="button" class="btn-admin-export-csv" id="btnAdminExportCsv" title="Exportar lista de clientes para Excel/CSV">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              <span>Exportar CSV</span>
+            </button>
+            <button type="button" class="btn-admin-add-user" id="btnAdminOpenAddUser">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              <span>Novo Cliente</span>
+            </button>
+          </div>
         </div>
 
         <div class="admin-table-card">
@@ -5631,10 +5826,11 @@
             <table class="admin-table" id="admUsersTable">
               <thead>
                 <tr>
-                  <th>Utilizador / Nome</th>
+                  <th>Cliente / Nome</th>
                   <th>Email de Contacto</th>
-                  <th>Cargo / Função</th>
-                  <th>Plano Actual</th>
+                  <th>Role</th>
+                  <th>Plano Atual</th>
+                  <th>Total Pago</th>
                   <th>Estado</th>
                   <th>Ações de Controlo</th>
                 </tr>
@@ -5858,6 +6054,116 @@
             <span>Criar Conta de Utilizador</span>
           </button>
         </form>
+      </div>
+    </div>
+  </div>
+
+  
+  <!-- MODAL: EDITAR CLIENTE (ADMIN) -->
+  <div class="admin-modal-backdrop" id="modalAdminEditUser">
+    <div class="admin-modal">
+      <div class="admin-modal-header">
+        <h3 class="admin-modal-title">Editar Dados do Cliente</h3>
+        <button type="button" class="checkout-close-btn" id="btnAdminCloseEditUser">&times;</button>
+      </div>
+      <div class="admin-modal-body">
+        <form id="formAdminEditUser">
+          <div style="margin-bottom:14px;">
+            <label class="checkout-field-label">Email do Cliente (Identificador)</label>
+            <input type="email" class="checkout-text-input" id="admEditEmail" readonly style="background:#F1F3F4; color:#666; cursor:not-allowed;">
+          </div>
+          <div style="margin-bottom:14px;">
+            <label class="checkout-field-label">Nome Completo</label>
+            <input type="text" class="checkout-text-input" id="admEditName" required>
+          </div>
+          <div style="margin-bottom:14px;">
+            <label class="checkout-field-label">Role de Acesso</label>
+            <select class="checkout-text-input" id="admEditRole" style="cursor:pointer;">
+              <option value="user">Utilizador (user)</option>
+              <option value="admin">Administrador (admin)</option>
+            </select>
+          </div>
+          <div style="margin-bottom:14px;">
+            <label class="checkout-field-label">Plano de Subscrição</label>
+            <select class="checkout-text-input" id="admEditPlan" style="cursor:pointer;">
+              <option value="free">Plano Gratuito / Básico (0 MZN)</option>
+              <option value="pro">Plano Profissional (499 MZN/mês)</option>
+              <option value="corp">Plano Corporativo (3.999 MZN/ano)</option>
+            </select>
+          </div>
+          <div style="margin-bottom:20px;">
+            <label class="checkout-field-label">Estado da Conta</label>
+            <select class="checkout-text-input" id="admEditStatus" style="cursor:pointer;">
+              <option value="Ativo">Ativo (Acesso Liberado)</option>
+              <option value="Suspenso">Suspenso (Acesso Bloqueado)</option>
+            </select>
+          </div>
+          <button type="submit" class="btn-pay-checkout-main" style="height:46px;">
+            <span>Guardar Alterações no MongoDB</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: FICHA 360° DO CLIENTE -->
+  <div class="admin-modal-backdrop" id="modalAdminUserDetail">
+    <div class="admin-modal modal-wide">
+      <div class="admin-modal-header">
+        <h3 class="admin-modal-title">Ficha Completa do Cliente</h3>
+        <button type="button" class="checkout-close-btn" id="btnAdminCloseUserDetail">&times;</button>
+      </div>
+      <div class="admin-modal-body">
+        <div class="client-detail-top">
+          <div class="client-detail-avatar" id="detClientAvatar">RC</div>
+          <div style="flex:1;">
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:4px;">
+              <h4 id="detClientName" style="font-size:18px; font-weight:800; color:#1A1A1A; margin:0;">-</h4>
+              <span id="detClientRoleBadge"></span>
+              <span id="detClientPlanBadge"></span>
+              <span id="detClientStatusBadge"></span>
+            </div>
+            <div id="detClientEmail" style="font-size:13.5px; color:#666;">-</div>
+          </div>
+        </div>
+
+        <div class="client-detail-kpis">
+          <div class="client-detail-kpi">
+            <div class="client-detail-kpi-label">Total Pago (MZN)</div>
+            <div class="client-detail-kpi-val" id="detClientTotalPaid" style="color:#137333;">0 MZN</div>
+          </div>
+          <div class="client-detail-kpi">
+            <div class="client-detail-kpi-label">Pagamentos</div>
+            <div class="client-detail-kpi-val" id="detClientTxCount">0</div>
+          </div>
+          <div class="client-detail-kpi">
+            <div class="client-detail-kpi-label">Cliente Desde</div>
+            <div class="client-detail-kpi-val" id="detClientSince" style="font-size:14.5px; padding-top:3px;">-</div>
+          </div>
+        </div>
+
+        <h4 style="font-size:14px; font-weight:700; color:#1A1A1A; margin-bottom:10px;">Histórico de Pagamentos M-Pesa &amp; e-Mola</h4>
+        <div style="max-height:220px; overflow-y:auto; border:1px solid var(--border-light); border-radius:12px; margin-bottom:20px;">
+          <table class="client-tx-table">
+            <thead>
+              <tr>
+                <th>Referência</th>
+                <th>Operadora</th>
+                <th>Montante</th>
+                <th>Data</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody id="detClientTxTbody">
+              <!-- Preenchido dinamicamente -->
+            </tbody>
+          </table>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:10px;">
+          <button type="button" class="btn-admin-action primary" id="btnDetEditClient" style="padding:10px 18px; font-size:13.5px;">Editar Cliente</button>
+          <button type="button" class="btn-admin-action" id="btnDetCloseFooter" style="padding:10px 18px; font-size:13.5px;">Fechar</button>
+        </div>
       </div>
     </div>
   </div>
@@ -6230,6 +6536,11 @@
 
         if (!found) {
           showToast('Utilizador não encontrado no banco de dados. Registe uma conta primeiro.');
+          return;
+        }
+
+        if (found.status === 'Suspenso') {
+          showToast('A sua conta encontra-se suspensa. Contacte o administrador do sistema.');
           return;
         }
 
@@ -7390,8 +7701,8 @@
     }
 
   
-                    // ==============================================================
-    // LÓGICA DO PAINEL ADMINISTRATIVO CONECTADA AO MONGODB ATLAS
+                        // ==============================================================
+    // LÓGICA DO PAINEL ADMINISTRATIVO CONECTADA AO MONGODB ATLAS (GESTÃO 360°)
     // ==============================================================
     const navAdminBtn = document.getElementById('navAdminBtn');
     const mNavAdmin = document.getElementById('mNavAdmin');
@@ -7399,10 +7710,20 @@
     const admUsersTbody = document.getElementById('admUsersTbody');
     const admTransTbody = document.getElementById('admTransTbody');
     const admSearchUserInput = document.getElementById('admSearchUserInput');
+    const admFilterPlan = document.getElementById('admFilterPlan');
+    const admFilterStatus = document.getElementById('admFilterStatus');
+    const btnAdminExportCsv = document.getElementById('btnAdminExportCsv');
     const btnAdminOpenAddUser = document.getElementById('btnAdminOpenAddUser');
     const modalAdminAddUser = document.getElementById('modalAdminAddUser');
     const btnAdminCloseAddUser = document.getElementById('btnAdminCloseAddUser');
     const formAdminCreateUser = document.getElementById('formAdminCreateUser');
+    const modalAdminEditUser = document.getElementById('modalAdminEditUser');
+    const btnAdminCloseEditUser = document.getElementById('btnAdminCloseEditUser');
+    const formAdminEditUser = document.getElementById('formAdminEditUser');
+    const modalAdminUserDetail = document.getElementById('modalAdminUserDetail');
+    const btnAdminCloseUserDetail = document.getElementById('btnAdminCloseUserDetail');
+    const btnDetCloseFooter = document.getElementById('btnDetCloseFooter');
+    const btnDetEditClient = document.getElementById('btnDetEditClient');
     const btnAdminResetUsers = document.getElementById('btnAdminResetUsers');
     const btnAdminClearCache = document.getElementById('btnAdminClearCache');
     const btnSyncMongoNow = document.getElementById('btnSyncMongoNow');
@@ -7410,10 +7731,40 @@
 
     // Dados Reais extraídos diretamente do Cluster MongoDB Atlas (Apenas 2 roles: 'admin' e 'user')
     let mongoLiveState = {"users": [{"_id": "6afc3e2eaeca0c870c4ebf69", "email": "marta.sitoe@comercio.co.mz", "createdAt": "2026-11-12T13:44:09.826000", "name": "Marta Sitoe", "plan": "pro", "role": "user", "status": "Ativo", "updatedAt": "2026-11-17T13:44:09.826000"}, {"_id": "6afc3e2eaeca0c870c4ebf68", "email": "alberto.manhica@transportes.co.mz", "createdAt": "2026-11-07T13:44:09.826000", "name": "Alberto Manhiça", "plan": "pro", "role": "user", "status": "Ativo", "updatedAt": "2026-11-17T13:44:09.826000"}, {"_id": "6afc3e2eaeca0c870c4ebf67", "email": "paulo.sitoe@techmaputo.mz", "createdAt": "2026-11-02T13:44:09.826000", "name": "Paulo Sitoe", "plan": "free", "role": "user", "status": "Ativo", "updatedAt": "2026-11-17T13:44:09.826000"}, {"_id": "6afc3e2daeca0c870c4ebf66", "email": "teresa.macamo@consultoria.co.mz", "createdAt": "2026-10-23T13:44:09.826000", "name": "Teresa Macamo", "plan": "corp", "role": "user", "status": "Ativo", "updatedAt": "2026-11-17T13:44:09.826000"}, {"_id": "6afc3e2daeca0c870c4ebf65", "email": "carlos.mondlane@bancozambezia.mz", "createdAt": "2026-10-18T13:44:09.826000", "name": "Carlos Mondlane", "plan": "pro", "role": "user", "status": "Ativo", "updatedAt": "2026-11-17T13:44:09.826000"}, {"_id": "6afc3e2daeca0c870c4ebf64", "email": "analista@empresa.co.mz", "createdAt": "2026-10-03T13:44:09.826000", "name": "Rofina Cumbe", "plan": "pro", "role": "user", "status": "Ativo", "updatedAt": "2026-11-17T13:44:09.826000"}, {"_id": "6afc3e2daeca0c870c4ebf63", "email": "admin@analiseautomatizada.co.mz", "createdAt": "2026-09-18T13:44:09.826000", "name": "Administrador", "plan": "admin", "role": "admin", "status": "Ativo", "updatedAt": "2026-11-17T13:44:09.826000"}], "transactions": [{"_id": "6afc40db7d16c8e6e40f860a", "paymentId": "pay_kv_894101", "reference": "AA-2026-9041", "customerName": "Rofina Cumbe", "customerEmail": "analista@empresa.co.mz", "phone": "841234567", "provider": "M-Pesa (Vodacom)", "amount": 499, "currency": "MZN", "planName": "Plano Profissional (Mensal)", "status": "paid", "createdAt": "2026-11-17T11:56:07.719000", "updatedAt": "2026-11-17T11:56:07.719000"}, {"_id": "6afc40db7d16c8e6e40f860b", "paymentId": "pay_kv_772390", "reference": "AA-2026-8812", "customerName": "Carlos Mondlane", "customerEmail": "carlos.mondlane@bancozambezia.mz", "phone": "869876543", "provider": "e-Mola (Movitel)", "amount": 499, "currency": "MZN", "planName": "Plano Profissional (Mensal)", "status": "paid", "createdAt": "2026-11-17T08:56:07.719000", "updatedAt": "2026-11-17T08:56:07.719000"}, {"_id": "6afc40db7d16c8e6e40f860c", "paymentId": "pay_kv_661902", "reference": "AA-2026-7734", "customerName": "Teresa Macamo", "customerEmail": "teresa.macamo@consultoria.co.mz", "phone": "849988776", "provider": "M-Pesa (Vodacom)", "amount": 3999, "currency": "MZN", "planName": "Plano Corporativo (Anual)", "status": "paid", "createdAt": "2026-11-16T09:56:07.719000", "updatedAt": "2026-11-16T09:56:07.719000"}, {"_id": "6afc40db7d16c8e6e40f860d", "paymentId": "pay_kv_552199", "reference": "AA-2026-6621", "customerName": "Alberto Manhiça", "customerEmail": "alberto.manhica@transportes.co.mz", "phone": "848877665", "provider": "M-Pesa (Vodacom)", "amount": 499, "currency": "MZN", "planName": "Plano Profissional (Mensal)", "status": "paid", "createdAt": "2026-11-15T13:56:07.719000", "updatedAt": "2026-11-15T13:56:07.719000"}, {"_id": "6afc40db7d16c8e6e40f860e", "paymentId": "pay_kv_441803", "reference": "AA-2026-5510", "customerName": "Marta Sitoe", "customerEmail": "marta.sitoe@comercio.co.mz", "phone": "867766554", "provider": "e-Mola (Movitel)", "amount": 499, "currency": "MZN", "planName": "Plano Profissional (Mensal)", "status": "paid", "createdAt": "2026-11-14T13:56:07.719000", "updatedAt": "2026-11-14T13:56:07.719000"}], "inquiries": [{"_id": "6afc47813eff51a3f764b87b", "dataset": "sample_sales_data.csv", "rows": 48, "prompt": "Resumo estatístico descritivo e KPIs", "status": "completed", "createdAt": "2026-11-17T12:24:33.193000"}, {"_id": "6afc47813eff51a3f764b87c", "dataset": "indicadores_financeiros_mz.csv", "rows": 520, "prompt": "Detecção de outliers por Z-Score robusto", "status": "completed", "createdAt": "2026-11-17T08:24:33.193000"}, {"_id": "6afc47813eff51a3f764b87d", "dataset": "desempenho_regional_2026.csv", "rows": 310, "prompt": "Análise de distribuição provincial", "status": "completed", "createdAt": "2026-11-16T14:24:33.193000"}, {"_id": "6afc47813eff51a3f764b87e", "dataset": "metricas_operacionais.csv", "rows": 890, "prompt": "Tendência temporal e previsões", "status": "completed", "createdAt": "2026-11-15T14:24:33.193000"}]};
+    let currentDetailClientEmail = null;
 
     function normalizeSystemRole(role, email) {
       if (email && email.toLowerCase() === 'admin@analiseautomatizada.co.mz') return 'admin';
       return (role === 'admin') ? 'admin' : 'user';
+    }
+
+    function getClientTransactions(email) {
+      const txs = mongoLiveState.transactions || [];
+      return txs.filter(t => t.customerEmail && t.customerEmail.toLowerCase() === email.toLowerCase());
+    }
+
+    function getClientTotalPaid(email) {
+      return getClientTransactions(email)
+        .filter(t => t.status === 'paid' || t.status === 'completed')
+        .reduce((acc, t) => acc + (Number(t.amount) || 0), 0);
+    }
+
+    function getFilteredAdminUsers() {
+      const users = mongoLiveState.users || [];
+      const search = (admSearchUserInput ? admSearchUserInput.value.toLowerCase().trim() : '');
+      const planFilter = admFilterPlan ? admFilterPlan.value : 'all';
+      const statusFilter = admFilterStatus ? admFilterStatus.value : 'all';
+
+      return users.filter(u => {
+        const matchText = !search ||
+          (u.name && u.name.toLowerCase().includes(search)) ||
+          (u.email && u.email.toLowerCase().includes(search)) ||
+          (u.role && u.role.toLowerCase().includes(search));
+        const matchPlan = planFilter === 'all' || (u.plan || 'free') === planFilter;
+        const userStatus = u.status || 'Ativo';
+        const matchStatus = statusFilter === 'all' || userStatus === statusFilter;
+        return matchText && matchPlan && matchStatus;
+      });
     }
 
     // Sincronizar dados em tempo real a partir dos endpoints /api/admin/* conectados ao MongoDB Atlas
@@ -7433,7 +7784,8 @@
           if (uData.users && uData.users.length > 0) {
             mongoLiveState.users = uData.users.map(u => ({
               ...u,
-              role: normalizeSystemRole(u.role, u.email)
+              role: normalizeSystemRole(u.role, u.email),
+              status: u.status || 'Ativo'
             }));
             localStorage.setItem('ai_analyst_registered_users', JSON.stringify(mongoLiveState.users));
             updatedFromServer = true;
@@ -7480,13 +7832,31 @@
       syncFromMongoDBAtlas(false);
     }
 
+    function getRoleBadgeHtml(role) {
+      return role === 'admin'
+        ? '<span class="badge-admin-role">admin</span>'
+        : '<span class="badge-admin-free">user</span>';
+    }
+
+    function getPlanBadgeHtml(plan) {
+      if (plan === 'admin') return '<span class="badge-admin-role">Admin</span>';
+      if (plan === 'corp') return '<span class="badge-admin-corp">Corporativo</span>';
+      if (plan === 'pro') return '<span class="badge-admin-pro">Pro (M-Pesa)</span>';
+      return '<span class="badge-admin-free">Gratuito</span>';
+    }
+
+    function getStatusBadgeHtml(status) {
+      return status === 'Suspenso'
+        ? '<span class="badge-status-suspended">Suspenso</span>'
+        : '<span class="badge-status-active">Ativo</span>';
+    }
+
     function renderAdminTables() {
       const users = mongoLiveState.users || [];
       const transactions = mongoLiveState.transactions || [];
       const inquiries = mongoLiveState.inquiries || [];
-      const filter = (admSearchUserInput ? admSearchUserInput.value.toLowerCase().trim() : '');
 
-      // Atualizar KPIs com base nos documentos reais do banco
+      // Atualizar KPIs
       const elKpiUsers = document.getElementById('admKpiUsers');
       const elKpiRev = document.getElementById('admKpiRevenue');
       const elKpiPro = document.getElementById('admKpiPro');
@@ -7494,7 +7864,7 @@
 
       if (elKpiUsers) elKpiUsers.textContent = String(users.length);
       if (elKpiPro) {
-        const proCount = users.filter(u => u.plan === 'pro' || u.plan === 'corp' || u.plan === 'admin').length;
+        const proCount = users.filter(u => (u.status || 'Ativo') === 'Ativo' && (u.plan === 'pro' || u.plan === 'corp' || u.plan === 'admin')).length;
         elKpiPro.textContent = String(proCount);
       }
       if (elKpiRev) {
@@ -7507,53 +7877,54 @@
         elKpiDs.textContent = String(inquiries.length);
       }
 
-      // 1. Renderizar Tabela de Utilizadores Reais (Apenas 2 roles: 'admin' e 'user')
+      // 1. Renderizar Tabela Completa de Clientes
       if (admUsersTbody) {
         admUsersTbody.innerHTML = '';
-        const filtered = users.filter(u =>
-          (u.name && u.name.toLowerCase().includes(filter)) ||
-          (u.email && u.email.toLowerCase().includes(filter)) ||
-          (u.role && u.role.toLowerCase().includes(filter))
-        );
+        const filtered = getFilteredAdminUsers();
 
-        filtered.forEach(user => {
-          const tr = document.createElement('tr');
-          const cleanRole = normalizeSystemRole(user.role, user.email);
-          const roleBadge = cleanRole === 'admin'
-            ? '<span class="badge-admin-role">admin</span>'
-            : '<span class="badge-admin-free">user</span>';
+        if (filtered.length === 0) {
+          admUsersTbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:28px; color:#888;">Nenhum cliente encontrado com os filtros aplicados.</td></tr>';
+        } else {
+          filtered.forEach(user => {
+            const tr = document.createElement('tr');
+            const cleanRole = normalizeSystemRole(user.role, user.email);
+            const userStatus = user.status || 'Ativo';
+            const totalPaid = getClientTotalPaid(user.email);
+            const isMainAdmin = user.email.toLowerCase() === 'admin@analiseautomatizada.co.mz';
 
-          const planBadge = user.plan === 'admin'
-            ? '<span class="badge-admin-role">Admin</span>'
-            : user.plan === 'corp'
-              ? '<span class="badge-admin-corp">Corporativo</span>'
-              : user.plan === 'pro'
-                ? '<span class="badge-admin-pro">Pro (M-Pesa)</span>'
-                : '<span class="badge-admin-free">Gratuito</span>';
-
-          const isMainAdmin = user.email.toLowerCase() === 'admin@analiseautomatizada.co.mz';
-
-          tr.innerHTML = `
-            <td><strong>${user.name}</strong></td>
-            <td>${user.email}</td>
-            <td>${roleBadge}</td>
-            <td>${planBadge}</td>
-            <td><span class="badge-status-active">${user.status || 'Ativo'}</span></td>
-            <td>
-              ${isMainAdmin
-                ? '<span style="color:#888; font-size:12px; font-weight:600;">Conta Principal BD</span>'
-                : `
-                  <button type="button" class="btn-admin-action" onclick="toggleUserPlan('${user.email}')">
-                    ${user.plan === 'pro' || user.plan === 'corp' ? 'Mudar para Grátis' : 'Promover a Pro'}
-                  </button>
-                  <button type="button" class="btn-admin-action danger" onclick="deleteAdminUser('${user.email}')">
-                    Eliminar
-                  </button>
-                `}
-            </td>
-          `;
-          admUsersTbody.appendChild(tr);
-        });
+            tr.innerHTML = `
+              <td>
+                <a class="admin-user-link" onclick="openUserDetailModal('${user.email}')" title="Ver ficha completa e histórico de pagamentos">
+                  ${user.name}
+                </a>
+              </td>
+              <td>${user.email}</td>
+              <td>${getRoleBadgeHtml(cleanRole)}</td>
+              <td>${getPlanBadgeHtml(user.plan)}</td>
+              <td><strong style="color:${totalPaid > 0 ? '#137333' : '#777'};">${totalPaid.toLocaleString('pt-MZ')} MZN</strong></td>
+              <td>${getStatusBadgeHtml(userStatus)}</td>
+              <td>
+                <button type="button" class="btn-admin-action primary" onclick="openUserDetailModal('${user.email}')" title="Ver Ficha 360°">
+                  Ficha
+                </button>
+                ${isMainAdmin
+                  ? '<span style="color:#888; font-size:12px; font-weight:600; margin-left:4px;">Conta Principal</span>'
+                  : `
+                    <button type="button" class="btn-admin-action" onclick="openEditUserModal('${user.email}')" title="Editar Nome, Role ou Plano">
+                      Editar
+                    </button>
+                    <button type="button" class="btn-admin-action warning" onclick="toggleUserStatus('${user.email}')" title="${userStatus === 'Suspenso' ? 'Reativar acesso' : 'Suspender acesso'}">
+                      ${userStatus === 'Suspenso' ? 'Reativar' : 'Suspender'}
+                    </button>
+                    <button type="button" class="btn-admin-action danger" onclick="deleteAdminUser('${user.email}')" title="Eliminar permanentemente">
+                      Eliminar
+                    </button>
+                  `}
+              </td>
+            `;
+            admUsersTbody.appendChild(tr);
+          });
+        }
       }
 
       // 2. Renderizar Tabela de Transações Reais do MongoDB
@@ -7579,40 +7950,182 @@
       }
     }
 
-    // Alternar Plano de Utilizador (Mantendo role estritamente 'user' ou 'admin')
-    window.toggleUserPlan = async function(email) {
+    // Abrir Ficha Detalhada 360° do Cliente
+    window.openUserDetailModal = function(email) {
+      const user = mongoLiveState.users.find(u => u.email.toLowerCase() === email.toLowerCase());
+      if (!user) return;
+      currentDetailClientEmail = user.email;
+
+      const cleanRole = normalizeSystemRole(user.role, user.email);
+      const userStatus = user.status || 'Ativo';
+      const txs = getClientTransactions(user.email);
+      const totalPaid = getClientTotalPaid(user.email);
+      const parts = (user.name || 'U').trim().split(' ');
+      const initials = parts.length > 1 ? (parts[0][0] + parts[parts.length - 1][0]) : user.name.slice(0, 2);
+
+      document.getElementById('detClientAvatar').textContent = initials.toUpperCase();
+      document.getElementById('detClientName').textContent = user.name;
+      document.getElementById('detClientEmail').textContent = user.email;
+      document.getElementById('detClientRoleBadge').innerHTML = getRoleBadgeHtml(cleanRole);
+      document.getElementById('detClientPlanBadge').innerHTML = getPlanBadgeHtml(user.plan);
+      document.getElementById('detClientStatusBadge').innerHTML = getStatusBadgeHtml(userStatus);
+      document.getElementById('detClientTotalPaid').textContent = `${totalPaid.toLocaleString('pt-MZ')} MZN`;
+      document.getElementById('detClientTxCount').textContent = String(txs.length);
+      document.getElementById('detClientSince').textContent = user.createdAt
+        ? new Date(user.createdAt).toLocaleDateString('pt-MZ')
+        : 'Recente';
+
+      const tbody = document.getElementById('detClientTxTbody');
+      tbody.innerHTML = '';
+      if (txs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:18px; color:#888;">Este cliente ainda não realizou pagamentos móveis.</td></tr>';
+      } else {
+        txs.forEach(tx => {
+          const tr = document.createElement('tr');
+          const isEmola = tx.provider && tx.provider.toLowerCase().includes('mola');
+          const dt = tx.createdAt ? new Date(tx.createdAt).toLocaleDateString('pt-MZ') : '-';
+          tr.innerHTML = `
+            <td><strong>${tx.reference}</strong></td>
+            <td><span class="momo-badge ${isEmola ? 'momo-emola' : 'momo-mpesa'}">${tx.provider || 'M-Pesa'}</span></td>
+            <td><strong>${Number(tx.amount).toLocaleString('pt-MZ')} MZN</strong></td>
+            <td>${dt}</td>
+            <td><span class="badge-status-active">${tx.status === 'paid' ? 'Liquidado' : tx.status}</span></td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      const isMainAdmin = user.email.toLowerCase() === 'admin@analiseautomatizada.co.mz';
+      if (btnDetEditClient) btnDetEditClient.style.display = isMainAdmin ? 'none' : 'inline-flex';
+      if (modalAdminUserDetail) modalAdminUserDetail.classList.add('show');
+    };
+
+    // Abrir Modal de Edição do Cliente
+    window.openEditUserModal = function(email) {
+      const user = mongoLiveState.users.find(u => u.email.toLowerCase() === email.toLowerCase());
+      if (!user) return;
+
+      document.getElementById('admEditEmail').value = user.email;
+      document.getElementById('admEditName').value = user.name;
+      document.getElementById('admEditRole').value = normalizeSystemRole(user.role, user.email);
+      document.getElementById('admEditPlan').value = (user.plan === 'admin') ? 'pro' : (user.plan || 'free');
+      document.getElementById('admEditStatus').value = user.status || 'Ativo';
+
+      if (modalAdminUserDetail) modalAdminUserDetail.classList.remove('show');
+      if (modalAdminEditUser) modalAdminEditUser.classList.add('show');
+    };
+
+    // Suspender ou Reativar Cliente (Atualiza MongoDB Atlas)
+    window.toggleUserStatus = async function(email) {
       const target = mongoLiveState.users.find(u => u.email.toLowerCase() === email.toLowerCase());
       if (!target) return;
 
-      const isPro = target.plan === 'pro' || target.plan === 'corp';
-      const newPlan = isPro ? 'free' : 'pro';
-      const validRole = normalizeSystemRole(target.role, email);
-
-      target.plan = newPlan;
-      target.role = validRole;
+      const newStatus = (target.status || 'Ativo') === 'Suspenso' ? 'Ativo' : 'Suspenso';
+      target.status = newStatus;
+      localStorage.setItem('ai_analyst_registered_users', JSON.stringify(mongoLiveState.users));
       renderAdminTables();
 
       try {
         await fetch('/api/admin/users', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, plan: newPlan, role: validRole })
+          body: JSON.stringify({ email, status: newStatus })
         });
       } catch (e) {}
-      showToast('Plano atualizado no banco de dados MongoDB Atlas!');
+      showToast(`Conta de ${target.name} alterada para: ${newStatus}`);
     };
 
-    // Eliminar Utilizador (Remove do MongoDB Atlas e Estado Local)
+    // Eliminar Cliente (Remove do MongoDB Atlas)
     window.deleteAdminUser = async function(email) {
-      if (!confirm(`Tem a certeza que deseja eliminar permanentemente o utilizador ${email} do banco de dados?`)) return;
+      if (!confirm(`Tem a certeza que deseja eliminar permanentemente o cliente ${email} do banco de dados?`)) return;
       mongoLiveState.users = mongoLiveState.users.filter(u => u.email.toLowerCase() !== email.toLowerCase());
+      localStorage.setItem('ai_analyst_registered_users', JSON.stringify(mongoLiveState.users));
       renderAdminTables();
 
       try {
         await fetch(`/api/admin/users?email=${encodeURIComponent(email)}`, { method: 'DELETE' });
       } catch (e) {}
-      showToast('Utilizador eliminado do MongoDB Atlas.');
+      showToast('Cliente eliminado permanentemente do MongoDB Atlas.');
     };
+
+    // Exportar Lista de Clientes para CSV (Excel)
+    if (btnAdminExportCsv) {
+      btnAdminExportCsv.addEventListener('click', () => {
+        const list = getFilteredAdminUsers();
+        if (list.length === 0) {
+          showToast('Não existem clientes para exportar com o filtro atual.');
+          return;
+        }
+        const headers = ['Nome', 'Email', 'Role', 'Plano', 'Estado', 'Total Pago (MZN)', 'Data Registo'];
+        const rows = list.map(u => [
+          `"${(u.name || '').replace(/"/g, '""')}"`,
+          `"${u.email || ''}"`,
+          normalizeSystemRole(u.role, u.email),
+          u.plan || 'free',
+          u.status || 'Ativo',
+          getClientTotalPaid(u.email),
+          u.createdAt ? new Date(u.createdAt).toLocaleDateString('pt-MZ') : ''
+        ].join(','));
+
+        const csvContent = '\uFEFF' + [headers.join(','), ...rows].join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `clientes_analise_automatizada_${new Date().toISOString().slice(0,10)}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast(`${list.length} clientes exportados para CSV com sucesso!`);
+      });
+    }
+
+    // Listeners de Filtros e Pesquisa
+    if (admSearchUserInput) admSearchUserInput.addEventListener('input', () => renderAdminTables());
+    if (admFilterPlan) admFilterPlan.addEventListener('change', () => renderAdminTables());
+    if (admFilterStatus) admFilterStatus.addEventListener('change', () => renderAdminTables());
+
+    // Listeners dos Modais
+    if (btnAdminCloseEditUser) btnAdminCloseEditUser.addEventListener('click', () => modalAdminEditUser.classList.remove('show'));
+    if (btnAdminCloseUserDetail) btnAdminCloseUserDetail.addEventListener('click', () => modalAdminUserDetail.classList.remove('show'));
+    if (btnDetCloseFooter) btnDetCloseFooter.addEventListener('click', () => modalAdminUserDetail.classList.remove('show'));
+    if (btnDetEditClient) {
+      btnDetEditClient.addEventListener('click', () => {
+        if (currentDetailClientEmail) openEditUserModal(currentDetailClientEmail);
+      });
+    }
+
+    // Submissão de Edição do Cliente
+    if (formAdminEditUser) {
+      formAdminEditUser.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('admEditEmail').value.trim().toLowerCase();
+        const name = document.getElementById('admEditName').value.trim();
+        const role = normalizeSystemRole(document.getElementById('admEditRole').value, email);
+        const plan = document.getElementById('admEditPlan').value;
+        const status = document.getElementById('admEditStatus').value;
+
+        const target = mongoLiveState.users.find(u => u.email.toLowerCase() === email);
+        if (target) {
+          target.name = name;
+          target.role = role;
+          target.plan = role === 'admin' ? 'admin' : plan;
+          target.status = status;
+        }
+
+        localStorage.setItem('ai_analyst_registered_users', JSON.stringify(mongoLiveState.users));
+        if (modalAdminEditUser) modalAdminEditUser.classList.remove('show');
+        renderAdminTables();
+
+        try {
+          await fetch('/api/admin/users', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, name, role, plan: role === 'admin' ? 'admin' : plan, status })
+          });
+        } catch (err) {}
+        showToast(`Dados de ${name} atualizados no MongoDB Atlas!`);
+      });
+    }
 
     // Alternar Abas no Painel Admin
     document.querySelectorAll('.admin-tab-btn').forEach(btn => {
@@ -7634,10 +8147,6 @@
         }
       });
     });
-
-    if (admSearchUserInput) {
-      admSearchUserInput.addEventListener('input', () => renderAdminTables());
-    }
 
     if (btnSyncMongoNow) {
       btnSyncMongoNow.addEventListener('click', () => syncFromMongoDBAtlas(true));
@@ -7677,6 +8186,7 @@
 
         mongoLiveState.users = mongoLiveState.users.filter(u => u.email.toLowerCase() !== email);
         mongoLiveState.users.unshift(newUserObj);
+        localStorage.setItem('ai_analyst_registered_users', JSON.stringify(mongoLiveState.users));
 
         if (modalAdminAddUser) modalAdminAddUser.classList.remove('show');
         formAdminCreateUser.reset();
@@ -7689,7 +8199,7 @@
             body: JSON.stringify(newUserObj)
           });
         } catch (err) {}
-        showToast(`Utilizador ${name} gravado no MongoDB Atlas com role '${validRole}'!`);
+        showToast(`Cliente ${name} gravado no MongoDB Atlas!`);
       });
     }
 
