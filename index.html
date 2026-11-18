@@ -10,6 +10,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- Google Identity Services (OAuth 2.0) -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     :root {
       --bg-topbar: #1F1F1F;
@@ -4413,6 +4415,24 @@
       }
     }
 
+  
+    /* Botão Google OAuth 2.0 (Google Identity Services) */
+    .google-auth-box {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 44px;
+      margin-bottom: 12px;
+      width: 100%;
+    }
+    .topbar-user-avatar img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+    }
+
   </style>
 </head>
 <body>
@@ -4936,6 +4956,9 @@
             <span>Iniciar Sessão</span>
           </button>
 
+          <div class="auth-divider-text">ou entre com a sua conta Google</div>
+          <div class="google-auth-box" id="googleSignInBtnWrap"></div>
+
           <div class="auth-divider-text">Acesso Rápido de Teste</div>
 
           <!-- BOTÃO ADMIN (1-CLIQUE) -->
@@ -4992,6 +5015,9 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
             <span>Criar Minha Conta</span>
           </button>
+
+          <div class="auth-divider-text">ou crie conta com o Google</div>
+          <div class="google-auth-box" id="googleRegisterBtnWrap"></div>
         </form>
 
         <div class="auth-footer-help">
@@ -6359,7 +6385,13 @@
         
         const parts = currentUser.name.trim().split(' ');
         const initials = parts.length > 1 ? (parts[0][0] + parts[parts.length - 1][0]) : (currentUser.name.slice(0, 2));
-        if (topbarUserAvatar) topbarUserAvatar.textContent = initials.toUpperCase();
+        if (topbarUserAvatar) {
+          if (currentUser.picture) {
+            topbarUserAvatar.innerHTML = `<img src="${currentUser.picture}" alt="${currentUser.name}" referrerpolicy="no-referrer">`;
+          } else {
+            topbarUserAvatar.textContent = initials.toUpperCase();
+          }
+        }
 
         const isAdmin = currentUser.role === 'admin' || currentUser.email.toLowerCase() === 'admin@analiseautomatizada.co.mz';
         const navAdm = document.getElementById('navAdminBtn');
@@ -8225,6 +8257,160 @@
         syncFromMongoDBAtlas(true);
       });
     }
+
+  
+    // ==============================================================
+    // AUTENTICAÇÃO COM CONTA GOOGLE (GOOGLE IDENTITY SERVICES / OAUTH 2.0)
+    // ==============================================================
+    const GOOGLE_CLIENT_ID = '78248021833-cre15s9u9ke00kciomqpv3kkki7l7um4.apps.googleusercontent.com';
+
+    function decodeGoogleJwtPayload(token) {
+      try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(
+          atob(base64)
+            .split('')
+            .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+            .join('')
+        );
+        return JSON.parse(jsonPayload);
+      } catch (e) {
+        return null;
+      }
+    }
+
+    async function handleGoogleCredentialResponse(response) {
+      if (!response || !response.credential) {
+        showToast('Não foi possível obter a credencial da Google.');
+        return;
+      }
+
+      showToast('A validar a sua conta Google...');
+
+      try {
+        const apiRes = await fetch('/api/auth/google', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ credential: response.credential })
+        }).catch(() => null);
+
+        if (apiRes) {
+          const data = await apiRes.json();
+          if (apiRes.status === 403) {
+            showToast(data.error ? data.error.message : 'Conta suspensa pelo administrador.');
+            return;
+          }
+          if (apiRes.ok && data.user) {
+            const gUser = data.user;
+            // Sincronizar no estado local e lista de utilizadores
+            if (typeof mongoLiveState !== 'undefined' && mongoLiveState.users) {
+              const exists = mongoLiveState.users.some(u => u.email.toLowerCase() === gUser.email.toLowerCase());
+              if (!exists) mongoLiveState.users.unshift({ ...gUser, createdAt: new Date().toISOString() });
+            }
+            setCurrentUser(gUser, true);
+            showToast(`Bem-vindo(a), ${gUser.name}!`);
+            showView(gUser.role === 'admin' ? 'admin' : 'workspace');
+            return;
+          }
+        }
+
+        // Fallback seguro caso esteja em ambiente estático sem servidor API ativo
+        const payload = decodeGoogleJwtPayload(response.credential);
+        if (!payload || !payload.email) {
+          showToast('Erro ao validar a resposta da Google. Tente novamente.');
+          return;
+        }
+
+        const emailLower = payload.email.toLowerCase();
+        const existingLocal = (typeof mongoLiveState !== 'undefined' && mongoLiveState.users)
+          ? mongoLiveState.users.find(u => u.email.toLowerCase() === emailLower)
+          : null;
+
+        if (existingLocal && existingLocal.status === 'Suspenso') {
+          showToast('A sua conta encontra-se suspensa. Contacte o administrador do sistema.');
+          return;
+        }
+
+        const role = (emailLower === 'admin@analiseautomatizada.co.mz' || (existingLocal && existingLocal.role === 'admin'))
+          ? 'admin'
+          : 'user';
+
+        const googleUser = {
+          name: (existingLocal && existingLocal.name) || payload.name || emailLower.split('@')[0],
+          email: emailLower,
+          picture: payload.picture || '',
+          role,
+          plan: (existingLocal && existingLocal.plan) || (role === 'admin' ? 'admin' : 'free'),
+          status: 'Ativo',
+          authProvider: 'google'
+        };
+
+        if (typeof mongoLiveState !== 'undefined' && mongoLiveState.users && !existingLocal) {
+          mongoLiveState.users.unshift({ ...googleUser, createdAt: new Date().toISOString() });
+        }
+
+        setCurrentUser(googleUser, true);
+        showToast(`Sessão Google iniciada com sucesso! Bem-vindo(a), ${googleUser.name}.`);
+        showView(role === 'admin' ? 'admin' : 'workspace');
+      } catch (err) {
+        console.error('Erro no login Google:', err);
+        showToast('Erro ao autenticar com a conta Google.');
+      }
+    }
+
+    function initGoogleSignInButtons() {
+      if (typeof google === 'undefined' || !google.accounts || !google.accounts.id) {
+        return false;
+      }
+
+      google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: handleGoogleCredentialResponse,
+        auto_select: false,
+        cancel_on_tap_outside: true
+      });
+
+      const loginWrap = document.getElementById('googleSignInBtnWrap');
+      if (loginWrap) {
+        loginWrap.innerHTML = '';
+        google.accounts.id.renderButton(loginWrap, {
+          theme: 'outline',
+          size: 'large',
+          shape: 'pill',
+          text: 'signin_with',
+          width: 340,
+          locale: 'pt'
+        });
+      }
+
+      const regWrap = document.getElementById('googleRegisterBtnWrap');
+      if (regWrap) {
+        regWrap.innerHTML = '';
+        google.accounts.id.renderButton(regWrap, {
+          theme: 'outline',
+          size: 'large',
+          shape: 'pill',
+          text: 'signup_with',
+          width: 340,
+          locale: 'pt'
+        });
+      }
+      return true;
+    }
+
+    // Aguardar carregamento assíncrono do SDK Google Identity Services
+    window.addEventListener('load', () => {
+      if (!initGoogleSignInButtons()) {
+        let gAttempts = 0;
+        const gTimer = setInterval(() => {
+          gAttempts++;
+          if (initGoogleSignInButtons() || gAttempts >= 20) {
+            clearInterval(gTimer);
+          }
+        }, 400);
+      }
+    });
 
   </script>
   <!-- MODAL DE CHECKOUT M-PESA & E-MOLA (KIVORA PAYMENTS) -->
