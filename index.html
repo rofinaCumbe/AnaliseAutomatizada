@@ -5171,17 +5171,14 @@
     <div class="auth-page-container">
       <div class="auth-card">
         
-        <div class="auth-card-header">
+        <div class="auth-card-header" style="margin-bottom: 20px;">
           <div class="auth-brand-badge">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2v20"></path>
-              <path d="m17 5-5-3-5 3"></path>
-              <path d="m17 19-5 3-5-3"></path>
-              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M3 3v18h18"></path>
+              <path d="m19 9-5 5-4-4-3 3"></path>
             </svg>
           </div>
-          <h2 class="auth-card-title" id="authTitleText">Aceder à Plataforma</h2>
-          <p class="auth-card-sub" id="authSubText">Inicie sessão para gerir os seus dados e guardar as análises de negócio.</p>
+          <h2 class="auth-card-title" id="authTitleText" style="margin-bottom: 0;">Iniciar Sessão</h2>
         </div>
 
         <!-- Abas Alternadoras: Entrar vs Criar Conta -->
@@ -5193,10 +5190,10 @@
         <!-- FORMULÁRIO 1: LOGIN -->
         <form id="formLogin">
           <div class="auth-form-group">
-            <label class="auth-label" for="loginEmail">Email Corporativo</label>
+            <label class="auth-label" for="loginEmail">Email</label>
             <div class="auth-input-wrapper">
               <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-              <input type="email" id="loginEmail" class="auth-input" placeholder="ex: admin@analiseautomatizada.co.mz" required autocomplete="email" />
+              <input type="email" id="loginEmail" class="auth-input" placeholder="nome@empresa.com" required autocomplete="email" />
             </div>
           </div>
 
@@ -5204,8 +5201,8 @@
             <label class="auth-label" for="loginPassword">Palavra-passe</label>
             <div class="auth-input-wrapper">
               <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-              <input type="password" id="loginPassword" class="auth-input" placeholder="Introduza a sua palavra-passe" required autocomplete="current-password" />
-              <button type="button" class="auth-pwd-toggle" id="toggleLoginPwd" title="Mostrar/ocultar senha">
+              <input type="password" id="loginPassword" class="auth-input" placeholder="••••••••" required autocomplete="current-password" />
+              <button type="button" class="auth-pwd-toggle" id="toggleLoginPwd" title="Mostrar/ocultar palavra-passe">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
               </button>
             </div>
@@ -5214,32 +5211,17 @@
           <div class="auth-row-options">
             <label class="auth-remember-label">
               <input type="checkbox" id="loginRemember" checked />
-              <span>Lembrar-me neste ecrã</span>
+              <span>Manter sessão iniciada</span>
             </label>
-            <a class="auth-forgot-link" id="linkForgotPassword">Esqueceu a senha?</a>
+            <a class="auth-forgot-link" id="linkForgotPassword">Esqueceu a palavra-passe?</a>
           </div>
 
           <button type="submit" class="btn-auth-submit" id="btnSubmitLogin">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
-            <span>Iniciar Sessão</span>
+            <span>Entrar</span>
           </button>
 
-          <div class="auth-divider-text">ou entre com a sua conta Google</div>
+          <div class="auth-divider-text">ou</div>
           <div class="google-auth-box" id="googleSignInBtnWrap"></div>
-
-          <div class="auth-divider-text">Acesso Rápido de Teste</div>
-
-          <!-- BOTÃO ADMIN (1-CLIQUE) -->
-          <button type="button" class="btn-admin-quick-login" id="btnAdminQuickLogin" title="Entrar diretamente com a Conta de Administrador">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F1C40F" stroke-width="2.2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
-            <span>Entrar como Administrador (admin123)</span>
-          </button>
-
-          <!-- BOTÃO DEMO DE 1 CLIQUE -->
-          <button type="button" class="btn-demo-quick-login" id="btnDemoQuickLogin">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-            <span>Entrar com Conta de Teste (1-Clique)</span>
-          </button>
         </form>
 
         <!-- FORMULÁRIO 2: REGISTO (CRIAR CONTA) -->
@@ -5248,31 +5230,20 @@
             <label class="auth-label" for="regName">Nome Completo</label>
             <div class="auth-input-wrapper">
               <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-              <input type="text" id="regName" class="auth-input" placeholder="ex: Rofina Cumbe" required />
+              <input type="text" id="regName" class="auth-input" placeholder="O seu nome completo" required />
             </div>
           </div>
 
           <div class="auth-form-group">
-            <label class="auth-label" for="regEmail">Email Profissional</label>
+            <label class="auth-label" for="regEmail">Email</label>
             <div class="auth-input-wrapper">
               <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-              <input type="email" id="regEmail" class="auth-input" placeholder="ex: rofina@empresa.co.mz" required autocomplete="email" />
+              <input type="email" id="regEmail" class="auth-input" placeholder="nome@empresa.com" required autocomplete="email" />
             </div>
           </div>
 
           <div class="auth-form-group">
-            <label class="auth-label" for="regRole">Função / Cargo</label>
-            <div class="auth-input-wrapper">
-              <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-              <select id="regRole" class="auth-input" style="cursor: pointer;">
-                <option value="user">Utilizador (user)</option>
-                <option value="admin">Administrador (admin)</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="auth-form-group">
-            <label class="auth-label" for="regPassword">Criar Palavra-passe</label>
+            <label class="auth-label" for="regPassword">Palavra-passe</label>
             <div class="auth-input-wrapper">
               <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
               <input type="password" id="regPassword" class="auth-input" placeholder="Mínimo 6 caracteres" minlength="6" required />
@@ -5280,17 +5251,16 @@
           </div>
 
           <button type="submit" class="btn-auth-submit" id="btnSubmitRegister">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
-            <span>Criar Minha Conta</span>
+            <span>Criar Conta</span>
           </button>
 
-          <div class="auth-divider-text">ou crie conta com o Google</div>
+          <div class="auth-divider-text">ou</div>
           <div class="google-auth-box" id="googleRegisterBtnWrap"></div>
         </form>
 
         <div class="auth-footer-help">
           <span id="authToggleHint">Ainda não tem conta?</span>
-          <a id="authToggleAction">Registe-se gratuitamente</a>
+          <a id="authToggleAction">Criar conta</a>
         </div>
 
       </div>
@@ -6786,17 +6756,15 @@
         if (tabBtnRegister) tabBtnRegister.classList.remove('active');
         if (formLogin) formLogin.style.display = 'block';
         if (formRegister) formRegister.style.display = 'none';
-        if (authTitleText) authTitleText.textContent = 'Aceder à Plataforma';
-        if (authSubText) authSubText.textContent = 'Inicie sessão para gerir os seus dados e guardar as análises.';
+        if (authTitleText) authTitleText.textContent = 'Iniciar Sessão';
         if (authToggleHint) authToggleHint.textContent = 'Ainda não tem conta? ';
-        if (authToggleAction) authToggleAction.textContent = 'Registe-se gratuitamente';
+        if (authToggleAction) authToggleAction.textContent = 'Criar conta';
       } else {
         if (tabBtnRegister) tabBtnRegister.classList.add('active');
         if (tabBtnLogin) tabBtnLogin.classList.remove('active');
         if (formLogin) formLogin.style.display = 'none';
         if (formRegister) formRegister.style.display = 'block';
-        if (authTitleText) authTitleText.textContent = 'Criar Nova Conta';
-        if (authSubText) authSubText.textContent = 'Cadastre-se para desbloquear todo o poder do Agente de IA.';
+        if (authTitleText) authTitleText.textContent = 'Criar Conta';
         if (authToggleHint) authToggleHint.textContent = 'Já possui conta? ';
         if (authToggleAction) authToggleAction.textContent = 'Iniciar sessão';
       }
@@ -6946,41 +6914,6 @@
       });
     }
 
-    // Acesso Rápido Admin (1-Clique)
-    const btnAdminQuickLogin = document.getElementById('btnAdminQuickLogin');
-    if (btnAdminQuickLogin) {
-      btnAdminQuickLogin.addEventListener('click', () => {
-        const emailInput = document.getElementById('loginEmail');
-        const pwdInput = document.getElementById('loginPassword');
-        if (emailInput) emailInput.value = 'admin@analiseautomatizada.co.mz';
-        if (pwdInput) pwdInput.value = 'admin123';
-
-        const adminUser = {
-          name: 'Administrador',
-          email: 'admin@analiseautomatizada.co.mz',
-          role: 'admin'
-        };
-        setCurrentUser(adminUser, true);
-        showToast('Sessão de Administrador iniciada com sucesso!');
-        showView('admin');
-      });
-    }
-
-    // Login Rápido Demo (1-Clique)
-    const btnDemoQuickLogin = document.getElementById('btnDemoQuickLogin');
-    if (btnDemoQuickLogin) {
-      btnDemoQuickLogin.addEventListener('click', () => {
-        const demoUser = {
-          name: 'Rofina Cumbe',
-          email: 'analista@empresa.co.mz',
-          role: 'user'
-        };
-        setCurrentUser(demoUser, true);
-        showToast('Sessão de demonstração iniciada com sucesso!');
-        showView('workspace');
-      });
-    }
-
     // Submissão de Registo
     if (formRegister) {
       formRegister.addEventListener('submit', (e) => {
@@ -6995,7 +6928,7 @@
         const role = regRoleInput ? regRoleInput.value : 'user';
         const password = regPwdInput ? regPwdInput.value : '';
 
-        if (!name || !email || !password || !role) {
+        if (!name || !email || !password) {
           showToast('Por favor, preencha todos os campos obrigatórios.');
           return;
         }
@@ -7036,8 +6969,8 @@
     if (linkForgotPassword) {
       linkForgotPassword.addEventListener('click', () => {
         const emailInput = document.getElementById('loginEmail');
-        const email = (emailInput && emailInput.value.trim()) || 'o seu email corporativo';
-        alert(`Um link de recuperação seguro seria enviado para: ${email}. Para demonstração imediata, clique em "Entrar com Conta de Teste (1-Clique)".`);
+        const email = (emailInput && emailInput.value.trim()) || 'o seu email registado';
+        showToast(`Instruções de recuperação enviadas para ${email}.`);
       });
     }
 
