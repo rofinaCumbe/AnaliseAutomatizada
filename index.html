@@ -4433,6 +4433,274 @@
       display: block;
     }
 
+    /* ==================== BIBLIOTECA DE DATASETS GUARDADOS & VISUALIZADOR ==================== */
+    .file-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn-file-view {
+      background: #EFF6FF;
+      border: 1px solid #BFDBFE;
+      color: #1A73E8;
+      cursor: pointer;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all var(--transition-fast);
+    }
+    .btn-file-view:hover {
+      background: #DBEAFE;
+      border-color: #1A73E8;
+    }
+
+    .saved-datasets-card {
+      background: #FFFFFF;
+      border-radius: 28px;
+      border: 1px solid var(--border-light);
+      box-shadow: var(--shadow-card);
+      padding: 28px 36px;
+      margin-bottom: 26px;
+    }
+    .saved-datasets-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .saved-datasets-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .saved-datasets-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: #E8F0FE;
+      color: #1A73E8;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .saved-datasets-title {
+      font-size: 19px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .saved-datasets-sub {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+    }
+    .saved-datasets-badge {
+      background: #E6F4EA;
+      color: #137333;
+      border: 1px solid #CEEAD6;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 999px;
+    }
+    .saved-datasets-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 14px;
+    }
+    .saved-ds-item {
+      background: #F8F9FA;
+      border: 1px solid #E5E7EB;
+      border-radius: 18px;
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+      transition: all var(--transition-fast);
+    }
+    .saved-ds-item:hover {
+      border-color: #93C5FD;
+      background: #FFFFFF;
+      box-shadow: 0 4px 14px rgba(26, 115, 232, 0.08);
+    }
+    .saved-ds-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .saved-ds-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1A1A1A;
+      word-break: break-word;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .saved-ds-meta-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .saved-ds-pill {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #555555;
+      background: #FFFFFF;
+      border: 1px solid #E5E7EB;
+      padding: 2px 9px;
+      border-radius: 999px;
+    }
+    .saved-ds-inquiry {
+      font-size: 12.5px;
+      color: #666666;
+      background: #FFFFFF;
+      border-left: 3px solid #1A73E8;
+      padding: 6px 10px;
+      border-radius: 6px;
+      line-height: 1.4;
+    }
+    .saved-ds-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding-top: 4px;
+    }
+    .btn-saved-ds-view {
+      flex: 1;
+      background: #FFFFFF;
+      border: 1px solid #D2E3FC;
+      color: #1A73E8;
+      font-family: inherit;
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 7px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: all var(--transition-fast);
+    }
+    .btn-saved-ds-view:hover {
+      background: #EFF6FF;
+      border-color: #1A73E8;
+    }
+    .btn-saved-ds-analyze {
+      flex: 1;
+      background: #1A73E8;
+      border: 1px solid #1A73E8;
+      color: #FFFFFF;
+      font-family: inherit;
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 7px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: all var(--transition-fast);
+    }
+    .btn-saved-ds-analyze:hover {
+      background: #1557B0;
+    }
+    .btn-saved-ds-delete {
+      background: transparent;
+      border: 1px solid transparent;
+      color: #888888;
+      padding: 7px 9px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all var(--transition-fast);
+    }
+    .btn-saved-ds-delete:hover {
+      background: #FEE2E2;
+      color: #DC2626;
+    }
+
+    /* Barra de ferramentas da tabela e Modal Visualizador de Dataset */
+    .dataset-table-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .dataset-search-input {
+      flex: 1;
+      min-width: 220px;
+      height: 38px;
+      border-radius: 10px;
+      border: 1px solid var(--border-input);
+      padding: 0 14px;
+      font-family: inherit;
+      font-size: 13.5px;
+      outline: none;
+    }
+    .dataset-search-input:focus {
+      border-color: var(--accent-blue);
+    }
+    .dataset-limit-select {
+      height: 38px;
+      border-radius: 10px;
+      border: 1px solid var(--border-input);
+      padding: 0 12px;
+      font-family: inherit;
+      font-size: 13px;
+      background: #FFFFFF;
+      cursor: pointer;
+    }
+    .dataset-viewer-modal {
+      max-width: 1120px !important;
+      width: 96% !important;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .dataset-viewer-body {
+      padding: 20px 24px 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .dataset-viewer-table-wrap {
+      max-height: 58vh;
+      overflow: auto;
+      border: 1px solid var(--border-light);
+      border-radius: 14px;
+      background: #FFFFFF;
+    }
+    .dataset-viewer-table-wrap thead th {
+      position: sticky;
+      top: 0;
+      background: #F8F9FA;
+      z-index: 2;
+      box-shadow: 0 1px 0 var(--border-light);
+    }
+    .top-inquiry-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
   </style>
 </head>
 <body>
@@ -5071,6 +5339,23 @@
         </div>
       </section>
 
+      <!-- Secção Persistente: Meus Datasets & Análises Guardadas -->
+      <section class="saved-datasets-card" id="savedDatasetsSection" style="display: none;">
+        <div class="saved-datasets-header">
+          <div class="saved-datasets-title-wrap">
+            <div class="saved-datasets-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+            </div>
+            <div>
+              <h2 class="saved-datasets-title">Meus Datasets &amp; Análises Guardadas</h2>
+              <p class="saved-datasets-sub">Aceda novamente a qualquer conjunto de dados já submetido para consultar a tabela completa ou reabrir o relatório.</p>
+            </div>
+          </div>
+          <span class="saved-datasets-badge" id="savedDatasetsCountBadge">0 guardados</span>
+        </div>
+        <div class="saved-datasets-grid" id="savedDatasetsGrid"></div>
+      </section>
+
       <!-- Cartão 1 -->
       <section class="card">
         <div class="card-header">
@@ -5166,19 +5451,29 @@
     <!-- ==================== ECRÃ 2: INTERFACE CRIADA APÓS CLICAR EM ANALYZE (IDÊNTICA À IMAGEM) ==================== -->
     <section class="analysis-interface" id="analysisInterface">
 
-      <!-- Barra de Topo: Dataset + Pergunta + Botão "Nova análise" -->
+      <!-- Barra de Topo: Dataset + Pergunta + Botões "Ver Dataset", "Meus Datasets" e "Nova análise" -->
       <div class="top-inquiry-bar">
         <div class="top-inquiry-left">
           <span class="top-dataset-label" id="topBarDatasetName">Conjunto de dados: vendas</span>
           <div class="top-inquiry-text" id="topBarInquiryText">faça análise geral</div>
         </div>
-        <button type="button" class="btn-upgrade-pro" id="btnUpgradeWorkspace" title="Subscrever Plano Pro via M-Pesa ou e-Mola">
-          <span>✨</span>
-          <span>Plano Pro (M-Pesa / e-Mola)</span>
-        </button>
-        <button type="button" class="new-analysis-btn" id="btnNewAnalysis">
-          Nova análise
-        </button>
+        <div class="top-inquiry-actions">
+          <button type="button" class="new-analysis-btn" id="btnViewCurrentDatasetModal" title="Abrir e explorar todas as linhas e colunas deste dataset">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            <span>Ver Dataset Completo</span>
+          </button>
+          <button type="button" class="new-analysis-btn" id="btnOpenSavedDatasetsFromReport" title="Ver lista de todos os datasets já submetidos">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+            <span>Meus Datasets</span>
+          </button>
+          <button type="button" class="btn-upgrade-pro" id="btnUpgradeWorkspace" title="Subscrever Plano Pro via M-Pesa ou e-Mola">
+            <span>✨</span>
+            <span>Plano Pro (M-Pesa / e-Mola)</span>
+          </button>
+          <button type="button" class="new-analysis-btn" id="btnNewAnalysis">
+            Nova análise
+          </button>
+        </div>
       </div>
 
       <!-- Layout de 2 Colunas: Esquerda (Analytics Agent) + Direita (Analysis Card + KPIs + Abas) -->
@@ -5409,8 +5704,24 @@
             </div>
 
             <div class="content-white-card">
-              <h3>2. Registos Completos do Dataset</h3>
-              <div class="stats-table-wrap" style="max-height: 420px;">
+              <div class="dataset-table-toolbar">
+                <div>
+                  <h3 style="margin-bottom: 2px;">2. Registos Completos do Dataset</h3>
+                  <span id="rawTableCountInfo" style="font-size: 12.5px; color: #666;">A mostrar todos os registos</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                  <input type="text" id="rawTableSearchInput" class="dataset-search-input" placeholder="Pesquisar qualquer valor nas linhas ou colunas..." />
+                  <select id="rawTableLimitSelect" class="dataset-limit-select" title="Quantidade de linhas a exibir">
+                    <option value="100">Mostrar 100 linhas</option>
+                    <option value="500">Mostrar 500 linhas</option>
+                    <option value="all" selected>Mostrar Todas as linhas</option>
+                  </select>
+                  <button type="button" class="btn-file-view" id="btnExportActiveDatasetCsv" title="Descarregar o ficheiro CSV original">
+                    ⬇️ Exportar CSV
+                  </button>
+                </div>
+              </div>
+              <div class="stats-table-wrap" style="max-height: 480px;">
                 <table class="stats-table">
                   <thead id="rawTableHead"></thead>
                   <tbody id="rawTableBody"></tbody>
@@ -6194,6 +6505,40 @@
     </div>
   </div>
 
+  <!-- MODAL: VISUALIZADOR COMPLETO DE DATASET (DISPONÍVEL A QUALQUER MOMENTO) -->
+  <div class="admin-modal-backdrop" id="modalDatasetViewer">
+    <div class="admin-modal dataset-viewer-modal">
+      <div class="admin-modal-header">
+        <div>
+          <h3 class="admin-modal-title" id="dsViewerTitle">Visualizador de Dataset</h3>
+          <div id="dsViewerMeta" style="font-size: 12.5px; color: #666; margin-top: 2px;">-</div>
+        </div>
+        <button type="button" class="checkout-close-btn" id="btnCloseDatasetViewer" title="Fechar visualizador">&times;</button>
+      </div>
+      <div class="dataset-viewer-body">
+        <div class="dataset-table-toolbar" style="margin-bottom: 4px;">
+          <input type="text" id="dsViewerSearchInput" class="dataset-search-input" placeholder="Pesquisar qualquer texto, categoria, província ou valor neste dataset..." />
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <span id="dsViewerCountBadge" class="saved-ds-pill" style="padding: 6px 12px; font-size: 12.5px;">0 linhas</span>
+            <button type="button" class="btn-file-view" id="btnDsViewerDownloadCsv">
+              ⬇️ Baixar CSV
+            </button>
+            <button type="button" class="btn-saved-ds-analyze" id="btnDsViewerAnalyzeNow" style="flex: initial; padding: 8px 16px;">
+              📊 Abrir Relatório de Análise
+            </button>
+          </div>
+        </div>
+
+        <div class="dataset-viewer-table-wrap">
+          <table class="stats-table">
+            <thead id="dsViewerTableHead"></thead>
+            <tbody id="dsViewerTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 
   <!-- ==================== LÓGICA DA APLICAÇÃO ==================== -->
@@ -6419,6 +6764,8 @@
         }
       } catch (err) {}
       updateAuthUI();
+      if (typeof renderSavedDatasetsLibrary === 'function') renderSavedDatasetsLibrary();
+      if (typeof syncSavedDatasetsFromBackend === 'function') syncSavedDatasetsFromBackend();
     }
 
     // Inicialização da sessão
@@ -6790,6 +7137,338 @@
       analyzeBtn.classList.toggle('ready', ready);
     }
 
+    // ==================== HISTÓRICO PERSISTENTE & VISUALIZADOR DE DATASETS ====================
+    const SAVED_DATASETS_STORAGE_KEY = 'ai_analyst_saved_datasets';
+    let savedDatasetsHistory = [];
+    let currentViewerDataset = null;
+    let activeAnalysisHeaders = [];
+    let activeAnalysisRows = [];
+
+    function getCurrentOwnerEmail() {
+      return (currentUser && currentUser.email) ? currentUser.email.toLowerCase() : 'guest';
+    }
+
+    function loadSavedDatasetsFromStorage() {
+      try {
+        const raw = localStorage.getItem(SAVED_DATASETS_STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            savedDatasetsHistory = parsed;
+          }
+        }
+      } catch (err) {
+        savedDatasetsHistory = [];
+      }
+      renderSavedDatasetsLibrary();
+    }
+
+    async function syncSavedDatasetsFromBackend() {
+      try {
+        const emailParam = encodeURIComponent(getCurrentOwnerEmail());
+        const res = await fetch(`/api/datasets?email=${emailParam}`).catch(() => null);
+        if (res && res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data.datasets) && data.datasets.length > 0) {
+            data.datasets.forEach(remoteDs => {
+              if (!remoteDs || !remoteDs.datasetId) return;
+              const existingIdx = savedDatasetsHistory.findIndex(d => d.datasetId === remoteDs.datasetId);
+              if (existingIdx >= 0) {
+                savedDatasetsHistory[existingIdx] = { ...savedDatasetsHistory[existingIdx], ...remoteDs };
+              } else {
+                savedDatasetsHistory.push(remoteDs);
+              }
+            });
+            try {
+              localStorage.setItem(SAVED_DATASETS_STORAGE_KEY, JSON.stringify(savedDatasetsHistory.slice(0, 25)));
+            } catch (e) {}
+            renderSavedDatasetsLibrary();
+          }
+        }
+      } catch (err) {}
+    }
+
+    function saveDatasetToHistory(ds, inquiryText) {
+      if (!ds || !Array.isArray(ds.headers) || !Array.isArray(ds.rows)) return;
+      const ownerEmail = getCurrentOwnerEmail();
+      const ownerName = (currentUser && currentUser.name) ? currentUser.name : 'Visitante';
+      const cleanName = ds.cleanName || ds.name.replace(/\.csv$/i, '');
+      const datasetId = ds.datasetId || `ds_${ownerEmail}_${cleanName.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
+      const nowIso = new Date().toISOString();
+
+      const entry = {
+        datasetId,
+        name: ds.name,
+        cleanName,
+        source: ds.source || 'Local',
+        sizeLabel: ds.sizeLabel || `${ds.rows.length} linhas`,
+        headers: ds.headers,
+        rows: ds.rows,
+        rowCount: ds.rows.length,
+        colCount: ds.headers.length,
+        lastInquiry: inquiryText || ds.lastInquiry || (questionInput && questionInput.value.trim()) || 'faça análise geral',
+        ownerEmail,
+        ownerName,
+        updatedAt: nowIso
+      };
+
+      ds.datasetId = datasetId;
+
+      savedDatasetsHistory = savedDatasetsHistory.filter(item => item.datasetId !== datasetId);
+      savedDatasetsHistory.unshift(entry);
+
+      try {
+        localStorage.setItem(SAVED_DATASETS_STORAGE_KEY, JSON.stringify(savedDatasetsHistory.slice(0, 25)));
+      } catch (err) {}
+
+      renderSavedDatasetsLibrary();
+
+      // Sincronizar de forma assíncrona com o MongoDB Atlas
+      fetch('/api/datasets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(entry)
+      }).catch(() => null);
+    }
+
+    function getVisibleSavedDatasets() {
+      const ownerEmail = getCurrentOwnerEmail();
+      return savedDatasetsHistory.filter(d => {
+        if (!d.ownerEmail || d.ownerEmail === 'guest') return true;
+        return d.ownerEmail.toLowerCase() === ownerEmail;
+      });
+    }
+
+    function renderSavedDatasetsLibrary() {
+      const section = document.getElementById('savedDatasetsSection');
+      const grid = document.getElementById('savedDatasetsGrid');
+      const countBadge = document.getElementById('savedDatasetsCountBadge');
+      if (!section || !grid) return;
+
+      const list = getVisibleSavedDatasets();
+      if (list.length === 0) {
+        section.style.display = 'none';
+        return;
+      }
+
+      section.style.display = 'block';
+      if (countBadge) {
+        countBadge.textContent = `${list.length} ${list.length === 1 ? 'dataset disponível' : 'datasets disponíveis'}`;
+      }
+
+      grid.innerHTML = '';
+      list.forEach(ds => {
+        const card = document.createElement('div');
+        card.className = 'saved-ds-item';
+        const dateLabel = ds.updatedAt
+          ? new Date(ds.updatedAt).toLocaleString('pt-MZ', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+          : 'Guardado';
+        const rowLen = Array.isArray(ds.rows) ? ds.rows.length : (ds.rowCount || 0);
+        const colLen = Array.isArray(ds.headers) ? ds.headers.length : (ds.colCount || 0);
+
+        card.innerHTML = `
+          <div>
+            <div class="saved-ds-top">
+              <div class="saved-ds-name">
+                <span class="file-icon" style="width:28px; height:28px; font-size:10px;">${ds.source === 'GCS' ? 'GCS' : 'CSV'}</span>
+                <span>${ds.name}</span>
+              </div>
+              <button type="button" class="btn-saved-ds-delete" data-dsid="${ds.datasetId}" title="Remover do histórico">✕</button>
+            </div>
+            <div class="saved-ds-meta-row">
+              <span class="saved-ds-pill">${rowLen} linhas × ${colLen} colunas</span>
+              <span class="saved-ds-pill">${ds.sizeLabel || ''}</span>
+              <span class="saved-ds-pill">🕒 ${dateLabel}</span>
+            </div>
+          </div>
+          <div class="saved-ds-inquiry" title="Última pergunta analisada">
+            <strong>Pergunta:</strong> ${ds.lastInquiry || 'faça análise geral'}
+          </div>
+          <div class="saved-ds-actions">
+            <button type="button" class="btn-saved-ds-view" data-dsid="${ds.datasetId}">
+              👁️ Ver Tabela Completa
+            </button>
+            <button type="button" class="btn-saved-ds-analyze" data-dsid="${ds.datasetId}">
+              📊 Reabrir Análise
+            </button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      grid.querySelectorAll('.btn-saved-ds-view').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const id = e.currentTarget.getAttribute('data-dsid');
+          const target = savedDatasetsHistory.find(d => d.datasetId === id);
+          if (target) openDatasetViewerModal(target);
+        });
+      });
+
+      grid.querySelectorAll('.btn-saved-ds-analyze').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const id = e.currentTarget.getAttribute('data-dsid');
+          const target = savedDatasetsHistory.find(d => d.datasetId === id);
+          if (!target) return;
+
+          datasets.length = 0;
+          datasets.push({
+            datasetId: target.datasetId,
+            name: target.name,
+            cleanName: target.cleanName || target.name.replace(/\.csv$/i, ''),
+            source: target.source || 'Local',
+            sizeLabel: target.sizeLabel || `${target.rows.length} linhas`,
+            headers: target.headers,
+            rows: target.rows,
+            lastInquiry: target.lastInquiry
+          });
+
+          if (questionInput) {
+            questionInput.value = target.lastInquiry || 'faça análise geral';
+          }
+          renderFileList();
+          buildAnalysisInterface();
+          showToast(`Análise do dataset "${target.name}" reaberta com sucesso!`);
+        });
+      });
+
+      grid.querySelectorAll('.btn-saved-ds-delete').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const id = e.currentTarget.getAttribute('data-dsid');
+          savedDatasetsHistory = savedDatasetsHistory.filter(d => d.datasetId !== id);
+          try {
+            localStorage.setItem(SAVED_DATASETS_STORAGE_KEY, JSON.stringify(savedDatasetsHistory));
+          } catch (err) {}
+          renderSavedDatasetsLibrary();
+          fetch(`/api/datasets?datasetId=${encodeURIComponent(id)}`, { method: 'DELETE' }).catch(() => null);
+          showToast('Dataset removido do histórico.');
+        });
+      });
+    }
+
+    function exportDatasetToCsvFile(ds) {
+      if (!ds || !Array.isArray(ds.headers) || !Array.isArray(ds.rows)) return;
+      const csvHeaders = ds.headers.map(h => `"${String(h).replace(/"/g, '""')}"`).join(',');
+      const csvRows = ds.rows.map(r =>
+        ds.headers.map(h => {
+          const val = r[h] ?? '';
+          return `"${String(val).replace(/"/g, '""')}"`;
+        }).join(',')
+      );
+      const csvContent = '\uFEFF' + [csvHeaders, ...csvRows].join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = ds.name.toLowerCase().endsWith('.csv') ? ds.name : `${ds.name}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast(`Ficheiro ${a.download} descarregado!`);
+    }
+
+    // Modal Visualizador Completo de Dataset
+    const modalDatasetViewer = document.getElementById('modalDatasetViewer');
+    const btnCloseDatasetViewer = document.getElementById('btnCloseDatasetViewer');
+    const dsViewerSearchInput = document.getElementById('dsViewerSearchInput');
+    const btnDsViewerDownloadCsv = document.getElementById('btnDsViewerDownloadCsv');
+    const btnDsViewerAnalyzeNow = document.getElementById('btnDsViewerAnalyzeNow');
+
+    function renderDatasetViewerRows() {
+      if (!currentViewerDataset) return;
+      const headers = currentViewerDataset.headers || [];
+      const rows = currentViewerDataset.rows || [];
+      const query = (dsViewerSearchInput ? dsViewerSearchInput.value.toLowerCase().trim() : '');
+
+      const filtered = !query
+        ? rows
+        : rows.filter(r => headers.some(h => String(r[h] ?? '').toLowerCase().includes(query)));
+
+      const headEl = document.getElementById('dsViewerTableHead');
+      const bodyEl = document.getElementById('dsViewerTableBody');
+      const badgeEl = document.getElementById('dsViewerCountBadge');
+
+      if (badgeEl) {
+        badgeEl.textContent = query
+          ? `${filtered.length} de ${rows.length} linhas encontradas`
+          : `${rows.length} linhas × ${headers.length} colunas`;
+      }
+
+      if (headEl) {
+        headEl.innerHTML = `<tr><th style="width:52px; color:#888;">#</th>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
+      }
+
+      if (bodyEl) {
+        if (filtered.length === 0) {
+          bodyEl.innerHTML = `<tr><td colspan="${headers.length + 1}" style="text-align:center; padding:28px; color:#888;">Nenhum registo corresponde à pesquisa "${query}".</td></tr>`;
+        } else {
+          bodyEl.innerHTML = filtered.map((r, idx) => `
+            <tr>
+              <td style="color:#888; font-weight:600;">${idx + 1}</td>
+              ${headers.map(h => `<td>${typeof r[h] === 'number' ? r[h].toLocaleString('pt-MZ') : (r[h] ?? '')}</td>`).join('')}
+            </tr>
+          `).join('');
+        }
+      }
+    }
+
+    function openDatasetViewerModal(ds) {
+      if (!ds) return;
+      currentViewerDataset = ds;
+      const titleEl = document.getElementById('dsViewerTitle');
+      const metaEl = document.getElementById('dsViewerMeta');
+
+      if (titleEl) titleEl.textContent = `Dataset: ${ds.name}`;
+      if (metaEl) {
+        metaEl.textContent = `${ds.rows.length} registos • ${ds.headers.length} colunas (${ds.headers.join(', ')}) • Fonte: ${ds.source || 'Local'}`;
+      }
+      if (dsViewerSearchInput) dsViewerSearchInput.value = '';
+      renderDatasetViewerRows();
+      if (modalDatasetViewer) modalDatasetViewer.classList.add('show');
+    }
+
+    if (btnCloseDatasetViewer) {
+      btnCloseDatasetViewer.addEventListener('click', () => {
+        if (modalDatasetViewer) modalDatasetViewer.classList.remove('show');
+      });
+    }
+    if (modalDatasetViewer) {
+      modalDatasetViewer.addEventListener('click', (e) => {
+        if (e.target === modalDatasetViewer) modalDatasetViewer.classList.remove('show');
+      });
+    }
+    if (dsViewerSearchInput) {
+      dsViewerSearchInput.addEventListener('input', renderDatasetViewerRows);
+    }
+    if (btnDsViewerDownloadCsv) {
+      btnDsViewerDownloadCsv.addEventListener('click', () => {
+        if (currentViewerDataset) exportDatasetToCsvFile(currentViewerDataset);
+      });
+    }
+    if (btnDsViewerAnalyzeNow) {
+      btnDsViewerAnalyzeNow.addEventListener('click', () => {
+        if (!currentViewerDataset) return;
+        const target = currentViewerDataset;
+        if (modalDatasetViewer) modalDatasetViewer.classList.remove('show');
+
+        datasets.length = 0;
+        datasets.push({
+          datasetId: target.datasetId,
+          name: target.name,
+          cleanName: target.cleanName || target.name.replace(/\.csv$/i, ''),
+          source: target.source || 'Local',
+          sizeLabel: target.sizeLabel || `${target.rows.length} linhas`,
+          headers: target.headers,
+          rows: target.rows,
+          lastInquiry: target.lastInquiry
+        });
+
+        if (questionInput && !questionInput.value.trim()) {
+          questionInput.value = target.lastInquiry || 'faça análise geral';
+        }
+        renderFileList();
+        buildAnalysisInterface();
+      });
+    }
+
     function renderFileList() {
       fileListEl.innerHTML = '';
       datasets.forEach((ds, index) => {
@@ -6802,9 +7481,21 @@
             <span class="file-meta">${ds.rows.length} linhas × ${ds.headers.length} colunas</span>
             <span class="file-meta">${ds.sizeLabel}</span>
           </div>
-          <button type="button" class="file-remove" data-index="${index}">Remover ✕</button>
+          <div class="file-actions">
+            <button type="button" class="btn-file-view" data-view-index="${index}" title="Visualizar todas as linhas e colunas deste dataset">
+              👁️ Ver Dados
+            </button>
+            <button type="button" class="file-remove" data-index="${index}">Remover ✕</button>
+          </div>
         `;
         fileListEl.appendChild(item);
+      });
+
+      fileListEl.querySelectorAll('.btn-file-view').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const idx = Number(e.currentTarget.getAttribute('data-view-index'));
+          if (datasets[idx]) openDatasetViewerModal(datasets[idx]);
+        });
       });
 
       fileListEl.querySelectorAll('.file-remove').forEach(btn => {
@@ -6830,16 +7521,18 @@
           const parsed = parseCSV(e.target.result);
           if (parsed.headers.length === 0) return;
           const kb = (file.size / 1024).toFixed(1);
-          datasets.push({
+          const newDs = {
             name: file.name,
             cleanName: file.name.replace(/\.csv$/i, ''),
             source: 'Local',
             sizeLabel: `${kb} KB`,
             headers: parsed.headers,
             rows: parsed.rows
-          });
+          };
+          datasets.push(newDs);
+          saveDatasetToHistory(newDs, questionInput.value.trim() || 'faça análise geral');
           renderFileList();
-          showToast(`Ficheiro ${file.name} carregado!`);
+          showToast(`Ficheiro ${file.name} carregado e guardado nos seus datasets!`);
         };
         reader.readAsText(file);
       });
@@ -6888,19 +7581,21 @@
     loadSampleBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       const parsed = parseCSV(SAMPLE_CSV);
-      datasets.push({
+      const sampleDs = {
         name: 'vendas.csv',
         cleanName: 'vendas',
         source: 'Local',
         sizeLabel: '2.1 KB',
         headers: parsed.headers,
         rows: parsed.rows
-      });
+      };
+      datasets.push(sampleDs);
       if (!questionInput.value.trim()) {
         questionInput.value = 'faca analise geral';
       }
+      saveDatasetToHistory(sampleDs, questionInput.value.trim());
       renderFileList();
-      showToast('Conjunto de dados "vendas.csv" carregado! Clique em "Analisar Dados".');
+      showToast('Conjunto de dados "vendas.csv" carregado e guardado! Clique em "Analisar Dados".');
     });
 
     gcsInput.addEventListener('input', () => {
@@ -6913,14 +7608,16 @@
       const rawName = uri.split('/').pop() || 'vendas_gcs.csv';
       const cleanName = rawName.replace(/\.csv$/i, '');
       const parsed = parseCSV(SAMPLE_CSV);
-      datasets.push({
+      const gcsDs = {
         name: rawName.endsWith('.csv') ? rawName : `${rawName}.csv`,
         cleanName,
         source: 'GCS',
         sizeLabel: '12.4 MB (GCS)',
         headers: parsed.headers,
         rows: parsed.rows
-      });
+      };
+      datasets.push(gcsDs);
+      saveDatasetToHistory(gcsDs, questionInput.value.trim() || 'faça análise geral');
       gcsInput.value = '';
       gcsAddBtn.classList.remove('active');
       renderFileList();
@@ -7128,6 +7825,12 @@
         Em termos geográficos (<strong>${provCol}</strong>), <strong>${topProv[0]}</strong> apresenta o maior volume com <strong>${topProv[1].toLocaleString('pt-MZ')} MT</strong>.
       `;
 
+      // Guardar automaticamente o(s) dataset(s) e a pergunta no histórico persistente do cliente
+      datasets.forEach(ds => saveDatasetToHistory(ds, inquiry));
+
+      activeAnalysisHeaders = headers;
+      activeAnalysisRows = allRows;
+
       // 5. Preencher Tabelas de Dados
       document.getElementById('statsTableBody').innerHTML = numericCols.map(col => {
         const s = colStats[col];
@@ -7144,10 +7847,9 @@
         `;
       }).join('');
 
-      document.getElementById('rawTableHead').innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
-      document.getElementById('rawTableBody').innerHTML = allRows.slice(0, 100).map(r => `
-        <tr>${headers.map(h => `<td>${typeof r[h] === 'number' ? r[h].toLocaleString('pt-MZ') : (r[h] ?? '')}</td>`).join('')}</tr>
-      `).join('');
+      const rawSearchEl = document.getElementById('rawTableSearchInput');
+      if (rawSearchEl) rawSearchEl.value = '';
+      renderActiveRawTable();
 
       // 6. Preencher Insights & Anomalias
       document.getElementById('insightsList').innerHTML = [
@@ -7241,13 +7943,104 @@
       chartInstances.push(createBarChart('canvasVis3', sortedProvs.slice(0, 8)));
     }
 
+    // Renderizar Tabela Completa de Registos com pesquisa em tempo real e seletor de linhas
+    function renderActiveRawTable() {
+      const headEl = document.getElementById('rawTableHead');
+      const bodyEl = document.getElementById('rawTableBody');
+      const countInfoEl = document.getElementById('rawTableCountInfo');
+      const searchEl = document.getElementById('rawTableSearchInput');
+      const limitEl = document.getElementById('rawTableLimitSelect');
+      if (!headEl || !bodyEl) return;
+
+      const headers = activeAnalysisHeaders || [];
+      const rows = activeAnalysisRows || [];
+      const query = (searchEl ? searchEl.value.toLowerCase().trim() : '');
+      const limitVal = (limitEl ? limitEl.value : 'all');
+
+      const filtered = !query
+        ? rows
+        : rows.filter(r => headers.some(h => String(r[h] ?? '').toLowerCase().includes(query)));
+
+      const sliced = limitVal === 'all' ? filtered : filtered.slice(0, Number(limitVal) || 100);
+
+      if (countInfoEl) {
+        countInfoEl.textContent = query
+          ? `A mostrar ${sliced.length} de ${filtered.length} registos filtrados (Total no dataset: ${rows.length} linhas × ${headers.length} colunas)`
+          : `A mostrar ${sliced.length} de ${rows.length} registos totais (${headers.length} colunas)`;
+      }
+
+      headEl.innerHTML = `<tr><th style="width:48px; color:#888;">#</th>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
+      if (sliced.length === 0) {
+        bodyEl.innerHTML = `<tr><td colspan="${headers.length + 1}" style="text-align:center; padding:24px; color:#888;">Nenhum registo encontrado para "${query}".</td></tr>`;
+      } else {
+        bodyEl.innerHTML = sliced.map((r, idx) => `
+          <tr>
+            <td style="color:#888; font-weight:600;">${idx + 1}</td>
+            ${headers.map(h => `<td>${typeof r[h] === 'number' ? r[h].toLocaleString('pt-MZ') : (r[h] ?? '')}</td>`).join('')}
+          </tr>
+        `).join('');
+      }
+    }
+
+    const rawTableSearchInput = document.getElementById('rawTableSearchInput');
+    const rawTableLimitSelect = document.getElementById('rawTableLimitSelect');
+    const btnExportActiveDatasetCsv = document.getElementById('btnExportActiveDatasetCsv');
+    const btnViewCurrentDatasetModal = document.getElementById('btnViewCurrentDatasetModal');
+    const btnOpenSavedDatasetsFromReport = document.getElementById('btnOpenSavedDatasetsFromReport');
+
+    if (rawTableSearchInput) rawTableSearchInput.addEventListener('input', renderActiveRawTable);
+    if (rawTableLimitSelect) rawTableLimitSelect.addEventListener('change', renderActiveRawTable);
+    if (btnExportActiveDatasetCsv) {
+      btnExportActiveDatasetCsv.addEventListener('click', () => {
+        if (datasets.length > 0) {
+          exportDatasetToCsvFile({
+            name: datasets[0].name,
+            headers: activeAnalysisHeaders,
+            rows: activeAnalysisRows
+          });
+        }
+      });
+    }
+
+    if (btnViewCurrentDatasetModal) {
+      btnViewCurrentDatasetModal.addEventListener('click', () => {
+        if (datasets.length > 0) {
+          openDatasetViewerModal({
+            ...datasets[0],
+            headers: activeAnalysisHeaders.length ? activeAnalysisHeaders : datasets[0].headers,
+            rows: activeAnalysisRows.length ? activeAnalysisRows : datasets[0].rows
+          });
+        }
+      });
+    }
+
+    if (btnOpenSavedDatasetsFromReport) {
+      btnOpenSavedDatasetsFromReport.addEventListener('click', () => {
+        analysisInterface.classList.remove('active');
+        setupView.classList.remove('hidden');
+        heroBanner.classList.remove('hidden');
+        renderSavedDatasetsLibrary();
+        const savedSec = document.getElementById('savedDatasetsSection');
+        if (savedSec && savedSec.style.display !== 'none') {
+          savedSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      });
+    }
+
+    // Inicializar biblioteca persistente de datasets do cliente ao abrir a aplicação
+    loadSavedDatasetsFromStorage();
+    syncSavedDatasetsFromBackend();
+
     analyzeBtn.addEventListener('click', buildAnalysisInterface);
 
-    // Botão "Nova análise" para voltar ao ecrã inicial
+    // Botão "Nova análise" para voltar ao ecrã inicial (mantendo todos os datasets guardados disponíveis)
     document.getElementById('btnNewAnalysis').addEventListener('click', () => {
       analysisInterface.classList.remove('active');
       setupView.classList.remove('hidden');
       heroBanner.classList.remove('hidden');
+      renderSavedDatasetsLibrary();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
