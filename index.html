@@ -6938,7 +6938,7 @@
 
         setCurrentUser(userObj, remember);
         showToast(`Bem-vindo de volta, ${userObj.name} (${userObj.role})!`);
-        if (userObj.role === 'Administrador do Sistema') {
+        if (userObj.role === 'admin' || userObj.role === 'Administrador do Sistema') {
           showView('admin');
         } else {
           showView('workspace');
@@ -6992,19 +6992,26 @@
 
         const name = regNameInput ? regNameInput.value.trim() : '';
         const email = regEmailInput ? regEmailInput.value.trim() : '';
-        const role = regRoleInput ? regRoleInput.value : '';
+        const role = regRoleInput ? regRoleInput.value : 'user';
+        const password = regPwdInput ? regPwdInput.value : '';
 
         if (!name || !email || !password || !role) {
           showToast('Por favor, preencha todos os campos obrigatórios.');
           return;
         }
 
-        const newUser = { name, email: email.toLowerCase(), role, plan: 'free', status: 'Ativo' };
+        const newUser = {
+          name,
+          email: email.toLowerCase(),
+          role,
+          plan: role === 'admin' ? 'admin' : 'free',
+          status: 'Ativo'
+        };
 
         try {
           if (typeof mongoLiveState !== 'undefined' && mongoLiveState.users) {
             mongoLiveState.users = mongoLiveState.users.filter(u => u.email.toLowerCase() !== email.toLowerCase());
-            mongoLiveState.users.unshift(newUser);
+            mongoLiveState.users.unshift({ ...newUser, createdAt: new Date().toISOString() });
           }
           let registeredUsers = JSON.parse(localStorage.getItem('ai_analyst_registered_users') || '[]');
           registeredUsers = registeredUsers.filter(u => u.email.toLowerCase() !== email.toLowerCase());
@@ -7019,8 +7026,8 @@
         } catch (err) {}
 
         setCurrentUser(newUser, true);
-        showToast(`Conta criada no banco de dados com o cargo ${role}!`);
-        showView('workspace');
+        showToast(`Conta criada com sucesso (${name})!`);
+        showView(role === 'admin' ? 'admin' : 'workspace');
       });
     }
 
