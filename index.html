@@ -5712,9 +5712,9 @@
                 <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                   <input type="text" id="rawTableSearchInput" class="dataset-search-input" placeholder="Pesquisar qualquer valor nas linhas ou colunas..." />
                   <select id="rawTableLimitSelect" class="dataset-limit-select" title="Quantidade de linhas a exibir">
-                    <option value="100">Mostrar 100 linhas</option>
+                    <option value="100" selected>Mostrar 100 linhas</option>
                     <option value="500">Mostrar 500 linhas</option>
-                    <option value="all" selected>Mostrar Todas as linhas</option>
+                    <option value="all">Mostrar Todas as linhas</option>
                   </select>
                   <button type="button" class="btn-file-view" id="btnExportActiveDatasetCsv" title="Descarregar o ficheiro CSV original">
                     ⬇️ Exportar CSV
@@ -7146,6 +7146,8 @@
 
     // ==================== HISTÓRICO PERSISTENTE & VISUALIZADOR DE DATASETS ====================
     const SAVED_DATASETS_STORAGE_KEY = 'ai_analyst_saved_datasets';
+    const nfPtMz = new Intl.NumberFormat('pt-MZ', { maximumFractionDigits: 2 });
+    const dfPtMz = new Intl.DateTimeFormat('pt-MZ', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     let savedDatasetsHistory = [];
     let currentViewerDataset = null;
     let activeAnalysisHeaders = [];
@@ -7177,25 +7179,27 @@
         if (res && res.ok) {
           const data = await res.json();
           if (Array.isArray(data.datasets) && data.datasets.length > 0) {
+            let changed = false;
             data.datasets.forEach(remoteDs => {
               if (!remoteDs || !remoteDs.datasetId) return;
               const existingIdx = savedDatasetsHistory.findIndex(d => d.datasetId === remoteDs.datasetId);
-              if (existingIdx >= 0) {
-                savedDatasetsHistory[existingIdx] = { ...savedDatasetsHistory[existingIdx], ...remoteDs };
-              } else {
+              if (existingIdx < 0) {
                 savedDatasetsHistory.push(remoteDs);
+                changed = true;
               }
             });
-            try {
-              localStorage.setItem(SAVED_DATASETS_STORAGE_KEY, JSON.stringify(savedDatasetsHistory.slice(0, 25)));
-            } catch (e) {}
-            renderSavedDatasetsLibrary();
+            if (changed) {
+              try {
+                localStorage.setItem(SAVED_DATASETS_STORAGE_KEY, JSON.stringify(savedDatasetsHistory.slice(0, 25)));
+              } catch (e) {}
+              renderSavedDatasetsLibrary();
+            }
           }
         }
       } catch (err) {}
     }
 
-    function saveDatasetToHistory(ds, inquiryText) {
+    function saveDatasetToHistory(ds, inquiryText, skipBackendSync = false) {
       if (!ds || !Array.isArray(ds.headers) || !Array.isArray(ds.rows)) return;
       const ownerEmail = getCurrentOwnerEmail();
       const ownerName = (currentUser && currentUser.name) ? currentUser.name : 'Visitante';
@@ -7224,18 +7228,20 @@
       savedDatasetsHistory = savedDatasetsHistory.filter(item => item.datasetId !== datasetId);
       savedDatasetsHistory.unshift(entry);
 
-      try {
-        localStorage.setItem(SAVED_DATASETS_STORAGE_KEY, JSON.stringify(savedDatasetsHistory.slice(0, 25)));
-      } catch (err) {}
+      if (!skipBackendSync) {
+        setTimeout(() => {
+          try {
+            localStorage.setItem(SAVED_DATASETS_STORAGE_KEY, JSON.stringify(savedDatasetsHistory.slice(0, 25)));
+          } catch (err) {}
+          fetch('/api/datasets', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(entry)
+          }).catch(() => null);
+        }, 50);
+      }
 
       renderSavedDatasetsLibrary();
-
-      // Sincronizar de forma assíncrona com o MongoDB Atlas
-      fetch('/api/datasets', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(entry)
-      }).catch(() => null);
     }
 
     function getVisibleSavedDatasets() {
@@ -7263,57 +7269,58 @@
         countBadge.textContent = `${list.length} ${list.length === 1 ? 'dataset disponível' : 'datasets disponíveis'}`;
       }
 
-      grid.innerHTML = '';
-      list.forEach(ds => {
-        const card = document.createElement('div');
-        card.className = 'saved-ds-item';
-        const dateLabel = ds.updatedAt
-          ? new Date(ds.updatedAt).toLocaleString('pt-MZ', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-          : 'Guardado';
+      grid.innerHTML = list.map(ds => {
+        const dateLabel = ds.updatedAt ? dfPtMz.format(new Date(ds.updatedAt)) : 'Guardado';
         const rowLen = Array.isArray(ds.rows) ? ds.rows.length : (ds.rowCount || 0);
         const colLen = Array.isArray(ds.headers) ? ds.headers.length : (ds.colCount || 0);
 
-        card.innerHTML = `
-          <div>
-            <div class="saved-ds-top">
-              <div class="saved-ds-name">
-                <span class="file-icon" style="width:28px; height:28px; font-size:10px;">${ds.source === 'GCS' ? 'GCS' : 'CSV'}</span>
-                <span>${ds.name}</span>
+        return `
+          <div class="saved-ds-item">
+            <div>
+              <div class="saved-ds-top">
+                <div class="saved-ds-name">
+                  <span class="file-icon" style="width:28px; height:28px; font-size:10px;">${ds.source === 'GCS' ? 'GCS' : 'CSV'}</span>
+                  <span>${ds.name}</span>
+                </div>
+                <button type="button" class="btn-saved-ds-delete" data-dsid="${ds.datasetId}" title="Remover do histórico">✕</button>
               </div>
-              <button type="button" class="btn-saved-ds-delete" data-dsid="${ds.datasetId}" title="Remover do histórico">✕</button>
+              <div class="saved-ds-meta-row">
+                <span class="saved-ds-pill">${rowLen} linhas × ${colLen} colunas</span>
+                <span class="saved-ds-pill">${ds.sizeLabel || ''}</span>
+                <span class="saved-ds-pill">🕒 ${dateLabel}</span>
+              </div>
             </div>
-            <div class="saved-ds-meta-row">
-              <span class="saved-ds-pill">${rowLen} linhas × ${colLen} colunas</span>
-              <span class="saved-ds-pill">${ds.sizeLabel || ''}</span>
-              <span class="saved-ds-pill">🕒 ${dateLabel}</span>
+            <div class="saved-ds-inquiry" title="Última pergunta analisada">
+              <strong>Pergunta:</strong> ${ds.lastInquiry || 'faça análise geral'}
             </div>
-          </div>
-          <div class="saved-ds-inquiry" title="Última pergunta analisada">
-            <strong>Pergunta:</strong> ${ds.lastInquiry || 'faça análise geral'}
-          </div>
-          <div class="saved-ds-actions">
-            <button type="button" class="btn-saved-ds-view" data-dsid="${ds.datasetId}">
-              👁️ Ver Tabela Completa
-            </button>
-            <button type="button" class="btn-saved-ds-analyze" data-dsid="${ds.datasetId}">
-              📊 Reabrir Análise
-            </button>
+            <div class="saved-ds-actions">
+              <button type="button" class="btn-saved-ds-view" data-dsid="${ds.datasetId}">
+                👁️ Ver Tabela Completa
+              </button>
+              <button type="button" class="btn-saved-ds-analyze" data-dsid="${ds.datasetId}">
+                📊 Reabrir Análise
+              </button>
+            </div>
           </div>
         `;
-        grid.appendChild(card);
-      });
+      }).join('');
+    }
 
-      grid.querySelectorAll('.btn-saved-ds-view').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const id = e.currentTarget.getAttribute('data-dsid');
+    // Delegação única de eventos na grelha de datasets guardados (resposta imediata ao clique)
+    const savedDatasetsGridEl = document.getElementById('savedDatasetsGrid');
+    if (savedDatasetsGridEl) {
+      savedDatasetsGridEl.addEventListener('click', (e) => {
+        const viewBtn = e.target.closest('.btn-saved-ds-view');
+        if (viewBtn) {
+          const id = viewBtn.getAttribute('data-dsid');
           const target = savedDatasetsHistory.find(d => d.datasetId === id);
           if (target) openDatasetViewerModal(target);
-        });
-      });
+          return;
+        }
 
-      grid.querySelectorAll('.btn-saved-ds-analyze').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const id = e.currentTarget.getAttribute('data-dsid');
+        const analyzeBtnItem = e.target.closest('.btn-saved-ds-analyze');
+        if (analyzeBtnItem) {
+          const id = analyzeBtnItem.getAttribute('data-dsid');
           const target = savedDatasetsHistory.find(d => d.datasetId === id);
           if (!target) return;
 
@@ -7333,22 +7340,24 @@
             questionInput.value = target.lastInquiry || 'faça análise geral';
           }
           renderFileList();
-          buildAnalysisInterface();
-          showToast(`Análise do dataset "${target.name}" reaberta com sucesso!`);
-        });
-      });
+          buildAnalysisInterface({ fromSavedHistory: true });
+          showToast(`Análise do dataset "${target.name}" reaberta!`);
+          return;
+        }
 
-      grid.querySelectorAll('.btn-saved-ds-delete').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const id = e.currentTarget.getAttribute('data-dsid');
+        const delBtn = e.target.closest('.btn-saved-ds-delete');
+        if (delBtn) {
+          const id = delBtn.getAttribute('data-dsid');
           savedDatasetsHistory = savedDatasetsHistory.filter(d => d.datasetId !== id);
-          try {
-            localStorage.setItem(SAVED_DATASETS_STORAGE_KEY, JSON.stringify(savedDatasetsHistory));
-          } catch (err) {}
           renderSavedDatasetsLibrary();
-          fetch(`/api/datasets?datasetId=${encodeURIComponent(id)}`, { method: 'DELETE' }).catch(() => null);
+          setTimeout(() => {
+            try {
+              localStorage.setItem(SAVED_DATASETS_STORAGE_KEY, JSON.stringify(savedDatasetsHistory));
+            } catch (err) {}
+            fetch(`/api/datasets?datasetId=${encodeURIComponent(id)}`, { method: 'DELETE' }).catch(() => null);
+          }, 20);
           showToast('Dataset removido do histórico.');
-        });
+        }
       });
     }
 
@@ -7407,10 +7416,10 @@
         if (filtered.length === 0) {
           bodyEl.innerHTML = `<tr><td colspan="${headers.length + 1}" style="text-align:center; padding:28px; color:#888;">Nenhum registo corresponde à pesquisa "${query}".</td></tr>`;
         } else {
-          bodyEl.innerHTML = filtered.map((r, idx) => `
+          bodyEl.innerHTML = filtered.slice(0, 500).map((r, idx) => `
             <tr>
               <td style="color:#888; font-weight:600;">${idx + 1}</td>
-              ${headers.map(h => `<td>${typeof r[h] === 'number' ? r[h].toLocaleString('pt-MZ') : (r[h] ?? '')}</td>`).join('')}
+              ${headers.map(h => `<td>${typeof r[h] === 'number' ? nfPtMz.format(r[h]) : (r[h] ?? '')}</td>`).join('')}
             </tr>
           `).join('');
         }
@@ -7428,8 +7437,8 @@
         metaEl.textContent = `${ds.rows.length} registos • ${ds.headers.length} colunas (${ds.headers.join(', ')}) • Fonte: ${ds.source || 'Local'}`;
       }
       if (dsViewerSearchInput) dsViewerSearchInput.value = '';
-      renderDatasetViewerRows();
       if (modalDatasetViewer) modalDatasetViewer.classList.add('show');
+      renderDatasetViewerRows();
     }
 
     if (btnCloseDatasetViewer) {
@@ -7472,7 +7481,7 @@
           questionInput.value = target.lastInquiry || 'faça análise geral';
         }
         renderFileList();
-        buildAnalysisInterface();
+        buildAnalysisInterface({ fromSavedHistory: true });
       });
     }
 
@@ -7659,7 +7668,7 @@
     }
 
     // ==================== CONSTRUIR A INTERFACE APÓS CLICAR EM ANALYZE ====================
-    function buildAnalysisInterface() {
+    function buildAnalysisInterface(options = {}) {
       if (datasets.length === 0 || !questionInput.value.trim()) return;
 
       const primaryDs = datasets[0];
@@ -7668,11 +7677,11 @@
       const allRows = datasets.flatMap(d => d.rows);
       const headers = primaryDs.headers;
 
-      // Esconder ecrã inicial e mostrar a Interface de Análise (como na captura de ecrã)
+      // Esconder ecrã inicial e mostrar a Interface de Análise imediatamente
       heroBanner.classList.add('hidden');
       setupView.classList.add('hidden');
       analysisInterface.classList.add('active');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: 'auto' });
 
       // Classificar colunas
       const numericCols = [];
@@ -7827,13 +7836,15 @@
       // 4. Preencher Resumo Executivo (Overview)
       const sharePct = ((topCat[1] / (colStats[metric1].sum || 1)) * 100).toFixed(1);
       document.getElementById('overviewNarrative').innerHTML = `
-        A análise geral do conjunto de dados <strong>${dsName}</strong> revela um total acumulado de <strong>${ colStats[metric1].sum.toLocaleString('pt-MZ') } MT</strong> em <strong>${metric1}</strong> e <strong>${ colStats[metric2].sum.toLocaleString('pt-MZ') }</strong> em <strong>${metric2}</strong>.
-        O segmento líder em <strong>${catCol}</strong> é <strong>${topCat[0]}</strong>, responsável por <strong>${topCat[1].toLocaleString('pt-MZ')} MT</strong> (<strong>${sharePct}%</strong> do total).
-        Em termos geográficos (<strong>${provCol}</strong>), <strong>${topProv[0]}</strong> apresenta o maior volume com <strong>${topProv[1].toLocaleString('pt-MZ')} MT</strong>.
+        A análise geral do conjunto de dados <strong>${dsName}</strong> revela um total acumulado de <strong>${ nfPtMz.format(colStats[metric1].sum) } MT</strong> em <strong>${metric1}</strong> e <strong>${ nfPtMz.format(colStats[metric2].sum) }</strong> em <strong>${metric2}</strong>.
+        O segmento líder em <strong>${catCol}</strong> é <strong>${topCat[0]}</strong>, responsável por <strong>${nfPtMz.format(topCat[1])} MT</strong> (<strong>${sharePct}%</strong> do total).
+        Em termos geográficos (<strong>${provCol}</strong>), <strong>${topProv[0]}</strong> apresenta o maior volume com <strong>${nfPtMz.format(topProv[1])} MT</strong>.
       `;
 
-      // Guardar automaticamente o(s) dataset(s) e a pergunta no histórico persistente do cliente
-      datasets.forEach(ds => saveDatasetToHistory(ds, inquiry));
+      // Guardar automaticamente o(s) dataset(s) apenas se não for uma reabertura direta do histórico
+      if (!options.fromSavedHistory) {
+        datasets.forEach(ds => saveDatasetToHistory(ds, inquiry));
+      }
 
       activeAnalysisHeaders = headers;
       activeAnalysisRows = allRows;
@@ -7844,32 +7855,28 @@
         return `
           <tr>
             <td><strong>${col}</strong></td>
-            <td>${s.sum.toLocaleString('pt-MZ', { maximumFractionDigits: 2 })}</td>
-            <td>${s.mean.toLocaleString('pt-MZ', { maximumFractionDigits: 2 })}</td>
-            <td>${s.median.toLocaleString('pt-MZ', { maximumFractionDigits: 2 })}</td>
-            <td>${s.std.toLocaleString('pt-MZ', { maximumFractionDigits: 2 })}</td>
-            <td>${s.min.toLocaleString('pt-MZ', { maximumFractionDigits: 2 })}</td>
-            <td>${s.max.toLocaleString('pt-MZ', { maximumFractionDigits: 2 })}</td>
+            <td>${nfPtMz.format(s.sum)}</td>
+            <td>${nfPtMz.format(s.mean)}</td>
+            <td>${nfPtMz.format(s.median)}</td>
+            <td>${nfPtMz.format(s.std)}</td>
+            <td>${nfPtMz.format(s.min)}</td>
+            <td>${nfPtMz.format(s.max)}</td>
           </tr>
         `;
       }).join('');
 
-      const rawSearchEl = document.getElementById('rawTableSearchInput');
-      if (rawSearchEl) rawSearchEl.value = '';
-      renderActiveRawTable();
-
       // 6. Preencher Insights & Anomalias
       document.getElementById('insightsList').innerHTML = [
-        `<strong>Principal Motor de Receita:</strong> <em>${topCat[0]}</em> lidera em ${catCol} com <strong>${topCat[1].toLocaleString('pt-MZ')} MT</strong> (${sharePct}% do total).`,
-        `<strong>Concentração Regional:</strong> <em>${topProv[0]}</em> lidera em ${provCol} com <strong>${topProv[1].toLocaleString('pt-MZ')} MT</strong>.`,
-        `<strong>Média por Operação:</strong> Cada registo apresenta uma média de <strong>${colStats[metric1].mean.toLocaleString('pt-MZ', { maximumFractionDigits: 1 })} MT</strong> e mediana de <strong>${colStats[metric1].median.toLocaleString('pt-MZ', { maximumFractionDigits: 1 })} MT</strong>.`
+        `<strong>Principal Motor de Receita:</strong> <em>${topCat[0]}</em> lidera em ${catCol} com <strong>${nfPtMz.format(topCat[1])} MT</strong> (${sharePct}% do total).`,
+        `<strong>Concentração Regional:</strong> <em>${topProv[0]}</em> lidera em ${provCol} com <strong>${nfPtMz.format(topProv[1])} MT</strong>.`,
+        `<strong>Média por Operação:</strong> Cada registo apresenta uma média de <strong>${nfPtMz.format(colStats[metric1].mean)} MT</strong> e mediana de <strong>${nfPtMz.format(colStats[metric1].median)} MT</strong>.`
       ].map(i => `<li>${i}</li>`).join('');
 
       document.getElementById('anomaliesList').innerHTML = anomalies.length === 0
         ? `<li>Nenhum outlier severo detectado (|z-score| &ge; 1.7).</li>`
         : anomalies.slice(0, 6).map(a => `
             <li>
-              <strong>${a.label}</strong> (Registo #${a.rowIdx}) — <em>${a.col}</em>: <strong>${a.val.toLocaleString('pt-MZ')}</strong> (${a.direction})
+              <strong>${a.label}</strong> (Registo #${a.rowIdx}) — <em>${a.col}</em>: <strong>${nfPtMz.format(a.val)}</strong> (${a.direction})
               <span class="anomaly-badge">z = ${a.z}</span>
             </li>
           `).join('');
@@ -7882,7 +7889,7 @@
         <button type="button" class="btn-download-pdf" onclick="window.print()">Imprimir / Guardar como PDF</button>
       `;
 
-      // 8. Renderizar Gráficos Chart.js
+      // 8. Renderizar Gráficos Chart.js imediatamente na Visão Geral e diferir os ocultos
       chartInstances.forEach(c => c.destroy());
       chartInstances = [];
 
@@ -7910,6 +7917,7 @@
           options: {
             responsive: true,
             maintainAspectRatio: false,
+            animation: { duration: 220 },
             plugins: { legend: { display: false } },
             scales: {
               y: { beginAtZero: false, grid: { color: '#F1F3F5' } },
@@ -7934,6 +7942,7 @@
           options: {
             responsive: true,
             maintainAspectRatio: false,
+            animation: { duration: 220 },
             plugins: { legend: { display: false } },
             scales: {
               y: { beginAtZero: true, grid: { color: '#F1F3F5' } },
@@ -7945,9 +7954,16 @@
 
       chartInstances.push(createLineChart('canvasOverview1'));
       chartInstances.push(createBarChart('canvasOverview2', sortedCats.slice(0, 6)));
-      chartInstances.push(createLineChart('canvasVis1'));
-      chartInstances.push(createBarChart('canvasVis2', sortedCats.slice(0, 6)));
-      chartInstances.push(createBarChart('canvasVis3', sortedProvs.slice(0, 8)));
+
+      // Diferir gráficos e tabela das abas secundárias para o próximo frame (evita bloqueio da UI)
+      requestAnimationFrame(() => {
+        const rawSearchEl = document.getElementById('rawTableSearchInput');
+        if (rawSearchEl) rawSearchEl.value = '';
+        renderActiveRawTable();
+        chartInstances.push(createLineChart('canvasVis1'));
+        chartInstances.push(createBarChart('canvasVis2', sortedCats.slice(0, 6)));
+        chartInstances.push(createBarChart('canvasVis3', sortedProvs.slice(0, 8)));
+      });
     }
 
     // Renderizar Tabela Completa de Registos com pesquisa em tempo real e seletor de linhas
@@ -7962,7 +7978,7 @@
       const headers = activeAnalysisHeaders || [];
       const rows = activeAnalysisRows || [];
       const query = (searchEl ? searchEl.value.toLowerCase().trim() : '');
-      const limitVal = (limitEl ? limitEl.value : 'all');
+      const limitVal = (limitEl ? limitEl.value : '100');
 
       const filtered = !query
         ? rows
@@ -7983,7 +7999,7 @@
         bodyEl.innerHTML = sliced.map((r, idx) => `
           <tr>
             <td style="color:#888; font-weight:600;">${idx + 1}</td>
-            ${headers.map(h => `<td>${typeof r[h] === 'number' ? r[h].toLocaleString('pt-MZ') : (r[h] ?? '')}</td>`).join('')}
+            ${headers.map(h => `<td>${typeof r[h] === 'number' ? nfPtMz.format(r[h]) : (r[h] ?? '')}</td>`).join('')}
           </tr>
         `).join('');
       }
