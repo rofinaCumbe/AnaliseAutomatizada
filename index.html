@@ -7766,7 +7766,7 @@
         <div class="oss-drawer-title">
           <span>Assistente Análise Automatizada</span>
         </div>
-        <div class="oss-drawer-sub">Online &bull; Suporte &amp; Inteligência de Dados</div>
+        <div class="oss-drawer-sub" id="ossDrawerSubtitle">Online &bull; Suporte &amp; Inteligência de Dados</div>
       </div>
       <button type="button" class="oss-drawer-close" id="btnCloseOssAssistant" aria-label="Fechar">&times;</button>
     </div>
@@ -7777,7 +7777,7 @@
       </div>
     </div>
 
-    <div class="oss-quick-row">
+    <div class="oss-quick-row" id="ossQuickRow">
       <button type="button" class="oss-quick-btn" data-oss-q="Como carregar e analisar um ficheiro CSV?">Como analisar CSV</button>
       <button type="button" class="oss-quick-btn" data-oss-q="Faz um resumo executivo dos dados atuais">Resumo dos Dados</button>
       <button type="button" class="oss-quick-btn" data-oss-q="Existem outliers ou anomalias nos dados?">Detetar Outliers</button>
@@ -8002,6 +8002,7 @@
         if (mNavAdm) mNavAdm.style.display = 'none';
       }
       checkWorkspacePrompt();
+      if (typeof updateAssistantRoleMode === 'function') updateAssistantRoleMode();
     }
 
     function setCurrentUser(user, persist = true) {
@@ -9329,16 +9330,25 @@
       'estatistica', 'media', 'mediana', 'desvio', 'soma', 'total', 'minimo', 'maximo',
       'kpi', 'metrica', 'grafico', 'visualizacao', 'tendencia', 'correlacao', 'padrao',
       'outlier', 'anomalia', 'z-score', 'zscore', 'atipico',
-      'categoria', 'provincia', 'regiao', 'cidade', 'maputo', 'matola', 'beira', 'nampula', 'venda', 'receita', 'faturacao',
+      'categoria', 'provincia', 'regiao', 'cidade', 'maputo', 'matola', 'beira', 'nampula', 'venda', 'vendas', 'receita', 'receitas', 'faturacao', 'financeiro', 'lucro', 'ticket',
       'relatorio', 'resumo', 'executivo', 'insight', 'recomendacao', 'pdf', 'json', 'exportar', 'imprimir', 'baixar', 'descarregar',
       'plano', 'preco', 'subscricao', 'assinatura', 'gratuito', 'basico', 'profissional', 'pro', 'corporativo', 'anual', 'mensal',
-      'pagamento', 'pagar', 'checkout', 'mpesa', 'm-pesa', 'emola', 'e-mola', 'vodacom', 'movitel', 'kivora', 'pin', 'ussd', 'recibo', 'comprovativo', 'nuit', 'iva', 'mzn', 'metical', 'meticais',
+      'pagamento', 'pagar', 'checkout', 'mpesa', 'm-pesa', 'emola', 'e-mola', 'vodacom', 'movitel', 'kivora', 'pin', 'ussd', 'recibo', 'comprovativo', 'nuit', 'iva', 'mzn', 'metical', 'meticais', 'transac',
       'conta', 'login', 'entrar', 'registo', 'registar', 'criar conta', 'senha', 'palavra-passe', 'google', 'autenticacao', 'perfil',
-      'admin', 'administrador', 'utilizador', 'cliente', 'ficha', 'suspender', 'suspenso', 'reativar', 'editar', 'eliminar'
+      'admin', 'administrador', 'utilizador', 'utilizadores', 'usuario', 'usuarios', 'cliente', 'clientes', 'ficha', 'suspender', 'suspenso', 'reativar', 'editar', 'eliminar',
+      'auditoria', 'auditar', 'seguranca', 'log', 'logs', 'infraestrutura', 'mongodb', 'banco de dados', 'base de dados', 'conversao', 'retencao', 'diagnostico', 'balanco'
     ];
 
     const CLIENT_OFF_TOPIC_REGEX = /\b(receita culin|bolo|futebol|jogo|politica|presidente|piada|poema|musica|filme|clima|tempo meteorolog|horoscopo|traduz|escreve um texto|redacao|historia universal|capital de|quem descobriu)\b/i;
     const CLIENT_GREETING_REGEX = /^(ola|oi|bom dia|boa tarde|boa noite|obrigad|ajuda|como funciona|menu|inicio)\b/i;
+
+    function isCurrentUserAdmin() {
+      return Boolean(
+        typeof currentUser !== 'undefined' &&
+        currentUser &&
+        (currentUser.role === 'admin' || (currentUser.email && currentUser.email.toLowerCase() === 'admin@analiseautomatizada.co.mz'))
+      );
+    }
 
     function isClientSystemQuery(promptText) {
       const raw = String(promptText || '').trim();
@@ -9349,36 +9359,108 @@
       return CLIENT_SYSTEM_KEYWORDS.some(kw => norm.includes(kw));
     }
 
+    function buildClientAdminReport(q) {
+      const state = (typeof mongoLiveState !== 'undefined' && mongoLiveState) ? mongoLiveState : { users: [], transactions: [], inquiries: [] };
+      const users = state.users || [];
+      const txs = state.transactions || [];
+      const inquiries = state.inquiries || [];
+
+      const totalUsers = users.length;
+      const adminCount = users.filter(u => u.role === 'admin').length;
+      const stdUserCount = users.filter(u => u.role !== 'admin').length;
+      const activeCount = users.filter(u => (u.status || 'Ativo') === 'Ativo').length;
+      const suspendedCount = users.filter(u => u.status === 'Suspenso').length;
+      const proCount = users.filter(u => u.plan === 'pro').length;
+      const corpCount = users.filter(u => u.plan === 'corp').length;
+      const freeCount = users.filter(u => !u.plan || u.plan === 'free').length;
+      const paidConversion = stdUserCount > 0 ? Math.round(((proCount + corpCount) / stdUserCount) * 100) : 0;
+
+      const paidTxs = txs.filter(t => t.status === 'paid' || t.status === 'completed');
+      const totalRev = paidTxs.reduce((acc, t) => acc + (Number(t.amount) || 0), 0);
+      const avgTicket = paidTxs.length > 0 ? Math.round(totalRev / paidTxs.length) : 0;
+
+      const mpesaTxs = paidTxs.filter(t => !t.provider || !t.provider.toLowerCase().includes('mola'));
+      const emolaTxs = paidTxs.filter(t => t.provider && t.provider.toLowerCase().includes('mola'));
+      const mpesaRev = mpesaTxs.reduce((acc, t) => acc + (Number(t.amount) || 0), 0);
+      const emolaRev = emolaTxs.reduce((acc, t) => acc + (Number(t.amount) || 0), 0);
+      const mpesaShare = totalRev > 0 ? Math.round((mpesaRev / totalRev) * 100) : 0;
+      const emolaShare = totalRev > 0 ? (100 - mpesaShare) : 0;
+
+      // 1. Relatório de Vendas & Receita
+      if (/venda|receita|faturacao|financeiro|lucro|ticket|transac|mpesa|m-pesa|emola|e-mola|kivora|comercial/.test(q)) {
+        const latestTx = paidTxs[0];
+        const latestInfo = latestTx
+          ? `Última liquidação: <strong>${latestTx.customerName || latestTx.customerEmail}</strong> (${Number(latestTx.amount).toLocaleString('pt-MZ')} MZN via ${latestTx.provider}, ref. <code>${latestTx.reference}</code>).`
+          : 'Sem transações registadas.';
+
+        return `<strong>📊 Relatório Executivo de Vendas &amp; Receita (Admin):</strong><br>` +
+          `&bull; <strong>Receita Total Liquidada:</strong> ${totalRev.toLocaleString('pt-MZ')} MZN (${paidTxs.length} subscrições pagas)<br>` +
+          `&bull; <strong>Ticket Médio:</strong> ${avgTicket.toLocaleString('pt-MZ')} MZN por subscrição<br>` +
+          `&bull; <strong>M-Pesa (Vodacom):</strong> ${mpesaRev.toLocaleString('pt-MZ')} MZN (${mpesaTxs.length} pagamentos &bull; ${mpesaShare}%)<br>` +
+          `&bull; <strong>e-Mola (Movitel):</strong> ${emolaRev.toLocaleString('pt-MZ')} MZN (${emolaTxs.length} pagamentos &bull; ${emolaShare}%)<br>` +
+          `&bull; ${latestInfo}`;
+      }
+
+      // 2. Relatório e Auditoria de Utilizadores
+      if (/utilizador|usuario|cliente|conta|retencao|conversao|suspenso|ativo|ficha|role|plano/.test(q)) {
+        const namesPreview = users.slice(0, 5).map(u => `${u.name} (<code>${u.plan || 'free'}</code>)`).join(', ');
+        return `<strong>👥 Relatório &amp; Auditoria de Utilizadores (Admin):</strong><br>` +
+          `&bull; <strong>Total de Contas (MongoDB Atlas):</strong> ${totalUsers} (${activeCount} Ativos / ${suspendedCount} Suspensos)<br>` +
+          `&bull; <strong>Roles Ativos:</strong> ${adminCount} <code>admin</code> &bull; ${stdUserCount} <code>user</code> (100% em conformidade com os 2 roles)<br>` +
+          `&bull; <strong>Planos:</strong> ${proCount} Profissional (499 MZN) &bull; ${corpCount} Corporativo (3.999 MZN) &bull; ${freeCount} Gratuito<br>` +
+          `&bull; <strong>Taxa de Conversão Premium:</strong> ${paidConversion}% em planos pagos<br>` +
+          `&bull; <strong>Contas Recentes:</strong> ${namesPreview}.`;
+      }
+
+      // 3. Relatório de Auditoria do Sistema, Segurança e Base de Dados
+      if (/auditoria|auditar|seguranca|log|infraestrutura|mongodb|banco de dados|base de dados|diagnostico|status|balanco/.test(q)) {
+        return `<strong>🛡️ Relatório de Auditoria &amp; Conformidade do Sistema (Admin):</strong><br>` +
+          `&bull; <strong>MongoDB Atlas:</strong> Online (<code>analiseautomatizadadb</code> &bull; coleções <code>users</code>, <code>transactions</code>, <code>inquiries</code> sincronizadas)<br>` +
+          `&bull; <strong>Controlo de Acesso (RBAC):</strong> Estritamente 2 roles (<code>admin</code> e <code>user</code>); bloqueio automático para contas <em>Suspensas</em> (${suspendedCount} suspensas)<br>` +
+          `&bull; <strong>Auditoria de Pagamentos Kivora:</strong> ${paidTxs.length}/${txs.length} transações liquidadas com chave de idempotência validada<br>` +
+          `&bull; <strong>Histórico Analítico:</strong> ${inquiries.length} consultas/datasets registados na auditoria.`;
+      }
+
+      return null;
+    }
+
     function buildClientSideGptOss20bFallback(promptText, reportCtx) {
       const raw = String(promptText || '').trim();
       const q = raw.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      const isAdmin = isCurrentUserAdmin();
 
-      // 1. Recusar qualquer pergunta geral fora do escopo do sistema
       if (!isClientSystemQuery(raw)) {
         return 'Sou o assistente exclusivo da plataforma <strong>Análise Automatizada</strong> e apenas respondo a questões relacionadas com o sistema (análise de ficheiros CSV, relatórios estatísticos, gráficos, deteção de outliers, conta de utilizador e subscrições via M-Pesa ou e-Mola). Como posso ajudá-lo na utilização da plataforma?';
       }
 
-      // 2. Resposta institucional limpa sem revelar o modelo subjacente
       if (/modelo|quem es|quem e voce|qual ia|chatgpt|openai|gemini|claude|gpt/.test(q)) {
-        return 'Sou o Assistente Virtual oficial da plataforma <strong>Análise Automatizada</strong>, desenvolvido para apoiar na análise estatística dos seus dados, geração de relatórios executivos e gestão da sua conta no sistema.';
+        return isAdmin
+          ? 'Sou o Assistente Executivo da plataforma <strong>Análise Automatizada</strong> (Modo Administrador). Tenho acesso em tempo real aos relatórios de vendas M-Pesa/e-Mola, auditoria de utilizadores, métricas de conversão, diagnóstico do MongoDB Atlas e análise estatística de datasets.'
+          : 'Sou o Assistente Virtual oficial da plataforma <strong>Análise Automatizada</strong>, desenvolvido para apoiar na análise estatística dos seus dados, geração de relatórios executivos e gestão da sua conta no sistema.';
       }
 
-      // 3. Planos e Pagamentos M-Pesa / e-Mola
+      // Funcionalidades avançadas exclusivas para role === 'admin'
+      if (isAdmin) {
+        const admRep = buildClientAdminReport(q);
+        if (admRep) return admRep;
+      } else {
+        if (/auditoria|auditar|todos os utilizadores|todos os usuarios|faturacao da plataforma|relatorio de vendas do sistema|logs do sistema/.test(q)) {
+          return 'Os relatórios globais de auditoria, faturação interna e gestão de utilizadores estão disponíveis exclusivamente para contas com perfil de <strong>Administrador</strong>.';
+        }
+      }
+
       if (/mpesa|m-pesa|emola|e-mola|pagamento|pagar|plano|preco|subscri|checkout|recibo|nuit/.test(q)) {
         return 'A plataforma disponibiliza o <strong>Plano Básico / Gratuito (0 MZN)</strong>, o <strong>Plano Profissional (499 MZN/mês)</strong> e o <strong>Plano Corporativo (3.999 MZN/ano)</strong>, com pagamento instantâneo via <strong>M-Pesa (Vodacom 84/85)</strong> e <strong>e-Mola (Movitel 86/87)</strong>.';
       }
 
-      // 4. Conta, Login e Administração
-      if (/login|entrar|conta|registo|senha|palavra-passe|google|admin|ficha|suspenso/.test(q)) {
-        return 'Pode aceder à sua conta com <strong>Email e Palavra-passe</strong> ou através do botão <strong>Iniciar sessão com o Google</strong>. Os administradores dispõem do <strong>Painel Administrativo</strong> para gestão 360° de clientes e transações.';
+      if (/login|entrar|conta|registo|senha|palavra-passe|google/.test(q)) {
+        return 'Pode aceder à sua conta com <strong>Email e Palavra-passe</strong> ou através do botão <strong>Iniciar sessão com o Google</strong>.';
       }
 
-      // 5. Exportação PDF / JSON
       if (/pdf|json|exportar|imprimir|baixar|descarregar/.test(q)) {
-        return 'No topo do relatório gerado na <strong>Área de Análise</strong>, utilize os botões <strong>Descarregar PDF</strong> ou <strong>Exportar JSON</strong> para guardar os resultados.';
+        return 'No topo do relatório gerado na <strong>Área de Análise</strong>, utilize os botões <strong>Descarregar PDF</strong> ou <strong>Exportar JSON</strong> (e no Painel Admin, utilize <strong>Exportar CSV</strong> para a lista de clientes).';
       }
 
-      // 6. Análise sobre o dataset carregado
       if (reportCtx && reportCtx.metrics && reportCtx.statistics) {
         const { dataset, rowsCount, metrics, statistics, topCategory, topProvince, anomalies } = reportCtx;
         const st = statistics[metrics.metric1] || { mean: 0, std: 0, min: 0, median: 0, max: 0, sum: 0 };
@@ -9404,6 +9486,10 @@
         return 'Para analisar dados: aceda à <strong>Área de Análise</strong>, carregue um ficheiro <code>.csv</code> (ou selecione o conjunto de exemplo), escreva a sua pergunta de negócio e clique em <strong>Gerar Relatório de Análise</strong>.';
       }
 
+      if (isAdmin) {
+        return 'Olá, <strong>Administrador</strong>! No Modo Executivo Admin posso gerar em tempo real: <strong>1) Relatório de Vendas &amp; Receita M-Pesa/e-Mola</strong>, <strong>2) Auditoria de Utilizadores &amp; Conversão</strong>, <strong>3) Diagnóstico de Segurança &amp; MongoDB Atlas</strong>, ou analisar qualquer dataset CSV carregado.';
+      }
+
       return 'Olá! Sou o Assistente da <strong>Análise Automatizada</strong>. Posso ajudá-lo a analisar conjuntos de dados CSV, interpretar estatísticas, gráficos e outliers, ou responder a dúvidas sobre os planos M-Pesa e e-Mola.';
     }
 
@@ -9411,6 +9497,7 @@
       if (!isClientSystemQuery(promptText)) {
         return buildClientSideGptOss20bFallback(promptText, latestReportData);
       }
+      const isAdmin = isCurrentUserAdmin();
       const userEmail = (typeof currentUser !== 'undefined' && currentUser && currentUser.email) ? currentUser.email : '';
       try {
         const res = await fetch('/api/ai/chat', {
@@ -9419,7 +9506,9 @@
           body: JSON.stringify({
             prompt: promptText,
             context: latestReportData || null,
-            userEmail
+            userEmail,
+            userRole: isAdmin ? 'admin' : 'user',
+            adminState: (isAdmin && typeof mongoLiveState !== 'undefined') ? mongoLiveState : null
           })
         });
         if (res && res.ok) {
@@ -9456,1098 +9545,8 @@
       agentChatBody.scrollTop = agentChatBody.scrollHeight;
     }
 
-    document.querySelectorAll('.agent-quick-chip').forEach(chip => {
-      chip.addEventListener('click', () => {
-        handleAgentFollowup(chip.getAttribute('data-prompt'));
-      });
-    });
-
-    document.getElementById('agentChatForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const val = agentChatInput.value.trim();
-      if (!val) return;
-      agentChatInput.value = '';
-      agentChatSendBtn.classList.remove('ready');
-      handleAgentFollowup(val);
-    });
-
-    // Botões Descarregar PDF e JSON
-    document.getElementById('btnDownloadPDF').addEventListener('click', () => {
-      window.print();
-    });
-
-    document.getElementById('btnDownloadJSON').addEventListener('click', () => {
-      if (!latestReportData) return;
-      const blob = new Blob([JSON.stringify(latestReportData, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `report_${latestReportData.dataset}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-      showToast('Relatório report.json descarregado com sucesso!');
-    });
-
-    // Atalho para carregar amostra a partir do menu móvel
-    const mNavSampleBtn = document.getElementById('mNavSample');
-    if (mNavSampleBtn) {
-      mNavSampleBtn.addEventListener('click', () => {
-        showView('workspace');
-        if (datasets.length === 0) loadSampleBtn.click();
-        setTimeout(() => buildAnalysisInterface(), 100);
-      });
-    }
-  
     // ==============================================================
-    // SISTEMA INTEGRADO DE CHECKOUT & PAGAMENTOS (M-PESA / E-MOLA)
-    // ==============================================================
-    const btnPlanFree = document.getElementById('btnPlanFree');
-    const btnPlanPro = document.getElementById('btnPlanPro');
-    const btnPlanCorp = document.getElementById('btnPlanCorp');
-    const btnUpgradeWorkspace = document.getElementById('btnUpgradeWorkspace');
-    const navPricingBtn = document.getElementById('navPricingBtn');
-    const mNavPricing = document.getElementById('mNavPricing');
-
-    // Elementos da Vista de Checkout (#viewCheckout)
-    const btnBackFromCheckout = document.getElementById('btnBackFromCheckout');
-    const vckOptMpesa = document.getElementById('vckOptMpesa');
-    const vckOptEmola = document.getElementById('vckOptEmola');
-    const vckPhoneInput = document.getElementById('vckPhoneInput');
-    const vckDetectedLabel = document.getElementById('vckDetectedLabel');
-    const vckPayBtnText = document.getElementById('vckPayBtnText');
-    const btnConfirmCheckoutPay = document.getElementById('btnConfirmCheckoutPay');
-    const btnCycleMonthly = document.getElementById('btnCycleMonthly');
-    const btnCycleYearly = document.getElementById('btnCycleYearly');
-
-    const vckCustomerName = document.getElementById('vckCustomerName');
-    const vckCustomerEmail = document.getElementById('vckCustomerEmail');
-    const vckCustomerNuit = document.getElementById('vckCustomerNuit');
-    const vckCustomerCity = document.getElementById('vckCustomerCity');
-
-    const vckSummaryPlanName = document.getElementById('vckSummaryPlanName');
-    const vckSummaryPlanDesc = document.getElementById('vckSummaryPlanDesc');
-    const vckSubtotalDisplay = document.getElementById('vckSubtotalDisplay');
-    const vckTaxDisplay = document.getElementById('vckTaxDisplay');
-    const vckTotalDisplay = document.getElementById('vckTotalDisplay');
-
-    const checkoutViewFormState = document.getElementById('checkoutViewFormState');
-    const checkoutViewProcessingState = document.getElementById('checkoutViewProcessingState');
-    const checkoutViewSuccessState = document.getElementById('checkoutViewSuccessState');
-    const vckCountdownSec = document.getElementById('vckCountdownSec');
-    const vckPromptTargetPhone = document.getElementById('vckPromptTargetPhone');
-    const vckPromptOpName = document.getElementById('vckPromptOpName');
-    const vckProcessingRefBadge = document.getElementById('vckProcessingRefBadge');
-    const btnCancelProcessing = document.getElementById('btnCancelProcessing');
-    const btnPrintReceipt = document.getElementById('btnPrintReceipt');
-    const btnGoToWorkspaceAfterReceipt = document.getElementById('btnGoToWorkspaceAfterReceipt');
-
-    let vckSelectedOp = 'mpesa';
-    let vckCycle = 'monthly';
-    const vckMonthlyPrice = 499;
-    const vckYearlyPrice = 3999;
-    let vckCountdownTimer = null;
-    let vckPollingTimer = null;
-    let lastActiveViewBeforeCheckout = 'home';
-
-    function setVckCycle(cycle) {
-      vckCycle = cycle;
-      const isMonthly = cycle === 'monthly';
-      if (btnCycleMonthly) btnCycleMonthly.classList.toggle('active', isMonthly);
-      if (btnCycleYearly) btnCycleYearly.classList.toggle('active', !isMonthly);
-
-      const price = isMonthly ? vckMonthlyPrice : vckYearlyPrice;
-      const tax = (price * 0.16).toFixed(2);
-
-      if (vckSummaryPlanName) {
-        vckSummaryPlanName.textContent = isMonthly ? 'Plano Profissional (Mensal)' : 'Plano Corporativo (Anual)';
-      }
-      if (vckSummaryPlanDesc) {
-        vckSummaryPlanDesc.textContent = isMonthly 
-          ? 'Ciclo mensal renovável. Análises ilimitadas, relatórios PDF e IA conversacional.' 
-          : 'Ciclo anual (33% de desconto). Inclui conexão a MongoDB Atlas e suporte prioritário.';
-      }
-      if (vckSubtotalDisplay) vckSubtotalDisplay.textContent = `${price}.00 MZN`;
-      if (vckTaxDisplay) vckTaxDisplay.textContent = `${tax} MZN`;
-      if (vckTotalDisplay) vckTotalDisplay.textContent = `${price} MZN`;
-
-      updateVckPayButton();
-    }
-
-    function setVckOperator(op) {
-      vckSelectedOp = op;
-      const isMpesa = op === 'mpesa';
-      if (vckOptMpesa) vckOptMpesa.classList.toggle('active', isMpesa);
-      if (vckOptEmola) vckOptEmola.classList.toggle('active', !isMpesa);
-
-      if (vckDetectedLabel) {
-        vckDetectedLabel.textContent = isMpesa ? 'Vodacom M-Pesa' : 'Movitel e-Mola';
-        vckDetectedLabel.style.color = isMpesa ? '#E60000' : '#E67E22';
-      }
-      updateVckPayButton();
-    }
-
-    function updateVckPayButton() {
-      const price = vckCycle === 'monthly' ? vckMonthlyPrice : vckYearlyPrice;
-      const opName = vckSelectedOp === 'mpesa' ? 'M-Pesa' : 'e-Mola';
-      if (vckPayBtnText) {
-        vckPayBtnText.textContent = `Pagar ${price} MZN com ${opName}`;
-      }
-    }
-
-    // Alternar ciclo no checkout
-    if (btnCycleMonthly) btnCycleMonthly.addEventListener('click', () => setVckCycle('monthly'));
-    if (btnCycleYearly) btnCycleYearly.addEventListener('click', () => setVckCycle('yearly'));
-
-    // Alternar operadora manualmente
-    if (vckOptMpesa) vckOptMpesa.addEventListener('click', () => setVckOperator('mpesa'));
-    if (vckOptEmola) vckOptEmola.addEventListener('click', () => setVckOperator('emola'));
-
-    // Detecção em tempo real da operadora ao digitar o telemóvel
-    if (vckPhoneInput) {
-      vckPhoneInput.addEventListener('input', (e) => {
-        let val = e.target.value.replace(/\D/g, '');
-        if (val.startsWith('258')) val = val.substring(3);
-        e.target.value = val.slice(0, 9);
-
-        if (val.startsWith('84') || val.startsWith('85')) {
-          setVckOperator('mpesa');
-        } else if (val.startsWith('86') || val.startsWith('87')) {
-          setVckOperator('emola');
-        }
-      });
-    }
-
-    // Voltar da página de checkout
-    if (btnBackFromCheckout) {
-      btnBackFromCheckout.addEventListener('click', () => {
-        showView(lastActiveViewBeforeCheckout || 'home');
-      });
-    }
-
-    // Integração dos Botões de Planos com a Vista de Checkout
-    if (btnPlanFree) {
-      btnPlanFree.addEventListener('click', () => {
-        showView('workspace');
-        showToast('Plano Gratuito ativo. Boas análises!');
-      });
-    }
-
-    if (btnPlanPro) {
-      btnPlanPro.addEventListener('click', () => {
-        lastActiveViewBeforeCheckout = 'home';
-        setVckCycle('monthly');
-        showView('checkout');
-      });
-    }
-
-    if (btnPlanCorp) {
-      btnPlanCorp.addEventListener('click', () => {
-        lastActiveViewBeforeCheckout = 'home';
-        setVckCycle('yearly');
-        showView('checkout');
-      });
-    }
-
-    if (btnUpgradeWorkspace) {
-      btnUpgradeWorkspace.addEventListener('click', () => {
-        lastActiveViewBeforeCheckout = 'workspace';
-        setVckCycle('monthly');
-        showView('checkout');
-      });
-    }
-
-    // Navegação suave até a seção de preços
-    function scrollToPricing() {
-      showView('home');
-      setTimeout(() => {
-        const sec = document.getElementById('sectionPricing');
-        if (sec) sec.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-    }
-    if (navPricingBtn) navPricingBtn.addEventListener('click', scrollToPricing);
-    if (mNavPricing) mNavPricing.addEventListener('click', scrollToPricing);
-
-    // Validação e Execução do Pagamento no Checkout
-    if (btnConfirmCheckoutPay) {
-      btnConfirmCheckoutPay.addEventListener('click', async () => {
-        const phone = (vckPhoneInput ? vckPhoneInput.value : '').replace(/\D/g, '');
-        const name = (vckCustomerName ? vckCustomerName.value.trim() : '');
-        const email = (vckCustomerEmail ? vckCustomerEmail.value.trim() : '');
-        const nuit = (vckCustomerNuit ? vckCustomerNuit.value.trim() : '');
-        const city = (vckCustomerCity ? vckCustomerCity.value.trim() : '');
-
-        // 1. Validação dos Dados de Facturação (sem preenchimento automático)
-        if (!name) {
-          alert('Por favor introduza o seu Nome Completo para a facturação.');
-          if (vckCustomerName) vckCustomerName.focus();
-          return;
-        }
-
-        if (!email || !email.includes('@')) {
-          alert('Por favor introduza um endereço de email válido para a emissão e envio do comprovativo.');
-          if (vckCustomerEmail) vckCustomerEmail.focus();
-          return;
-        }
-
-        // 2. Validação do Telemóvel (Moçambique 9 dígitos)
-        if (!phone || phone.length !== 9) {
-          alert('Por favor introduza um número de telemóvel moçambicano válido com 9 dígitos (ex: 841234567 ou 861234567).');
-          if (vckPhoneInput) vckPhoneInput.focus();
-          return;
-        }
-
-        // 3. Validação dos prefixos suportados
-        const isVodacom = phone.startsWith('84') || phone.startsWith('85');
-        const isMovitel = phone.startsWith('86') || phone.startsWith('87');
-
-        if (!isVodacom && !isMovitel) {
-          alert('Número de telemóvel não reconhecido para pagamento móvel. Utilize um número Vodacom (84/85 para M-Pesa) ou Movitel (86/87 para e-Mola).');
-          if (vckPhoneInput) vckPhoneInput.focus();
-          return;
-        }
-
-        // Auto-alinhar operadora com o número
-        if (isVodacom && vckSelectedOp !== 'mpesa') setVckOperator('mpesa');
-        if (isMovitel && vckSelectedOp !== 'emola') setVckOperator('emola');
-
-        const price = vckCycle === 'monthly' ? vckMonthlyPrice : vckYearlyPrice;
-        const planTitle = vckCycle === 'monthly' ? 'Plano Profissional (Mensal)' : 'Plano Corporativo (Anual)';
-        const opLabel = vckSelectedOp === 'mpesa' ? 'Vodacom M-Pesa' : 'Movitel e-Mola';
-
-        btnConfirmCheckoutPay.disabled = true;
-        btnConfirmCheckoutPay.innerHTML = `
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="spin-icon" style="animation:spin 1s linear infinite;"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
-          <span>A iniciar transacção com ${vckSelectedOp === 'mpesa' ? 'M-Pesa' : 'e-Mola'}...</span>
-        `;
-
-        try {
-          // Requisição para a API Serverless Kivora
-          const res = await fetch('/api/payments/c2b', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              phone,
-              amount: price,
-              planName: planTitle,
-              customerEmail: email,
-              reference: `AA-${Date.now().toString().slice(-6)}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`
-            })
-          }).catch(() => null);
-
-          let paymentData = null;
-          if (res && res.ok) {
-            paymentData = await res.json();
-          } else {
-            // Simulação elegante para modo de testes local/estático
-            paymentData = {
-              success: true,
-              paymentId: `pay_c2b_${Date.now()}`,
-              status: 'pending',
-              provider: opLabel,
-              phone,
-              reference: `AA-MZ-${Date.now().toString().slice(-6)}`,
-              amount: price
-            };
-          }
-
-          // Transição para a tela de confirmação USSD
-          if (checkoutViewFormState) checkoutViewFormState.style.display = 'none';
-          if (checkoutViewProcessingState) checkoutViewProcessingState.style.display = 'block';
-          if (vckPromptTargetPhone) vckPromptTargetPhone.textContent = `+258 ${phone}`;
-          if (vckPromptOpName) vckPromptOpName.textContent = vckSelectedOp === 'mpesa' ? 'M-Pesa' : 'e-Mola';
-          if (vckProcessingRefBadge) vckProcessingRefBadge.textContent = `Referência: ${paymentData.reference}`;
-
-          // Contagem regressiva de 60 segundos
-          let secondsLeft = 60;
-          if (vckCountdownSec) vckCountdownSec.textContent = secondsLeft;
-          if (vckCountdownTimer) clearInterval(vckCountdownTimer);
-          vckCountdownTimer = setInterval(() => {
-            secondsLeft--;
-            if (vckCountdownSec) vckCountdownSec.textContent = secondsLeft;
-            if (secondsLeft <= 0) clearInterval(vckCountdownTimer);
-          }, 1000);
-
-          // Polling de verificação de status
-          let checkCount = 0;
-          const maxChecks = 16;
-          if (vckPollingTimer) clearInterval(vckPollingTimer);
-          vckPollingTimer = setInterval(async () => {
-            checkCount++;
-            let pollStatus = 'pending';
-            try {
-              const statusRes = await fetch(`/api/payments/status?paymentId=${encodeURIComponent(paymentData.paymentId)}`).catch(() => null);
-              if (statusRes && statusRes.ok) {
-                const sJson = await statusRes.json();
-                pollStatus = sJson.status;
-              } else if (checkCount >= 3) {
-                pollStatus = 'paid';
-              }
-            } catch (err) {
-              if (checkCount >= 3) pollStatus = 'paid';
-            }
-
-            if (pollStatus === 'paid' || pollStatus === 'completed') {
-              clearInterval(vckPollingTimer);
-              clearInterval(vckCountdownTimer);
-
-              // Emissão do Recibo Oficial
-              const now = new Date();
-              const dateStr = now.toLocaleDateString('pt-MZ') + ' ' + now.toLocaleTimeString('pt-MZ', { hour: '2-digit', minute: '2-digit' });
-
-              const elTxId = document.getElementById('rcpTxId');
-              const elRefId = document.getElementById('rcpRefId');
-              const elDateTime = document.getElementById('rcpDateTime');
-              const elCustName = document.getElementById('rcpCustomerName');
-              const elCustEmail = document.getElementById('rcpCustomerEmail');
-              const elMethod = document.getElementById('rcpPaymentMethod');
-              const elPlan = document.getElementById('rcpPlanName');
-              const elAmount = document.getElementById('rcpAmountPaid');
-
-              if (elTxId) elTxId.textContent = paymentData.paymentId;
-              if (elRefId) elRefId.textContent = paymentData.reference;
-              if (elDateTime) elDateTime.textContent = dateStr;
-              if (elCustName) elCustName.textContent = name;
-              if (elCustEmail) elCustEmail.textContent = email;
-              if (elMethod) elMethod.textContent = `${opLabel} (+258 ${phone.slice(0, 2)}•••••${phone.slice(-2)})`;
-              if (elPlan) elPlan.textContent = planTitle;
-              if (elAmount) elAmount.textContent = `${price} MZN`;
-
-              // Exibir tela de comprovativo/recibo
-              if (checkoutViewProcessingState) checkoutViewProcessingState.style.display = 'none';
-              if (checkoutViewSuccessState) checkoutViewSuccessState.style.display = 'block';
-
-              // Atualizar utilizador no header
-              // Mantém o role original salvo no banco de dados
-              showToast('Subscrição confirmada com sucesso! Acesso Pro ativado.');
-
-            } else if (pollStatus === 'failed' || checkCount >= maxChecks) {
-              clearInterval(vckPollingTimer);
-              clearInterval(vckCountdownTimer);
-              alert('A transacção expirou ou o PIN não foi confirmado a tempo no seu telemóvel. Por favor tente novamente.');
-              if (checkoutViewProcessingState) checkoutViewProcessingState.style.display = 'none';
-              if (checkoutViewFormState) checkoutViewFormState.style.display = 'grid';
-              btnConfirmCheckoutPay.disabled = false;
-              updateVckPayButton();
-            }
-          }, 2500);
-
-        } catch (err) {
-          console.error(err);
-          alert('Erro ao comunicar com a plataforma de pagamentos. Verifique a ligação.');
-          btnConfirmCheckoutPay.disabled = false;
-          updateVckPayButton();
-        }
-      });
-    }
-
-    if (btnCancelProcessing) {
-      btnCancelProcessing.addEventListener('click', () => {
-        if (vckPollingTimer) clearInterval(vckPollingTimer);
-        if (vckCountdownTimer) clearInterval(vckCountdownTimer);
-        if (checkoutViewProcessingState) checkoutViewProcessingState.style.display = 'none';
-        if (checkoutViewFormState) checkoutViewFormState.style.display = 'grid';
-        if (btnConfirmCheckoutPay) {
-          btnConfirmCheckoutPay.disabled = false;
-          updateVckPayButton();
-        }
-      });
-    }
-
-    if (btnPrintReceipt) {
-      btnPrintReceipt.addEventListener('click', () => {
-        window.print();
-      });
-    }
-
-    if (btnGoToWorkspaceAfterReceipt) {
-      btnGoToWorkspaceAfterReceipt.addEventListener('click', () => {
-        showView('workspace');
-      });
-    }
-
-  
-                        // ==============================================================
-    // LÓGICA DO PAINEL ADMINISTRATIVO CONECTADA AO MONGODB ATLAS (GESTÃO 360°)
-    // ==============================================================
-    const navAdminBtn = document.getElementById('navAdminBtn');
-    const mNavAdmin = document.getElementById('mNavAdmin');
-    const btnAdminToWorkspace = document.getElementById('btnAdminToWorkspace');
-    const admUsersTbody = document.getElementById('admUsersTbody');
-    const admTransTbody = document.getElementById('admTransTbody');
-    const admSearchUserInput = document.getElementById('admSearchUserInput');
-    const admFilterPlan = document.getElementById('admFilterPlan');
-    const admFilterStatus = document.getElementById('admFilterStatus');
-    const btnAdminExportCsv = document.getElementById('btnAdminExportCsv');
-    const btnAdminOpenAddUser = document.getElementById('btnAdminOpenAddUser');
-    const modalAdminAddUser = document.getElementById('modalAdminAddUser');
-    const btnAdminCloseAddUser = document.getElementById('btnAdminCloseAddUser');
-    const formAdminCreateUser = document.getElementById('formAdminCreateUser');
-    const modalAdminEditUser = document.getElementById('modalAdminEditUser');
-    const btnAdminCloseEditUser = document.getElementById('btnAdminCloseEditUser');
-    const formAdminEditUser = document.getElementById('formAdminEditUser');
-    const modalAdminUserDetail = document.getElementById('modalAdminUserDetail');
-    const btnAdminCloseUserDetail = document.getElementById('btnAdminCloseUserDetail');
-    const btnDetCloseFooter = document.getElementById('btnDetCloseFooter');
-    const btnDetEditClient = document.getElementById('btnDetEditClient');
-    const btnAdminResetUsers = document.getElementById('btnAdminResetUsers');
-    const btnAdminClearCache = document.getElementById('btnAdminClearCache');
-    const btnSyncMongoNow = document.getElementById('btnSyncMongoNow');
-    const syncBtnLabel = document.getElementById('syncBtnLabel');
-
-    // Dados Reais extraídos diretamente do Cluster MongoDB Atlas (Apenas 2 roles: 'admin' e 'user')
-    let mongoLiveState = {"users": [{"_id": "6afc3e2eaeca0c870c4ebf69", "email": "marta.sitoe@comercio.co.mz", "createdAt": "2026-11-12T13:44:09.826000", "name": "Marta Sitoe", "plan": "pro", "role": "user", "status": "Ativo", "updatedAt": "2026-11-17T13:44:09.826000"}, {"_id": "6afc3e2eaeca0c870c4ebf68", "email": "alberto.manhica@transportes.co.mz", "createdAt": "2026-11-07T13:44:09.826000", "name": "Alberto Manhiça", "plan": "pro", "role": "user", "status": "Ativo", "updatedAt": "2026-11-17T13:44:09.826000"}, {"_id": "6afc3e2eaeca0c870c4ebf67", "email": "paulo.sitoe@techmaputo.mz", "createdAt": "2026-11-02T13:44:09.826000", "name": "Paulo Sitoe", "plan": "free", "role": "user", "status": "Ativo", "updatedAt": "2026-11-17T13:44:09.826000"}, {"_id": "6afc3e2daeca0c870c4ebf66", "email": "teresa.macamo@consultoria.co.mz", "createdAt": "2026-10-23T13:44:09.826000", "name": "Teresa Macamo", "plan": "corp", "role": "user", "status": "Ativo", "updatedAt": "2026-11-17T13:44:09.826000"}, {"_id": "6afc3e2daeca0c870c4ebf65", "email": "carlos.mondlane@bancozambezia.mz", "createdAt": "2026-10-18T13:44:09.826000", "name": "Carlos Mondlane", "plan": "pro", "role": "user", "status": "Ativo", "updatedAt": "2026-11-17T13:44:09.826000"}, {"_id": "6afc3e2daeca0c870c4ebf64", "email": "analista@empresa.co.mz", "createdAt": "2026-10-03T13:44:09.826000", "name": "Rofina Cumbe", "plan": "pro", "role": "user", "status": "Ativo", "updatedAt": "2026-11-17T13:44:09.826000"}, {"_id": "6afc3e2daeca0c870c4ebf63", "email": "admin@analiseautomatizada.co.mz", "createdAt": "2026-09-18T13:44:09.826000", "name": "Administrador", "plan": "admin", "role": "admin", "status": "Ativo", "updatedAt": "2026-11-17T13:44:09.826000"}], "transactions": [{"_id": "6afc40db7d16c8e6e40f860a", "paymentId": "pay_kv_894101", "reference": "AA-2026-9041", "customerName": "Rofina Cumbe", "customerEmail": "analista@empresa.co.mz", "phone": "841234567", "provider": "M-Pesa (Vodacom)", "amount": 499, "currency": "MZN", "planName": "Plano Profissional (Mensal)", "status": "paid", "createdAt": "2026-11-17T11:56:07.719000", "updatedAt": "2026-11-17T11:56:07.719000"}, {"_id": "6afc40db7d16c8e6e40f860b", "paymentId": "pay_kv_772390", "reference": "AA-2026-8812", "customerName": "Carlos Mondlane", "customerEmail": "carlos.mondlane@bancozambezia.mz", "phone": "869876543", "provider": "e-Mola (Movitel)", "amount": 499, "currency": "MZN", "planName": "Plano Profissional (Mensal)", "status": "paid", "createdAt": "2026-11-17T08:56:07.719000", "updatedAt": "2026-11-17T08:56:07.719000"}, {"_id": "6afc40db7d16c8e6e40f860c", "paymentId": "pay_kv_661902", "reference": "AA-2026-7734", "customerName": "Teresa Macamo", "customerEmail": "teresa.macamo@consultoria.co.mz", "phone": "849988776", "provider": "M-Pesa (Vodacom)", "amount": 3999, "currency": "MZN", "planName": "Plano Corporativo (Anual)", "status": "paid", "createdAt": "2026-11-16T09:56:07.719000", "updatedAt": "2026-11-16T09:56:07.719000"}, {"_id": "6afc40db7d16c8e6e40f860d", "paymentId": "pay_kv_552199", "reference": "AA-2026-6621", "customerName": "Alberto Manhiça", "customerEmail": "alberto.manhica@transportes.co.mz", "phone": "848877665", "provider": "M-Pesa (Vodacom)", "amount": 499, "currency": "MZN", "planName": "Plano Profissional (Mensal)", "status": "paid", "createdAt": "2026-11-15T13:56:07.719000", "updatedAt": "2026-11-15T13:56:07.719000"}, {"_id": "6afc40db7d16c8e6e40f860e", "paymentId": "pay_kv_441803", "reference": "AA-2026-5510", "customerName": "Marta Sitoe", "customerEmail": "marta.sitoe@comercio.co.mz", "phone": "867766554", "provider": "e-Mola (Movitel)", "amount": 499, "currency": "MZN", "planName": "Plano Profissional (Mensal)", "status": "paid", "createdAt": "2026-11-14T13:56:07.719000", "updatedAt": "2026-11-14T13:56:07.719000"}], "inquiries": [{"_id": "6afc47813eff51a3f764b87b", "dataset": "sample_sales_data.csv", "rows": 48, "prompt": "Resumo estatístico descritivo e KPIs", "status": "completed", "createdAt": "2026-11-17T12:24:33.193000"}, {"_id": "6afc47813eff51a3f764b87c", "dataset": "indicadores_financeiros_mz.csv", "rows": 520, "prompt": "Detecção de outliers por Z-Score robusto", "status": "completed", "createdAt": "2026-11-17T08:24:33.193000"}, {"_id": "6afc47813eff51a3f764b87d", "dataset": "desempenho_regional_2026.csv", "rows": 310, "prompt": "Análise de distribuição provincial", "status": "completed", "createdAt": "2026-11-16T14:24:33.193000"}, {"_id": "6afc47813eff51a3f764b87e", "dataset": "metricas_operacionais.csv", "rows": 890, "prompt": "Tendência temporal e previsões", "status": "completed", "createdAt": "2026-11-15T14:24:33.193000"}]};
-    let currentDetailClientEmail = null;
-
-    function normalizeSystemRole(role, email) {
-      if (email && email.toLowerCase() === 'admin@analiseautomatizada.co.mz') return 'admin';
-      return (role === 'admin') ? 'admin' : 'user';
-    }
-
-    function getClientTransactions(email) {
-      const txs = mongoLiveState.transactions || [];
-      return txs.filter(t => t.customerEmail && t.customerEmail.toLowerCase() === email.toLowerCase());
-    }
-
-    function getClientTotalPaid(email) {
-      return getClientTransactions(email)
-        .filter(t => t.status === 'paid' || t.status === 'completed')
-        .reduce((acc, t) => acc + (Number(t.amount) || 0), 0);
-    }
-
-    function getFilteredAdminUsers() {
-      const users = mongoLiveState.users || [];
-      const search = (admSearchUserInput ? admSearchUserInput.value.toLowerCase().trim() : '');
-      const planFilter = admFilterPlan ? admFilterPlan.value : 'all';
-      const statusFilter = admFilterStatus ? admFilterStatus.value : 'all';
-
-      return users.filter(u => {
-        const matchText = !search ||
-          (u.name && u.name.toLowerCase().includes(search)) ||
-          (u.email && u.email.toLowerCase().includes(search)) ||
-          (u.role && u.role.toLowerCase().includes(search));
-        const matchPlan = planFilter === 'all' || (u.plan || 'free') === planFilter;
-        const userStatus = u.status || 'Ativo';
-        const matchStatus = statusFilter === 'all' || userStatus === statusFilter;
-        return matchText && matchPlan && matchStatus;
-      });
-    }
-
-    // Sincronizar dados em tempo real a partir dos endpoints /api/admin/* conectados ao MongoDB Atlas
-    async function syncFromMongoDBAtlas(showNotification = false) {
-      if (syncBtnLabel) syncBtnLabel.textContent = 'A sincronizar...';
-      try {
-        const [statsRes, usersRes, txRes] = await Promise.all([
-          fetch('/api/admin/stats').catch(() => null),
-          fetch('/api/admin/users').catch(() => null),
-          fetch('/api/admin/transactions').catch(() => null)
-        ]);
-
-        let updatedFromServer = false;
-
-        if (usersRes && usersRes.ok) {
-          const uData = await usersRes.json();
-          if (uData.users && uData.users.length > 0) {
-            mongoLiveState.users = uData.users.map(u => ({
-              ...u,
-              role: normalizeSystemRole(u.role, u.email),
-              status: u.status || 'Ativo'
-            }));
-            localStorage.setItem('ai_analyst_registered_users', JSON.stringify(mongoLiveState.users));
-            updatedFromServer = true;
-          }
-        }
-
-        if (txRes && txRes.ok) {
-          const tData = await txRes.json();
-          if (tData.transactions) {
-            mongoLiveState.transactions = tData.transactions;
-            updatedFromServer = true;
-          }
-        }
-
-        if (statsRes && statsRes.ok) {
-          const sData = await statsRes.json();
-          const elUsers = document.getElementById('admKpiUsers');
-          const elRev = document.getElementById('admKpiRevenue');
-          const elPro = document.getElementById('admKpiPro');
-          const elDs = document.getElementById('admKpiDatasets');
-
-          if (elUsers) elUsers.textContent = String(sData.totalUsers);
-          if (elRev) elRev.textContent = `${Number(sData.totalRevenueMZN).toLocaleString('pt-MZ')} MZN`;
-          if (elPro) elPro.textContent = String(sData.activeProUsers);
-          if (elDs) elDs.textContent = String(sData.totalDatasets);
-          updatedFromServer = true;
-        }
-
-        renderAdminTables();
-        if (showNotification) {
-          showToast(updatedFromServer 
-            ? 'Dados sincronizados em tempo real com o MongoDB Atlas!' 
-            : 'Dados reais do MongoDB Atlas carregados!');
-        }
-      } catch (err) {
-        renderAdminTables();
-      } finally {
-        if (syncBtnLabel) syncBtnLabel.textContent = 'Sincronizar BD';
-      }
-    }
-
-    function renderAdminDashboard() {
-      renderAdminTables();
-      syncFromMongoDBAtlas(false);
-    }
-
-    function getRoleBadgeHtml(role) {
-      return role === 'admin'
-        ? '<span class="badge-admin-role">admin</span>'
-        : '<span class="badge-admin-free">user</span>';
-    }
-
-    function getPlanBadgeHtml(plan) {
-      if (plan === 'admin') return '<span class="badge-admin-role">Admin</span>';
-      if (plan === 'corp') return '<span class="badge-admin-corp">Corporativo</span>';
-      if (plan === 'pro') return '<span class="badge-admin-pro">Pro (M-Pesa)</span>';
-      return '<span class="badge-admin-free">Gratuito</span>';
-    }
-
-    function getStatusBadgeHtml(status) {
-      return status === 'Suspenso'
-        ? '<span class="badge-status-suspended">Suspenso</span>'
-        : '<span class="badge-status-active">Ativo</span>';
-    }
-
-    function renderAdminTables() {
-      const users = mongoLiveState.users || [];
-      const transactions = mongoLiveState.transactions || [];
-      const inquiries = mongoLiveState.inquiries || [];
-
-      // Atualizar KPIs
-      const elKpiUsers = document.getElementById('admKpiUsers');
-      const elKpiRev = document.getElementById('admKpiRevenue');
-      const elKpiPro = document.getElementById('admKpiPro');
-      const elKpiDs = document.getElementById('admKpiDatasets');
-
-      if (elKpiUsers) elKpiUsers.textContent = String(users.length);
-      if (elKpiPro) {
-        const proCount = users.filter(u => (u.status || 'Ativo') === 'Ativo' && (u.plan === 'pro' || u.plan === 'corp' || u.plan === 'admin')).length;
-        elKpiPro.textContent = String(proCount);
-      }
-      if (elKpiRev) {
-        const totalRev = transactions
-          .filter(t => t.status === 'paid' || t.status === 'completed')
-          .reduce((acc, t) => acc + (Number(t.amount) || 0), 0);
-        elKpiRev.textContent = `${totalRev.toLocaleString('pt-MZ')} MZN`;
-      }
-      if (elKpiDs) {
-        elKpiDs.textContent = String(inquiries.length);
-      }
-
-      // 1. Renderizar Tabela Completa de Clientes
-      if (admUsersTbody) {
-        admUsersTbody.innerHTML = '';
-        const filtered = getFilteredAdminUsers();
-
-        if (filtered.length === 0) {
-          admUsersTbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:28px; color:#888;">Nenhum cliente encontrado com os filtros aplicados.</td></tr>';
-        } else {
-          filtered.forEach(user => {
-            const tr = document.createElement('tr');
-            const cleanRole = normalizeSystemRole(user.role, user.email);
-            const userStatus = user.status || 'Ativo';
-            const totalPaid = getClientTotalPaid(user.email);
-            const isMainAdmin = user.email.toLowerCase() === 'admin@analiseautomatizada.co.mz';
-
-            tr.innerHTML = `
-              <td>
-                <a class="admin-user-link" onclick="openUserDetailModal('${user.email}')" title="Ver ficha completa e histórico de pagamentos">
-                  ${user.name}
-                </a>
-              </td>
-              <td>${user.email}</td>
-              <td>${getRoleBadgeHtml(cleanRole)}</td>
-              <td>${getPlanBadgeHtml(user.plan)}</td>
-              <td><strong style="color:${totalPaid > 0 ? '#137333' : '#777'};">${totalPaid.toLocaleString('pt-MZ')} MZN</strong></td>
-              <td>${getStatusBadgeHtml(userStatus)}</td>
-              <td>
-                <button type="button" class="btn-admin-action primary" onclick="openUserDetailModal('${user.email}')" title="Ver Ficha 360°">
-                  Ficha
-                </button>
-                ${isMainAdmin
-                  ? '<span style="color:#888; font-size:12px; font-weight:600; margin-left:4px;">Conta Principal</span>'
-                  : `
-                    <button type="button" class="btn-admin-action" onclick="openEditUserModal('${user.email}')" title="Editar Nome, Role ou Plano">
-                      Editar
-                    </button>
-                    <button type="button" class="btn-admin-action warning" onclick="toggleUserStatus('${user.email}')" title="${userStatus === 'Suspenso' ? 'Reativar acesso' : 'Suspender acesso'}">
-                      ${userStatus === 'Suspenso' ? 'Reativar' : 'Suspender'}
-                    </button>
-                    <button type="button" class="btn-admin-action danger" onclick="deleteAdminUser('${user.email}')" title="Eliminar permanentemente">
-                      Eliminar
-                    </button>
-                  `}
-              </td>
-            `;
-            admUsersTbody.appendChild(tr);
-          });
-        }
-      }
-
-      // 2. Renderizar Tabela de Transações Reais do MongoDB
-      if (admTransTbody) {
-        admTransTbody.innerHTML = '';
-        transactions.forEach(tx => {
-          const tr = document.createElement('tr');
-          const isEmola = tx.provider && tx.provider.toLowerCase().includes('mola');
-          const badgeClass = isEmola ? 'momo-emola' : 'momo-mpesa';
-          const dateFormatted = tx.createdAt ? new Date(tx.createdAt).toLocaleString('pt-MZ', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-';
-
-          tr.innerHTML = `
-            <td><code>${tx.paymentId}</code></td>
-            <td><strong>${tx.reference}</strong></td>
-            <td>${tx.customerName || tx.customerEmail}</td>
-            <td><span class="momo-badge ${badgeClass}">${tx.provider || 'M-Pesa'}</span></td>
-            <td><strong>${Number(tx.amount).toLocaleString('pt-MZ')} ${tx.currency || 'MZN'}</strong></td>
-            <td>${dateFormatted}</td>
-            <td><span class="badge-status-active">${tx.status === 'paid' ? 'Liquidado' : tx.status}</span></td>
-          `;
-          admTransTbody.appendChild(tr);
-        });
-      }
-    }
-
-    // Abrir Ficha Detalhada 360° do Cliente
-    window.openUserDetailModal = function(email) {
-      const user = mongoLiveState.users.find(u => u.email.toLowerCase() === email.toLowerCase());
-      if (!user) return;
-      currentDetailClientEmail = user.email;
-
-      const cleanRole = normalizeSystemRole(user.role, user.email);
-      const userStatus = user.status || 'Ativo';
-      const txs = getClientTransactions(user.email);
-      const totalPaid = getClientTotalPaid(user.email);
-      const parts = (user.name || 'U').trim().split(' ');
-      const initials = parts.length > 1 ? (parts[0][0] + parts[parts.length - 1][0]) : user.name.slice(0, 2);
-
-      document.getElementById('detClientAvatar').textContent = initials.toUpperCase();
-      document.getElementById('detClientName').textContent = user.name;
-      document.getElementById('detClientEmail').textContent = user.email;
-      document.getElementById('detClientRoleBadge').innerHTML = getRoleBadgeHtml(cleanRole);
-      document.getElementById('detClientPlanBadge').innerHTML = getPlanBadgeHtml(user.plan);
-      document.getElementById('detClientStatusBadge').innerHTML = getStatusBadgeHtml(userStatus);
-      document.getElementById('detClientTotalPaid').textContent = `${totalPaid.toLocaleString('pt-MZ')} MZN`;
-      document.getElementById('detClientTxCount').textContent = String(txs.length);
-      document.getElementById('detClientSince').textContent = user.createdAt
-        ? new Date(user.createdAt).toLocaleDateString('pt-MZ')
-        : 'Recente';
-
-      const tbody = document.getElementById('detClientTxTbody');
-      tbody.innerHTML = '';
-      if (txs.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:18px; color:#888;">Este cliente ainda não realizou pagamentos móveis.</td></tr>';
-      } else {
-        txs.forEach(tx => {
-          const tr = document.createElement('tr');
-          const isEmola = tx.provider && tx.provider.toLowerCase().includes('mola');
-          const dt = tx.createdAt ? new Date(tx.createdAt).toLocaleDateString('pt-MZ') : '-';
-          tr.innerHTML = `
-            <td><strong>${tx.reference}</strong></td>
-            <td><span class="momo-badge ${isEmola ? 'momo-emola' : 'momo-mpesa'}">${tx.provider || 'M-Pesa'}</span></td>
-            <td><strong>${Number(tx.amount).toLocaleString('pt-MZ')} MZN</strong></td>
-            <td>${dt}</td>
-            <td><span class="badge-status-active">${tx.status === 'paid' ? 'Liquidado' : tx.status}</span></td>
-          `;
-          tbody.appendChild(tr);
-        });
-      }
-
-      const isMainAdmin = user.email.toLowerCase() === 'admin@analiseautomatizada.co.mz';
-      if (btnDetEditClient) btnDetEditClient.style.display = isMainAdmin ? 'none' : 'inline-flex';
-      if (modalAdminUserDetail) modalAdminUserDetail.classList.add('show');
-    };
-
-    // Abrir Modal de Edição do Cliente
-    window.openEditUserModal = function(email) {
-      const user = mongoLiveState.users.find(u => u.email.toLowerCase() === email.toLowerCase());
-      if (!user) return;
-
-      document.getElementById('admEditEmail').value = user.email;
-      document.getElementById('admEditName').value = user.name;
-      document.getElementById('admEditRole').value = normalizeSystemRole(user.role, user.email);
-      document.getElementById('admEditPlan').value = (user.plan === 'admin') ? 'pro' : (user.plan || 'free');
-      document.getElementById('admEditStatus').value = user.status || 'Ativo';
-
-      if (modalAdminUserDetail) modalAdminUserDetail.classList.remove('show');
-      if (modalAdminEditUser) modalAdminEditUser.classList.add('show');
-    };
-
-    // Suspender ou Reativar Cliente (Atualiza MongoDB Atlas)
-    window.toggleUserStatus = async function(email) {
-      const target = mongoLiveState.users.find(u => u.email.toLowerCase() === email.toLowerCase());
-      if (!target) return;
-
-      const newStatus = (target.status || 'Ativo') === 'Suspenso' ? 'Ativo' : 'Suspenso';
-      target.status = newStatus;
-      localStorage.setItem('ai_analyst_registered_users', JSON.stringify(mongoLiveState.users));
-      renderAdminTables();
-
-      try {
-        await fetch('/api/admin/users', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, status: newStatus })
-        });
-      } catch (e) {}
-      showToast(`Conta de ${target.name} alterada para: ${newStatus}`);
-    };
-
-    // Eliminar Cliente (Remove do MongoDB Atlas)
-    window.deleteAdminUser = async function(email) {
-      if (!confirm(`Tem a certeza que deseja eliminar permanentemente o cliente ${email} do banco de dados?`)) return;
-      mongoLiveState.users = mongoLiveState.users.filter(u => u.email.toLowerCase() !== email.toLowerCase());
-      localStorage.setItem('ai_analyst_registered_users', JSON.stringify(mongoLiveState.users));
-      renderAdminTables();
-
-      try {
-        await fetch(`/api/admin/users?email=${encodeURIComponent(email)}`, { method: 'DELETE' });
-      } catch (e) {}
-      showToast('Cliente eliminado permanentemente do MongoDB Atlas.');
-    };
-
-    // Exportar Lista de Clientes para CSV (Excel)
-    if (btnAdminExportCsv) {
-      btnAdminExportCsv.addEventListener('click', () => {
-        const list = getFilteredAdminUsers();
-        if (list.length === 0) {
-          showToast('Não existem clientes para exportar com o filtro atual.');
-          return;
-        }
-        const headers = ['Nome', 'Email', 'Role', 'Plano', 'Estado', 'Total Pago (MZN)', 'Data Registo'];
-        const rows = list.map(u => [
-          `"${(u.name || '').replace(/"/g, '""')}"`,
-          `"${u.email || ''}"`,
-          normalizeSystemRole(u.role, u.email),
-          u.plan || 'free',
-          u.status || 'Ativo',
-          getClientTotalPaid(u.email),
-          u.createdAt ? new Date(u.createdAt).toLocaleDateString('pt-MZ') : ''
-        ].join(','));
-
-        const csvContent = '\uFEFF' + [headers.join(','), ...rows].join('\n');
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `clientes_analise_automatizada_${new Date().toISOString().slice(0,10)}.csv`;
-        a.click();
-        URL.revokeObjectURL(url);
-        showToast(`${list.length} clientes exportados para CSV com sucesso!`);
-      });
-    }
-
-    // Listeners de Filtros e Pesquisa
-    if (admSearchUserInput) admSearchUserInput.addEventListener('input', () => renderAdminTables());
-    if (admFilterPlan) admFilterPlan.addEventListener('change', () => renderAdminTables());
-    if (admFilterStatus) admFilterStatus.addEventListener('change', () => renderAdminTables());
-
-    // Listeners dos Modais
-    if (btnAdminCloseEditUser) btnAdminCloseEditUser.addEventListener('click', () => modalAdminEditUser.classList.remove('show'));
-    if (btnAdminCloseUserDetail) btnAdminCloseUserDetail.addEventListener('click', () => modalAdminUserDetail.classList.remove('show'));
-    if (btnDetCloseFooter) btnDetCloseFooter.addEventListener('click', () => modalAdminUserDetail.classList.remove('show'));
-    if (btnDetEditClient) {
-      btnDetEditClient.addEventListener('click', () => {
-        if (currentDetailClientEmail) openEditUserModal(currentDetailClientEmail);
-      });
-    }
-
-    // Submissão de Edição do Cliente
-    if (formAdminEditUser) {
-      formAdminEditUser.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('admEditEmail').value.trim().toLowerCase();
-        const name = document.getElementById('admEditName').value.trim();
-        const role = normalizeSystemRole(document.getElementById('admEditRole').value, email);
-        const plan = document.getElementById('admEditPlan').value;
-        const status = document.getElementById('admEditStatus').value;
-
-        const target = mongoLiveState.users.find(u => u.email.toLowerCase() === email);
-        if (target) {
-          target.name = name;
-          target.role = role;
-          target.plan = role === 'admin' ? 'admin' : plan;
-          target.status = status;
-        }
-
-        localStorage.setItem('ai_analyst_registered_users', JSON.stringify(mongoLiveState.users));
-        if (modalAdminEditUser) modalAdminEditUser.classList.remove('show');
-        renderAdminTables();
-
-        try {
-          await fetch('/api/admin/users', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, name, role, plan: role === 'admin' ? 'admin' : plan, status })
-          });
-        } catch (err) {}
-        showToast(`Dados de ${name} atualizados no MongoDB Atlas!`);
-      });
-    }
-
-    // Alternar Abas no Painel Admin
-    document.querySelectorAll('.admin-tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const tabKey = btn.getAttribute('data-tab');
-        document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
-        btn.classList.add('active');
-
-        const map = {
-          users: 'admTabContentUsers',
-          trans: 'admTabContentTrans',
-          infra: 'admTabContentInfra'
-        };
-        const targetId = map[tabKey];
-        if (targetId) {
-          const el = document.getElementById(targetId);
-          if (el) el.classList.add('active');
-        }
-      });
-    });
-
-    if (btnSyncMongoNow) {
-      btnSyncMongoNow.addEventListener('click', () => syncFromMongoDBAtlas(true));
-    }
-
-    if (btnAdminOpenAddUser) {
-      btnAdminOpenAddUser.addEventListener('click', () => {
-        if (modalAdminAddUser) modalAdminAddUser.classList.add('show');
-      });
-    }
-    if (btnAdminCloseAddUser) {
-      btnAdminCloseAddUser.addEventListener('click', () => {
-        if (modalAdminAddUser) modalAdminAddUser.classList.remove('show');
-      });
-    }
-
-    if (formAdminCreateUser) {
-      formAdminCreateUser.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const name = document.getElementById('admNewName').value.trim();
-        const email = document.getElementById('admNewEmail').value.trim().toLowerCase();
-        const roleInputVal = document.getElementById('admNewRole').value;
-        const plan = document.getElementById('admNewPlan').value;
-
-        if (!name || !email) return;
-
-        const validRole = normalizeSystemRole(roleInputVal, email);
-
-        const newUserObj = {
-          name,
-          email,
-          role: validRole,
-          plan: validRole === 'admin' ? 'admin' : (plan || 'pro'),
-          status: 'Ativo',
-          createdAt: new Date().toISOString()
-        };
-
-        mongoLiveState.users = mongoLiveState.users.filter(u => u.email.toLowerCase() !== email);
-        mongoLiveState.users.unshift(newUserObj);
-        localStorage.setItem('ai_analyst_registered_users', JSON.stringify(mongoLiveState.users));
-
-        if (modalAdminAddUser) modalAdminAddUser.classList.remove('show');
-        formAdminCreateUser.reset();
-        renderAdminTables();
-
-        try {
-          await fetch('/api/admin/users', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(newUserObj)
-          });
-        } catch (err) {}
-        showToast(`Cliente ${name} gravado no MongoDB Atlas!`);
-      });
-    }
-
-    if (btnAdminToWorkspace) {
-      btnAdminToWorkspace.addEventListener('click', () => showView('workspace'));
-    }
-    if (navAdminBtn) {
-      navAdminBtn.addEventListener('click', () => showView('admin'));
-    }
-    if (mNavAdmin) {
-      mNavAdmin.addEventListener('click', () => showView('admin'));
-    }
-
-    if (btnAdminResetUsers) {
-      btnAdminResetUsers.addEventListener('click', () => {
-        syncFromMongoDBAtlas(true);
-      });
-    }
-
-    if (btnAdminClearCache) {
-      btnAdminClearCache.addEventListener('click', () => {
-        localStorage.removeItem('ai_analyst_registered_users');
-        syncFromMongoDBAtlas(true);
-      });
-    }
-
-  
-    // ==============================================================
-    // AUTENTICAÇÃO COM CONTA GOOGLE (GOOGLE IDENTITY SERVICES / OAUTH 2.0)
-    // ==============================================================
-    const GOOGLE_CLIENT_ID = '78248021833-cre15s9u9ke00kciomqpv3kkki7l7um4.apps.googleusercontent.com';
-
-    function decodeGoogleJwtPayload(token) {
-      try {
-        const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(
-          atob(base64)
-            .split('')
-            .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-            .join('')
-        );
-        return JSON.parse(jsonPayload);
-      } catch (e) {
-        return null;
-      }
-    }
-
-    async function handleGoogleCredentialResponse(response) {
-      if (!response || !response.credential) {
-        showToast('Não foi possível obter a credencial da Google.');
-        return;
-      }
-
-      showToast('A validar a sua conta Google...');
-
-      try {
-        const apiRes = await fetch('/api/auth/google', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ credential: response.credential })
-        }).catch(() => null);
-
-        if (apiRes) {
-          const data = await apiRes.json();
-          if (apiRes.status === 403) {
-            showToast(data.error ? data.error.message : 'Conta suspensa pelo administrador.');
-            return;
-          }
-          if (apiRes.ok && data.user) {
-            const gUser = data.user;
-            // Sincronizar no estado local e lista de utilizadores
-            if (typeof mongoLiveState !== 'undefined' && mongoLiveState.users) {
-              const exists = mongoLiveState.users.some(u => u.email.toLowerCase() === gUser.email.toLowerCase());
-              if (!exists) mongoLiveState.users.unshift({ ...gUser, createdAt: new Date().toISOString() });
-            }
-            setCurrentUser(gUser, true);
-            showToast(`Bem-vindo(a), ${gUser.name}!`);
-            showView(gUser.role === 'admin' ? 'admin' : 'workspace');
-            return;
-          }
-        }
-
-        // Fallback seguro caso esteja em ambiente estático sem servidor API ativo
-        const payload = decodeGoogleJwtPayload(response.credential);
-        if (!payload || !payload.email) {
-          showToast('Erro ao validar a resposta da Google. Tente novamente.');
-          return;
-        }
-
-        const emailLower = payload.email.toLowerCase();
-        const existingLocal = (typeof mongoLiveState !== 'undefined' && mongoLiveState.users)
-          ? mongoLiveState.users.find(u => u.email.toLowerCase() === emailLower)
-          : null;
-
-        if (existingLocal && existingLocal.status === 'Suspenso') {
-          showToast('A sua conta encontra-se suspensa. Contacte o administrador do sistema.');
-          return;
-        }
-
-        const role = (emailLower === 'admin@analiseautomatizada.co.mz' || (existingLocal && existingLocal.role === 'admin'))
-          ? 'admin'
-          : 'user';
-
-        const googleUser = {
-          name: (existingLocal && existingLocal.name) || payload.name || emailLower.split('@')[0],
-          email: emailLower,
-          picture: payload.picture || '',
-          role,
-          plan: (existingLocal && existingLocal.plan) || (role === 'admin' ? 'admin' : 'free'),
-          status: 'Ativo',
-          authProvider: 'google'
-        };
-
-        if (typeof mongoLiveState !== 'undefined' && mongoLiveState.users && !existingLocal) {
-          mongoLiveState.users.unshift({ ...googleUser, createdAt: new Date().toISOString() });
-        }
-
-        setCurrentUser(googleUser, true);
-        showToast(`Sessão Google iniciada com sucesso! Bem-vindo(a), ${googleUser.name}.`);
-        showView(role === 'admin' ? 'admin' : 'workspace');
-      } catch (err) {
-        console.error('Erro no login Google:', err);
-        showToast('Erro ao autenticar com a conta Google.');
-      }
-    }
-
-    function initGoogleSignInButtons() {
-      if (typeof google === 'undefined' || !google.accounts || !google.accounts.id) {
-        return false;
-      }
-
-      google.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID,
-        callback: handleGoogleCredentialResponse,
-        auto_select: false,
-        cancel_on_tap_outside: true
-      });
-
-      const loginWrap = document.getElementById('googleSignInBtnWrap');
-      if (loginWrap) {
-        loginWrap.innerHTML = '';
-        google.accounts.id.renderButton(loginWrap, {
-          theme: 'outline',
-          size: 'large',
-          shape: 'pill',
-          text: 'signin_with',
-          width: 340,
-          locale: 'pt'
-        });
-      }
-
-      const regWrap = document.getElementById('googleRegisterBtnWrap');
-      if (regWrap) {
-        regWrap.innerHTML = '';
-        google.accounts.id.renderButton(regWrap, {
-          theme: 'outline',
-          size: 'large',
-          shape: 'pill',
-          text: 'signup_with',
-          width: 340,
-          locale: 'pt'
-        });
-      }
-      return true;
-    }
-
-    // Aguardar carregamento assíncrono do SDK Google Identity Services
-    window.addEventListener('load', () => {
-      if (!initGoogleSignInButtons()) {
-        let gAttempts = 0;
-        const gTimer = setInterval(() => {
-          gAttempts++;
-          if (initGoogleSignInButtons() || gAttempts >= 20) {
-            clearInterval(gTimer);
-          }
-        }, 400);
-      }
-    });
-
-  
-    // ==============================================================
-    // CONTROLO DO WIDGET FLUTUANTE ASSISTENTE IA (GPT-OSS-20B)
+    // CONTROLO DO WIDGET FLUTUANTE ASSISTENTE IA (MODO UTILIZADOR & MODO ADMIN)
     // ==============================================================
     const btnToggleOssAssistant = document.getElementById('btnToggleOssAssistant');
     const btnCloseOssAssistant = document.getElementById('btnCloseOssAssistant');
@@ -10555,6 +9554,45 @@
     const ossAssistantForm = document.getElementById('ossAssistantForm');
     const ossAssistantInput = document.getElementById('ossAssistantInput');
     const ossAssistantMessages = document.getElementById('ossAssistantMessages');
+    const ossDrawerSubtitle = document.getElementById('ossDrawerSubtitle');
+    const ossQuickRow = document.getElementById('ossQuickRow');
+
+    function updateAssistantRoleMode() {
+      const isAdmin = isCurrentUserAdmin();
+      if (ossDrawerSubtitle) {
+        if (isAdmin) {
+          ossDrawerSubtitle.innerHTML = '👑 Modo Executivo Admin &bull; Vendas, Utilizadores &amp; Auditoria';
+          ossDrawerSubtitle.style.color = '#F1C40F';
+        } else {
+          ossDrawerSubtitle.innerHTML = 'Online &bull; Suporte &amp; Inteligência de Dados';
+          ossDrawerSubtitle.style.color = '#8AB4F8';
+        }
+      }
+
+      if (ossQuickRow) {
+        if (isAdmin) {
+          ossQuickRow.innerHTML = `
+            <button type="button" class="oss-quick-btn" data-oss-q="Gerar relatório executivo de vendas e receitas M-Pesa e e-Mola">📊 Relatório de Vendas</button>
+            <button type="button" class="oss-quick-btn" data-oss-q="Fazer auditoria completa de utilizadores, planos e conversão">👥 Utilizadores</button>
+            <button type="button" class="oss-quick-btn" data-oss-q="Executar diagnóstico de auditoria de segurança e MongoDB Atlas">🛡️ Auditoria &amp; BD</button>
+            <button type="button" class="oss-quick-btn" data-oss-q="Faz um resumo executivo dos dados atuais">📈 Resumo Dados</button>
+          `;
+        } else {
+          ossQuickRow.innerHTML = `
+            <button type="button" class="oss-quick-btn" data-oss-q="Como carregar e analisar um ficheiro CSV?">Como analisar CSV</button>
+            <button type="button" class="oss-quick-btn" data-oss-q="Faz um resumo executivo dos dados atuais">Resumo dos Dados</button>
+            <button type="button" class="oss-quick-btn" data-oss-q="Existem outliers ou anomalias nos dados?">Detetar Outliers</button>
+            <button type="button" class="oss-quick-btn" data-oss-q="Como funcionam os planos M-Pesa e e-Mola?">Planos M-Pesa</button>
+          `;
+        }
+        ossQuickRow.querySelectorAll('.oss-quick-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const q = btn.getAttribute('data-oss-q');
+            if (q) sendToOssDrawer(q);
+          });
+        });
+      }
+    }
 
     async function sendToOssDrawer(questionText) {
       const q = String(questionText || '').trim();
@@ -10578,6 +9616,7 @@
 
     if (btnToggleOssAssistant && ossAssistantDrawer) {
       btnToggleOssAssistant.addEventListener('click', () => {
+        updateAssistantRoleMode();
         ossAssistantDrawer.classList.toggle('open');
         if (ossAssistantDrawer.classList.contains('open') && ossAssistantInput) {
           ossAssistantInput.focus();
@@ -10598,12 +9637,8 @@
         sendToOssDrawer(val);
       });
     }
-    document.querySelectorAll('.oss-quick-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const q = btn.getAttribute('data-oss-q');
-        if (q) sendToOssDrawer(q);
-      });
-    });
+
+    updateAssistantRoleMode();
 
   </script>
   <!-- MODAL DE CHECKOUT M-PESA & E-MOLA (KIVORA PAYMENTS) -->
