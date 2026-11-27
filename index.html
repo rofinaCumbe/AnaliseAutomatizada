@@ -5935,6 +5935,38 @@
       background: #1557B0;
     }
 
+  
+    /* Botão Gerar PDF dentro das respostas de relatório do Assistente */
+    .assistant-pdf-action-wrap {
+      margin-top: 10px;
+      padding-top: 9px;
+      border-top: 1px dashed var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    .btn-assistant-pdf {
+      background: linear-gradient(135deg, #1A73E8 0%, #1557B0 100%);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 10px;
+      padding: 7px 13px;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 3px 10px rgba(26, 115, 232, 0.25);
+      transition: all var(--transition-fast);
+    }
+    .btn-assistant-pdf:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 5px 14px rgba(26, 115, 232, 0.35);
+      background: #0D47A1;
+    }
+
   </style>
 </head>
 <body>
@@ -9534,10 +9566,11 @@
       agentChatBody.scrollTop = agentChatBody.scrollHeight;
 
       const answer = await queryGptOss20b(promptText);
+      const pdfBtnHtml = (typeof buildPdfActionButtonHtml === 'function') ? buildPdfActionButtonHtml(promptText, answer) : '';
       const ansEl = item.querySelector('.chat-followup-a');
       if (ansEl) {
         ansEl.style.color = '';
-        ansEl.innerHTML = answer;
+        ansEl.innerHTML = answer + pdfBtnHtml;
       }
 
       const badge = document.getElementById('chatCountBadge');
@@ -10687,6 +10720,228 @@
       }
     }
 
+    function isReportAnswer(questionText, answerHtml) {
+      const q = String(questionText || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      const a = String(answerHtml || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      if (a.includes('sou o assistente exclusivo da plataforma')) return false;
+      return (
+        /relatorio|sintese executiva|resumo executivo|auditoria|receita total liquidada|total de contas|outlier|estatistic|pdf/.test(a) ||
+        /relatorio|resumo|auditoria|vendas|receita|utilizadores|usuarios|pdf/.test(q)
+      );
+    }
+
+    function detectReportCategory(questionText, answerHtml) {
+      const combined = (String(questionText || '') + ' ' + String(answerHtml || ''))
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+      if (/relatorio executivo de vendas|receita total liquidada|venda|receita|faturacao/.test(combined)) return 'sales';
+      if (/auditoria de utilizadores|total de contas|utilizador|usuario|cliente/.test(combined)) return 'users';
+      if (/auditoria &amp; conformidade|conformidade do sistema|mongodb atlas|seguranca/.test(combined)) return 'audit';
+      return 'dataset';
+    }
+
+    window.exportAssistantReportToPDF = function(category, encodedSummaryHtml) {
+      const summaryHtml = decodeURIComponent(encodedSummaryHtml || '');
+      const isAdmin = isCurrentUserAdmin();
+      const state = (typeof mongoLiveState !== 'undefined' && mongoLiveState) ? mongoLiveState : { users: [], transactions: [], inquiries: [] };
+      const users = state.users || [];
+      const txs = state.transactions || [];
+      const inquiries = state.inquiries || [];
+      const nowStr = new Date().toLocaleString('pt-MZ', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      const issuerName = (typeof currentUser !== 'undefined' && currentUser && currentUser.name) ? currentUser.name : 'Utilizador Autenticado';
+      const issuerRole = isAdmin ? 'Administrador do Sistema (admin)' : 'Utilizador (user)';
+
+      let reportTitle = 'Relatório Executivo de Análise de Dados';
+      let extraTablesHtml = '';
+
+      if (isAdmin && category === 'sales') {
+        reportTitle = 'Relatório Executivo de Vendas & Receitas (M-Pesa / e-Mola)';
+        const rowsHtml = txs.map(t => `
+          <tr>
+            <td><code>${t.paymentId || '-'}</code></td>
+            <td><strong>${t.reference || '-'}</strong></td>
+            <td>${t.customerName || t.customerEmail || '-'}</td>
+            <td>${t.provider || 'M-Pesa'}</td>
+            <td><strong>${Number(t.amount || 0).toLocaleString('pt-MZ')} ${t.currency || 'MZN'}</strong></td>
+            <td>${t.createdAt ? new Date(t.createdAt).toLocaleDateString('pt-MZ') : '-'}</td>
+            <td>${t.status === 'paid' ? 'Liquidado' : (t.status || '-')}</td>
+          </tr>
+        `).join('');
+        extraTablesHtml = `
+          <h3 style="margin-top:24px; font-size:15px; color:#1A1A1A; border-bottom:1px solid #E0E0E0; padding-bottom:6px;">Detalhamento de Transações M-Pesa &amp; e-Mola (MongoDB Atlas)</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>ID Kivora</th>
+                <th>Referência</th>
+                <th>Cliente</th>
+                <th>Operadora</th>
+                <th>Montante</th>
+                <th>Data</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>${rowsHtml}</tbody>
+          </table>
+        `;
+      } else if (isAdmin && category === 'users') {
+        reportTitle = 'Relatório & Auditoria de Utilizadores Registados';
+        const rowsHtml = users.map(u => `
+          <tr>
+            <td><strong>${u.name || '-'}</strong></td>
+            <td>${u.email || '-'}</td>
+            <td><code>${u.role === 'admin' ? 'admin' : 'user'}</code></td>
+            <td>${(u.plan || 'free').toUpperCase()}</td>
+            <td>${u.status || 'Ativo'}</td>
+            <td>${u.createdAt ? new Date(u.createdAt).toLocaleDateString('pt-MZ') : '-'}</td>
+          </tr>
+        `).join('');
+        extraTablesHtml = `
+          <h3 style="margin-top:24px; font-size:15px; color:#1A1A1A; border-bottom:1px solid #E0E0E0; padding-bottom:6px;">Registo Completo de Contas no MongoDB Atlas</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Nome Completo</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Plano</th>
+                <th>Estado</th>
+                <th>Data Registo</th>
+              </tr>
+            </thead>
+            <tbody>${rowsHtml}</tbody>
+          </table>
+        `;
+      } else if (isAdmin && category === 'audit') {
+        reportTitle = 'Relatório de Auditoria, Segurança & Base de Dados';
+        const rowsHtml = inquiries.map(inq => `
+          <tr>
+            <td><strong>${inq.dataset || 'Assistente'}</strong></td>
+            <td>${inq.prompt || '-'}</td>
+            <td>${inq.rows || 0}</td>
+            <td>${inq.status || 'completed'}</td>
+            <td>${inq.createdAt ? new Date(inq.createdAt).toLocaleDateString('pt-MZ') : '-'}</td>
+          </tr>
+        `).join('');
+        extraTablesHtml = `
+          <h3 style="margin-top:24px; font-size:15px; color:#1A1A1A; border-bottom:1px solid #E0E0E0; padding-bottom:6px;">Registo de Auditoria de Consultas &amp; Datasets (Coleção inquiries)</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Dataset / Origem</th>
+                <th>Consulta Executada</th>
+                <th>Registos</th>
+                <th>Estado</th>
+                <th>Data</th>
+              </tr>
+            </thead>
+            <tbody>${rowsHtml}</tbody>
+          </table>
+        `;
+      } else if (typeof latestReportData !== 'undefined' && latestReportData && latestReportData.statistics) {
+        reportTitle = `Relatório Executivo de Análise — Dataset: ${latestReportData.dataset || 'Dados'}`;
+        const statEntries = Object.entries(latestReportData.statistics || {});
+        const rowsHtml = statEntries.map(([col, st]) => `
+          <tr>
+            <td><strong>${col}</strong></td>
+            <td>${Number(st.mean || 0).toLocaleString('pt-MZ', { maximumFractionDigits: 2 })}</td>
+            <td>${Number(st.std || 0).toLocaleString('pt-MZ', { maximumFractionDigits: 2 })}</td>
+            <td>${Number(st.min || 0).toLocaleString('pt-MZ')}</td>
+            <td>${Number(st.median || 0).toLocaleString('pt-MZ')}</td>
+            <td>${Number(st.max || 0).toLocaleString('pt-MZ')}</td>
+            <td><strong>${Number(st.sum || 0).toLocaleString('pt-MZ')}</strong></td>
+          </tr>
+        `).join('');
+        extraTablesHtml = `
+          <h3 style="margin-top:24px; font-size:15px; color:#1A1A1A; border-bottom:1px solid #E0E0E0; padding-bottom:6px;">Estatísticas Descritivas Calculadas (${latestReportData.rowsCount || 0} registos)</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Coluna</th>
+                <th>Média</th>
+                <th>Desvio Padrão</th>
+                <th>Mínimo</th>
+                <th>Mediana</th>
+                <th>Máximo</th>
+                <th>Soma Total</th>
+              </tr>
+            </thead>
+            <tbody>${rowsHtml}</tbody>
+          </table>
+        `;
+      }
+
+      const printWin = window.open('', '_blank', 'width=920,height=740');
+      if (!printWin) {
+        window.print();
+        return;
+      }
+
+      const docHtml = `<!DOCTYPE html>
+<html lang="pt-MZ">
+<head>
+  <meta charset="UTF-8">
+  <title>${reportTitle} — Análise Automatizada</title>
+  <style>
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; color: #1A1A1A; margin: 0; padding: 36px 42px; line-height: 1.55; }
+    .doc-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #1A73E8; padding-bottom: 16px; margin-bottom: 24px; }
+    .brand-title { font-size: 20px; font-weight: 800; color: #1A1A1A; }
+    .brand-sub { font-size: 12px; color: #666; margin-top: 2px; }
+    .meta-box { text-align: right; font-size: 12px; color: #555; }
+    .report-h1 { font-size: 22px; font-weight: 800; color: #1A73E8; margin: 0 0 16px; }
+    .summary-card { background: #F8F9FA; border: 1px solid #E0E0E0; border-left: 4px solid #1A73E8; border-radius: 10px; padding: 18px 20px; font-size: 13.5px; margin-bottom: 22px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+    th, td { border: 1px solid #DCDCDC; padding: 8px 10px; text-align: left; }
+    th { background: #F1F3F4; font-weight: 700; color: #333; }
+    .doc-footer { margin-top: 36px; padding-top: 14px; border-top: 1px solid #E0E0E0; font-size: 11px; color: #777; display: flex; justify-content: space-between; }
+    @media print { body { padding: 18px; } }
+  </style>
+</head>
+<body>
+  <div class="doc-header">
+    <div>
+      <div class="brand-title">Análise Automatizada &bull; MZ</div>
+      <div class="brand-sub">Plataforma de Inteligência e Análise de Dados &bull; Moçambique</div>
+    </div>
+    <div class="meta-box">
+      <div><strong>Data de Emissão:</strong> ${nowStr}</div>
+      <div><strong>Emitido por:</strong> ${issuerName} (${issuerRole})</div>
+    </div>
+  </div>
+  <h1 class="report-h1">${reportTitle}</h1>
+  <div class="summary-card">${summaryHtml}</div>
+  ${extraTablesHtml}
+  <div class="doc-footer">
+    <span>Documento Oficial Gerado pelo Assistente Análise Automatizada</span>
+    <span>Moeda: Metical Moçambicano (MZN / MT)</span>
+  </div>
+  <script>
+    window.onload = function() { setTimeout(function() { window.print(); }, 250); };
+  <\/script>
+</body>
+</html>`;
+
+      printWin.document.open();
+      printWin.document.write(docHtml);
+      printWin.document.close();
+      showToast('Relatório PDF preparado para impressão / download!');
+    };
+
+    function buildPdfActionButtonHtml(questionText, answerHtml) {
+      if (!isReportAnswer(questionText, answerHtml)) return '';
+      const category = detectReportCategory(questionText, answerHtml);
+      const encoded = encodeURIComponent(answerHtml);
+      return `
+        <div class="assistant-pdf-action-wrap">
+          <button type="button" class="btn-assistant-pdf" onclick="exportAssistantReportToPDF('${category}', '${encoded}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><polyline points="9 15 12 18 15 15"></polyline></svg>
+            <span>Gerar &amp; Baixar PDF deste Relatório</span>
+          </button>
+        </div>
+      `;
+    }
+
     async function sendToOssDrawer(questionText) {
       const q = String(questionText || '').trim();
       if (!q || !ossAssistantMessages) return;
@@ -10703,8 +10958,15 @@
       ossAssistantMessages.scrollTop = ossAssistantMessages.scrollHeight;
 
       const answer = await queryGptOss20b(q);
-      botDiv.innerHTML = answer;
+      const pdfBtnHtml = buildPdfActionButtonHtml(q, answer);
+      botDiv.innerHTML = answer + pdfBtnHtml;
       ossAssistantMessages.scrollTop = ossAssistantMessages.scrollHeight;
+
+      // Se o utilizador pediu explicitamente para gerar/baixar o PDF na mensagem, abre automaticamente
+      if (/\b(gera|gerar|baixa|baixar|exporta|exportar|imprime|imprimir)\b.*\bpdf\b/i.test(q) && pdfBtnHtml) {
+        const category = detectReportCategory(q, answer);
+        exportAssistantReportToPDF(category, encodeURIComponent(answer));
+      }
     }
 
     if (btnToggleOssAssistant && ossAssistantDrawer) {
