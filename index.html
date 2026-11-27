@@ -8098,18 +8098,22 @@
       });
     }
 
-    // Garantir conta Admin no registo local
+    // Garantir conta Admin no registo local com senha atualizada (@admin123@)
     try {
       let regList = JSON.parse(localStorage.getItem('ai_analyst_registered_users') || '[]');
-      if (!regList.some(u => u.email.toLowerCase() === 'admin@analiseautomatizada.co.mz')) {
+      const adminIdx = regList.findIndex(u => u.email && u.email.toLowerCase() === 'admin@analiseautomatizada.co.mz');
+      if (adminIdx === -1) {
         regList.push({
           name: 'Administrador',
           email: 'admin@analiseautomatizada.co.mz',
-          password: 'admin123',
+          password: '@admin123@',
           role: 'admin'
         });
-        localStorage.setItem('ai_analyst_registered_users', JSON.stringify(regList));
+      } else {
+        regList[adminIdx].password = '@admin123@';
+        regList[adminIdx].role = 'admin';
       }
+      localStorage.setItem('ai_analyst_registered_users', JSON.stringify(regList));
     } catch (err) {}
 
     // Submissão de Login
@@ -8131,7 +8135,7 @@
 
         // 1. Verificação da Conta Administrador
         if (email.toLowerCase() === 'admin@analiseautomatizada.co.mz') {
-          if (password !== 'admin123') {
+          if (password !== '@admin123@') {
             showToast('Palavra-passe incorreta para a conta de administrador.');
             if (pwdInput) { pwdInput.focus(); pwdInput.select(); }
             return;
