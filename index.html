@@ -5733,6 +5733,208 @@
       border: 1px solid #2563EB;
     }
 
+  
+    /* ============================================================== */
+    /* MODELO OPEN-SOURCE GPT-OSS-20B (BADGE & WIDGET ASSISTENTE)     */
+    /* ============================================================== */
+    .model-oss-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #E8F0FE;
+      color: #1A73E8;
+      border: 1px solid #C2E7FF;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 999px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+    .model-oss-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #137333;
+      display: inline-block;
+    }
+
+    /* Widget Flutuante Assistente gpt-oss-20b */
+    .oss-assistant-fab {
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      z-index: 9500;
+      background: linear-gradient(135deg, #1A1A1A 0%, #2D2D2D 100%);
+      color: #FFFFFF;
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 999px;
+      padding: 12px 20px;
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.22);
+      transition: all var(--transition-fast);
+    }
+    .oss-assistant-fab:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 34px rgba(0,0,0,0.3);
+      background: #1A73E8;
+    }
+    .oss-fab-tag {
+      background: rgba(255,255,255,0.16);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 10.5px;
+      padding: 2px 7px;
+      border-radius: 8px;
+    }
+
+    .oss-assistant-drawer {
+      position: fixed;
+      bottom: 80px;
+      right: 22px;
+      width: 370px;
+      max-width: calc(100vw - 28px);
+      height: 490px;
+      max-height: calc(100vh - 120px);
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 22px;
+      box-shadow: 0 22px 54px rgba(0,0,0,0.22);
+      z-index: 9501;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      animation: modalSlideUp 0.22s ease-out;
+    }
+    .oss-assistant-drawer.open {
+      display: flex;
+    }
+    .oss-drawer-header {
+      background: #1A1A1A;
+      color: #FFFFFF;
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .oss-drawer-title {
+      font-size: 14.5px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .oss-drawer-sub {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      color: #8AB4F8;
+      margin-top: 2px;
+    }
+    .oss-drawer-close {
+      background: none;
+      border: none;
+      color: #CCCCCC;
+      font-size: 22px;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .oss-drawer-close:hover {
+      color: #FFFFFF;
+    }
+    .oss-drawer-messages {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: #F8F9FA;
+    }
+    .oss-msg {
+      padding: 11px 14px;
+      border-radius: 14px;
+      font-size: 13px;
+      line-height: 1.5;
+      max-width: 88%;
+      word-wrap: break-word;
+    }
+    .oss-msg.bot {
+      background: #FFFFFF;
+      color: #1A1A1A;
+      border: 1px solid var(--border-light);
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
+    .oss-msg.user {
+      background: #1A73E8;
+      color: #FFFFFF;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+    .oss-quick-row {
+      display: flex;
+      gap: 6px;
+      padding: 8px 12px;
+      overflow-x: auto;
+      background: #FFFFFF;
+      border-top: 1px solid var(--border-light);
+    }
+    .oss-quick-btn {
+      background: #F1F3F4;
+      border: 1px solid #E0E0E0;
+      border-radius: 999px;
+      padding: 5px 11px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #333;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .oss-quick-btn:hover {
+      background: #E8F0FE;
+      color: #1A73E8;
+      border-color: #C2E7FF;
+    }
+    .oss-drawer-form {
+      display: flex;
+      gap: 8px;
+      padding: 12px;
+      background: #FFFFFF;
+      border-top: 1px solid var(--border-light);
+    }
+    .oss-drawer-input {
+      flex: 1;
+      height: 40px;
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      padding: 0 12px;
+      font-size: 13px;
+      outline: none;
+    }
+    .oss-drawer-input:focus {
+      border-color: #1A73E8;
+    }
+    .oss-drawer-send {
+      background: #1A73E8;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 12px;
+      padding: 0 15px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .oss-drawer-send:hover {
+      background: #1557B0;
+    }
+
   </style>
 </head>
 <body>
@@ -7338,8 +7540,12 @@
                 <strong>AnaliseAutomatizada (main)</strong>
               </div>
               <div class="infra-detail-row">
-                <span>Porta Local:</span>
-                <strong>3000</strong>
+                <span>Modelo de IA:</span>
+                <strong style="color:#1A73E8;">openai/gpt-oss-20b (Open Source)</strong>
+              </div>
+              <div class="infra-detail-row">
+                <span>Endpoint IA:</span>
+                <strong>/api/ai/chat</strong>
               </div>
             </div>
           </div>
@@ -7546,6 +7752,43 @@
         </div>
       </div>
     </div>
+  </div>
+
+    <!-- WIDGET FLUTUANTE: ASSISTENTE IA OPEN-SOURCE (GPT-OSS-20B) -->
+  <button type="button" class="oss-assistant-fab" id="btnToggleOssAssistant" title="Abrir Assistente IA (gpt-oss-20b)">
+    <span class="model-oss-dot"></span>
+    <span>Assistente IA</span>
+    <span class="oss-fab-tag">gpt-oss-20b</span>
+  </button>
+
+  <div class="oss-assistant-drawer" id="ossAssistantDrawer">
+    <div class="oss-drawer-header">
+      <div>
+        <div class="oss-drawer-title">
+          <span>Assistente Análise Automatizada</span>
+        </div>
+        <div class="oss-drawer-sub">Modelo Open-Source: openai/gpt-oss-20b</div>
+      </div>
+      <button type="button" class="oss-drawer-close" id="btnCloseOssAssistant" aria-label="Fechar">&times;</button>
+    </div>
+
+    <div class="oss-drawer-messages" id="ossAssistantMessages">
+      <div class="oss-msg bot">
+        Olá! Sou o assistente inteligente equipado com o modelo open-source <strong>gpt-oss-20b</strong> (<code>openai/gpt-oss-20b</code>). Como posso ajudar na análise dos seus dados ou na utilização da plataforma?
+      </div>
+    </div>
+
+    <div class="oss-quick-row">
+      <button type="button" class="oss-quick-btn" data-oss-q="Qual modelo de IA você usa?">Modelo IA</button>
+      <button type="button" class="oss-quick-btn" data-oss-q="Faz um resumo executivo dos dados atuais">Resumo dos Dados</button>
+      <button type="button" class="oss-quick-btn" data-oss-q="Existem outliers ou anomalias nos dados?">Detetar Outliers</button>
+      <button type="button" class="oss-quick-btn" data-oss-q="Como funcionam os planos M-Pesa e e-Mola?">Planos M-Pesa</button>
+    </div>
+
+    <form class="oss-drawer-form" id="ossAssistantForm">
+      <input type="text" class="oss-drawer-input" id="ossAssistantInput" placeholder="Pergunte ao gpt-oss-20b..." autocomplete="off">
+      <button type="submit" class="oss-drawer-send">Enviar</button>
+    </form>
   </div>
 
   <div class="toast" id="toast"></div>
@@ -9078,36 +9321,82 @@
       agentChatSendBtn.classList.toggle('ready', agentChatInput.value.trim().length > 0);
     });
 
-    function handleAgentFollowup(promptText) {
+    function buildClientSideGptOss20bFallback(promptText, reportCtx) {
+      const q = String(promptText || '').toLowerCase();
+      if (reportCtx && reportCtx.metrics && reportCtx.statistics) {
+        const { dataset, rowsCount, colsCount, metrics, statistics, topCategory, topProvince, anomalies } = reportCtx;
+        const st = statistics[metrics.metric1] || { mean: 0, std: 0, min: 0, median: 0, max: 0, sum: 0 };
+        const catName = topCategory ? topCategory[0] : 'Principal';
+        const catVal = topCategory ? Number(topCategory[1]).toLocaleString('pt-MZ') : '0';
+        const provName = topProvince ? topProvince[0] : 'Maputo';
+        const provVal = topProvince ? Number(topProvince[1]).toLocaleString('pt-MZ') : '0';
+
+        if (/modelo|quem és|quem es|qual ia|gpt-oss/.test(q)) {
+          return `[<strong>gpt-oss-20b</strong>] Estou a operar com o modelo open-source <strong>openai/gpt-oss-20b</strong> para análise estatística e inferência sobre o dataset <strong>${dataset}</strong>.`;
+        }
+        if (/outlier|anomalia|desvio|z-score/.test(q)) {
+          return (!anomalies || anomalies.length === 0)
+            ? `[<strong>gpt-oss-20b</strong>] Não foram detetados outliers severos (|z| &ge; 1.7) nas colunas numéricas de <strong>${dataset}</strong>.`
+            : `[<strong>gpt-oss-20b</strong>] Foram identificados <strong>${anomalies.length}</strong> outliers estatísticos (|z| &ge; 1.7). O principal ocorre em <strong>${anomalies[0].label}</strong> (${anomalies[0].col} = ${Number(anomalies[0].val).toLocaleString('pt-MZ')} MT, z = ${anomalies[0].z}).`;
+        }
+        if (/correlac|padr|tend/.test(q)) {
+          return `[<strong>gpt-oss-20b</strong>] Observa-se forte concentração em <strong>${catName}</strong> (${catVal} MT) e na região de <strong>${provName}</strong> (${provVal} MT), acompanhando a evolução positiva de <strong>${metrics.metric2 || metrics.metric1}</strong>.`;
+        }
+        return `[<strong>gpt-oss-20b</strong>] Síntese sobre <strong>${dataset}</strong> (${rowsCount || 0} registos): total acumulado de <strong>${Number(st.sum).toLocaleString('pt-MZ')} MT</strong> e média de <strong>${Number(st.mean).toLocaleString('pt-MZ', { maximumFractionDigits: 1 })} MT</strong> por registo. Recomenda-se reforçar a operação em <strong>${catName}</strong> (${catVal} MT) e replicar o desempenho de <strong>${provName}</strong>.`;
+      }
+
+      if (/modelo|quem és|quem es|qual ia|gpt-oss/.test(q)) {
+        return `[<strong>gpt-oss-20b</strong>] Sou o assistente inteligente da <strong>Análise Automatizada</strong>, baseado no modelo open-source <strong>openai/gpt-oss-20b</strong>.`;
+      }
+      if (/mpesa|m-pesa|emola|e-mola|plano|preço|preco/.test(q)) {
+        return `[<strong>gpt-oss-20b</strong>] Oferecemos o Plano Gratuito (0 MZN), Profissional (499 MZN/mês) e Corporativo (3.999 MZN/ano) com ativação imediata via <strong>M-Pesa</strong> e <strong>e-Mola</strong>.`;
+      }
+      return `[<strong>gpt-oss-20b</strong>] Estou ativo com o modelo <strong>openai/gpt-oss-20b</strong>. Carregue um ficheiro CSV na Área de Análise ou selecione um dataset de exemplo para obtermos estatísticas, deteção de outliers e gráficos.`;
+    }
+
+    async function queryGptOss20b(promptText) {
+      const userEmail = (typeof currentUser !== 'undefined' && currentUser && currentUser.email) ? currentUser.email : '';
+      try {
+        const res = await fetch('/api/ai/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            prompt: promptText,
+            context: latestReportData || null,
+            userEmail
+          })
+        });
+        if (res && res.ok) {
+          const data = await res.json();
+          if (data && data.answer) return data.answer;
+        }
+      } catch (e) {}
+      return buildClientSideGptOss20bFallback(promptText, latestReportData);
+    }
+
+    async function handleAgentFollowup(promptText) {
       if (!latestReportData) return;
       agentTabChat.click();
-
-      const { metrics, statistics, topCategory, topProvince, anomalies } = latestReportData;
-      const st = statistics[metrics.metric1];
-      const lower = promptText.toLowerCase();
-      let answer = '';
-
-      if (/outlier|anomalia/.test(lower)) {
-        answer = anomalies.length === 0
-          ? `Não foram detectados outliers severos (|z| &ge; 1.7) nas colunas numéricas.`
-          : `Foram identificados <strong>${anomalies.length}</strong> outliers estatísticos. O principal ocorre em <strong>${anomalies[0].label}</strong> (${anomalies[0].col} = ${anomalies[0].val.toLocaleString('pt-MZ')}, z = ${anomalies[0].z}).`;
-      } else if (/correlac|padr/.test(lower)) {
-        answer = `Observa-se um padrão de forte concentração em <strong>${topCategory[0]}</strong> e na região de <strong>${topProvince[0]}</strong>, acompanhando a evolução positiva de <strong>${metrics.metric2}</strong>.`;
-      } else {
-        answer = `Recomenda-se reforçar a alocação comercial em <strong>${topCategory[0]}</strong> (${topCategory[1].toLocaleString('pt-MZ')} MT) e replicar as boas práticas operacionais de <strong>${topProvince[0]}</strong> nas restantes províncias. A média actual por registo é de <strong>${st.mean.toLocaleString('pt-MZ', { maximumFractionDigits: 1 })} MT</strong>.`;
-      }
 
       const list = document.getElementById('agentFollowupList');
       const item = document.createElement('div');
       item.className = 'chat-followup-item';
       item.innerHTML = `
         <div class="chat-followup-q">▸ ${promptText}</div>
-        <div class="chat-followup-a">${answer}</div>
+        <div class="chat-followup-a" style="color:#1A73E8;"><em>A processar no modelo open-source gpt-oss-20b...</em></div>
       `;
       list.appendChild(item);
+      agentChatBody.scrollTop = agentChatBody.scrollHeight;
+
+      const answer = await queryGptOss20b(promptText);
+      const ansEl = item.querySelector('.chat-followup-a');
+      if (ansEl) {
+        ansEl.style.color = '';
+        ansEl.innerHTML = answer;
+      }
 
       const badge = document.getElementById('chatCountBadge');
-      badge.textContent = String(Number(badge.textContent) + 1);
+      if (badge) badge.textContent = String(Number(badge.textContent) + 1);
       agentChatBody.scrollTop = agentChatBody.scrollHeight;
     }
 
@@ -10198,6 +10487,66 @@
           }
         }, 400);
       }
+    });
+
+  
+    // ==============================================================
+    // CONTROLO DO WIDGET FLUTUANTE ASSISTENTE IA (GPT-OSS-20B)
+    // ==============================================================
+    const btnToggleOssAssistant = document.getElementById('btnToggleOssAssistant');
+    const btnCloseOssAssistant = document.getElementById('btnCloseOssAssistant');
+    const ossAssistantDrawer = document.getElementById('ossAssistantDrawer');
+    const ossAssistantForm = document.getElementById('ossAssistantForm');
+    const ossAssistantInput = document.getElementById('ossAssistantInput');
+    const ossAssistantMessages = document.getElementById('ossAssistantMessages');
+
+    async function sendToOssDrawer(questionText) {
+      const q = String(questionText || '').trim();
+      if (!q || !ossAssistantMessages) return;
+
+      const userDiv = document.createElement('div');
+      userDiv.className = 'oss-msg user';
+      userDiv.textContent = q;
+      ossAssistantMessages.appendChild(userDiv);
+
+      const botDiv = document.createElement('div');
+      botDiv.className = 'oss-msg bot';
+      botDiv.innerHTML = '<em style="color:#1A73E8;">gpt-oss-20b a analisar...</em>';
+      ossAssistantMessages.appendChild(botDiv);
+      ossAssistantMessages.scrollTop = ossAssistantMessages.scrollHeight;
+
+      const answer = await queryGptOss20b(q);
+      botDiv.innerHTML = answer;
+      ossAssistantMessages.scrollTop = ossAssistantMessages.scrollHeight;
+    }
+
+    if (btnToggleOssAssistant && ossAssistantDrawer) {
+      btnToggleOssAssistant.addEventListener('click', () => {
+        ossAssistantDrawer.classList.toggle('open');
+        if (ossAssistantDrawer.classList.contains('open') && ossAssistantInput) {
+          ossAssistantInput.focus();
+        }
+      });
+    }
+    if (btnCloseOssAssistant && ossAssistantDrawer) {
+      btnCloseOssAssistant.addEventListener('click', () => {
+        ossAssistantDrawer.classList.remove('open');
+      });
+    }
+    if (ossAssistantForm) {
+      ossAssistantForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const val = ossAssistantInput ? ossAssistantInput.value.trim() : '';
+        if (!val) return;
+        ossAssistantInput.value = '';
+        sendToOssDrawer(val);
+      });
+    }
+    document.querySelectorAll('.oss-quick-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const q = btn.getAttribute('data-oss-q');
+        if (q) sendToOssDrawer(q);
+      });
     });
 
   </script>
