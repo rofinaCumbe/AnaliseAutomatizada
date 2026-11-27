@@ -9343,11 +9343,15 @@
     const CLIENT_GREETING_REGEX = /^(ola|oi|bom dia|boa tarde|boa noite|obrigad|ajuda|como funciona|menu|inicio)\b/i;
 
     function isCurrentUserAdmin() {
-      return Boolean(
-        typeof currentUser !== 'undefined' &&
-        currentUser &&
-        (currentUser.role === 'admin' || (currentUser.email && currentUser.email.toLowerCase() === 'admin@analiseautomatizada.co.mz'))
-      );
+      try {
+        return Boolean(
+          typeof currentUser !== 'undefined' &&
+          currentUser &&
+          (currentUser.role === 'admin' || (currentUser.email && currentUser.email.toLowerCase() === 'admin@analiseautomatizada.co.mz'))
+        );
+      } catch (e) {
+        return false;
+      }
     }
 
     function isClientSystemQuery(promptText) {
@@ -10645,33 +10649,36 @@
 
     function updateAssistantRoleMode() {
       const isAdmin = isCurrentUserAdmin();
-      if (ossDrawerSubtitle) {
+      const subtitleEl = document.getElementById('ossDrawerSubtitle');
+      const quickRowEl = document.getElementById('ossQuickRow');
+
+      if (subtitleEl) {
         if (isAdmin) {
-          ossDrawerSubtitle.innerHTML = '👑 Modo Executivo Admin &bull; Vendas, Utilizadores &amp; Auditoria';
-          ossDrawerSubtitle.style.color = '#F1C40F';
+          subtitleEl.innerHTML = '👑 Modo Executivo Admin &bull; Vendas, Utilizadores &amp; Auditoria';
+          subtitleEl.style.color = '#F1C40F';
         } else {
-          ossDrawerSubtitle.innerHTML = 'Online &bull; Suporte &amp; Inteligência de Dados';
-          ossDrawerSubtitle.style.color = '#8AB4F8';
+          subtitleEl.innerHTML = 'Online &bull; Suporte &amp; Inteligência de Dados';
+          subtitleEl.style.color = '#8AB4F8';
         }
       }
 
-      if (ossQuickRow) {
+      if (quickRowEl) {
         if (isAdmin) {
-          ossQuickRow.innerHTML = `
+          quickRowEl.innerHTML = `
             <button type="button" class="oss-quick-btn" data-oss-q="Gerar relatório executivo de vendas e receitas M-Pesa e e-Mola">📊 Relatório de Vendas</button>
             <button type="button" class="oss-quick-btn" data-oss-q="Fazer auditoria completa de utilizadores, planos e conversão">👥 Utilizadores</button>
             <button type="button" class="oss-quick-btn" data-oss-q="Executar diagnóstico de auditoria de segurança e MongoDB Atlas">🛡️ Auditoria &amp; BD</button>
             <button type="button" class="oss-quick-btn" data-oss-q="Faz um resumo executivo dos dados atuais">📈 Resumo Dados</button>
           `;
         } else {
-          ossQuickRow.innerHTML = `
+          quickRowEl.innerHTML = `
             <button type="button" class="oss-quick-btn" data-oss-q="Como carregar e analisar um ficheiro CSV?">Como analisar CSV</button>
             <button type="button" class="oss-quick-btn" data-oss-q="Faz um resumo executivo dos dados atuais">Resumo dos Dados</button>
             <button type="button" class="oss-quick-btn" data-oss-q="Existem outliers ou anomalias nos dados?">Detetar Outliers</button>
             <button type="button" class="oss-quick-btn" data-oss-q="Como funcionam os planos M-Pesa e e-Mola?">Planos M-Pesa</button>
           `;
         }
-        ossQuickRow.querySelectorAll('.oss-quick-btn').forEach(btn => {
+        quickRowEl.querySelectorAll('.oss-quick-btn').forEach(btn => {
           btn.addEventListener('click', () => {
             const q = btn.getAttribute('data-oss-q');
             if (q) sendToOssDrawer(q);
