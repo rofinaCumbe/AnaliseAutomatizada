@@ -1,12 +1,12 @@
 /**
- * API Serverless Endpoint: Assistente de IA com Modelo Open-Source gpt-oss-20b
- * Suporta OpenRouter, Groq, HuggingFace Router ou qualquer endpoint compatível com OpenAI (openai/gpt-oss-20b).
- * Inclui motor analítico estruturado de fallback e gravação de consultas no MongoDB Atlas.
+ * API Serverless Endpoint: Assistente Oficial da Plataforma Análise Automatizada
+ * Motor interno: openai/gpt-oss-20b (oculto do utilizador final).
+ * Restrição estrita de escopo: responde EXCLUSIVAMENTE a questões sobre o sistema Análise Automatizada e datasets carregados.
  * Rota: POST /api/ai/chat
  */
 const { connectToDatabase } = require('../lib/mongodb');
 
-const DEFAULT_MODEL = process.env.AI_MODEL || 'openai/gpt-oss-20b';
+const INTERNAL_MODEL = process.env.AI_MODEL || 'openai/gpt-oss-20b';
 
 function resolveProviderConfig() {
   const apiKey =
@@ -18,86 +18,144 @@ function resolveProviderConfig() {
     '';
 
   let baseUrl = process.env.AI_BASE_URL || '';
-  let model = process.env.AI_MODEL || DEFAULT_MODEL;
+  let model = INTERNAL_MODEL;
 
   if (!baseUrl) {
     if (apiKey.startsWith('gsk_')) {
       baseUrl = 'https://api.groq.com/openai/v1/chat/completions';
-      model = process.env.AI_MODEL || 'openai/gpt-oss-20b';
     } else if (apiKey.startsWith('hf_')) {
       baseUrl = 'https://router.huggingface.co/v1/chat/completions';
-      model = process.env.AI_MODEL || 'openai/gpt-oss-20b';
     } else {
       baseUrl = 'https://openrouter.ai/api/v1/chat/completions';
-      model = process.env.AI_MODEL || 'openai/gpt-oss-20b';
     }
   }
 
   return { apiKey, baseUrl, model };
 }
 
-function buildLocalGptOss20bReasoning(prompt, context) {
+// Palavras-chave permitidas (Escopo estrito do sistema Análise Automatizada)
+const SYSTEM_SCOPE_KEYWORDS = [
+  'analise', 'análise', 'sistema', 'plataforma', 'workspace', 'painel', 'dashboard',
+  'csv', 'ficheiro', 'arquivo', 'upload', 'carregar', 'importar', 'gcs', 'cloud', 'dataset', 'dados', 'tabela', 'coluna', 'linha', 'registo',
+  'estatistica', 'estatística', 'media', 'média', 'mediana', 'desvio', 'soma', 'total', 'minimo', 'mínimo', 'maximo', 'máximo',
+  'kpi', 'metrica', 'métrica', 'grafico', 'gráfico', 'visualizacao', 'visualização', 'tendencia', 'tendência', 'correlacao', 'correlação', 'padrao', 'padrão',
+  'outlier', 'anomalia', 'z-score', 'zscore', 'atipico', 'atípico',
+  'categoria', 'provincia', 'província', 'regiao', 'região', 'cidade', 'maputo', 'matola', 'beira', 'nampula', 'venda', 'receita', 'faturacao', 'faturação',
+  'relatorio', 'relatório', 'resumo', 'executivo', 'insight', 'recomendacao', 'recomendação', 'pdf', 'json', 'exportar', 'imprimir', 'baixar', 'descarregar',
+  'plano', 'preco', 'preço', 'subscricao', 'subscrição', 'assinatura', 'gratuito', 'basico', 'básico', 'profissional', 'pro', 'corporativo', 'anual', 'mensal',
+  'pagamento', 'pagar', 'checkout', 'mpesa', 'm-pesa', 'emola', 'e-mola', 'vodacom', 'movitel', 'kivora', 'pin', 'ussd', 'recibo', 'comprovativo', 'nuit', 'iva', 'mzn', 'metical', 'meticais',
+  'conta', 'login', 'entrar', 'registo', 'registar', 'criar conta', 'senha', 'palavra-passe', 'google', 'autenticacao', 'autenticação', 'perfil',
+  'admin', 'administrador', 'utilizador', 'cliente', 'ficha', 'suspender', 'suspenso', 'reativar', 'editar', 'eliminar'
+];
+
+const GREETING_PATTERNS = /^(ol[aá]|oi|bom dia|boa tarde|boa noite|obrigad[oa]|ajuda|como funciona|menu|in[ií]cio)\b/i;
+
+const OFF_TOPIC_PATTERNS = /\b(receita culin[aá]ria|bolo|futebol|jogo|pol[ií]tica|presidente|piada|poema|m[uú]sica|filme|clima|tempo meteorol[oó]gico|hor[oó]scopo|traduz|traduzir|escreve um texto|redac[cç][aã]o|hist[oó]ria universal|capital de|quem descobriu)\b/i;
+
+function isSystemRelatedQuery(prompt) {
+  const raw = String(prompt || '').trim();
+  const q = raw
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+
+  if (OFF_TOPIC_PATTERNS.test(raw) || OFF_TOPIC_PATTERNS.test(q)) {
+    return false;
+  }
+
+  if (GREETING_PATTERNS.test(raw) || GREETING_PATTERNS.test(q)) {
+    return true;
+  }
+
+  if (/modelo|quem es|quem e voce|qual ia|chatgpt|openai|gemini|claude|llama/.test(q)) {
+    return true; // Tratado com resposta institucional limpa sem expor o modelo
+  }
+
+  return SYSTEM_SCOPE_KEYWORDS.some(kw => {
+    const cleanKw = kw.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    return q.includes(cleanKw);
+  });
+}
+
+function buildOutOfScopeMessage() {
+  return 'Sou o assistente exclusivo da plataforma <strong>Análise Automatizada</strong> e apenas respondo a questões relacionadas com o sistema (análise de ficheiros CSV, relatórios estatísticos, gráficos, deteção de outliers, conta de utilizador e subscrições via M-Pesa ou e-Mola). Como posso ajudá-lo na utilização da plataforma?';
+}
+
+function buildCleanSystemResponse(prompt, context) {
   const q = String(prompt || '').toLowerCase();
 
-  // 1. Se houver contexto de dataset carregado no Workspace
+  // 1. Bloquear perguntas fora do escopo do sistema
+  if (!isSystemRelatedQuery(prompt)) {
+    return buildOutOfScopeMessage();
+  }
+
+  // 2. Perguntas sobre identidade/modelo -> Resposta institucional limpa (sem revelar o modelo subjacente)
+  if (/modelo|quem és|quem es|quem é você|qual ia|chatgpt|openai|gemini|claude|gpt/.test(q)) {
+    return 'Sou o Assistente Virtual oficial da plataforma <strong>Análise Automatizada</strong>, desenvolvido para apoiar na análise estatística dos seus dados, geração de relatórios executivos e gestão da sua conta no sistema.';
+  }
+
+  // 3. Questões sobre Planos, Preços e Pagamentos M-Pesa / e-Mola
+  if (/mpesa|m-pesa|emola|e-mola|pagamento|pagar|plano|preço|preco|subscri|checkout|recibo|nuit/.test(q)) {
+    return 'A plataforma disponibiliza três opções: <strong>Plano Básico / Gratuito (0 MZN)</strong>, <strong>Plano Profissional (499 MZN/mês)</strong> e <strong>Plano Corporativo (3.999 MZN/ano)</strong>. Os pagamentos são processados em tempo real via <strong>M-Pesa (Vodacom 84/85)</strong> e <strong>e-Mola (Movitel 86/87)</strong> no Checkout, com emissão imediata de comprovativo.';
+  }
+
+  // 4. Questões sobre Login, Conta Google ou Administração
+  if (/login|entrar|conta|registo|senha|palavra-passe|google|admin|ficha|suspenso/.test(q)) {
+    return 'Pode aceder à sua conta através de <strong>Email e Palavra-passe</strong> ou com 1 clique pelo botão <strong>Iniciar sessão com o Google</strong>. Os administradores dispõem ainda do <strong>Painel Administrativo</strong> para gestão 360° de clientes, histórico de transações e exportação CSV.';
+  }
+
+  // 5. Questões sobre Exportação PDF / JSON
+  if (/pdf|json|exportar|imprimir|baixar|descarregar/.test(q)) {
+    return 'No topo do relatório gerado na <strong>Área de Análise</strong>, utilize os botões <strong>Descarregar PDF</strong> (para impressão ou gravação do relatório executivo formatado) ou <strong>Exportar JSON</strong> (para obter a estrutura completa das estatísticas e métricas calculadas).';
+  }
+
+  // 6. Se houver um dataset carregado na Área de Análise
   if (context && context.metrics && context.statistics) {
     const { dataset, rowsCount, colsCount, metrics, statistics, topCategory, topProvince, anomalies } = context;
     const m1 = metrics.metric1;
     const m2 = metrics.metric2;
     const st1 = statistics[m1] || { mean: 0, std: 0, min: 0, median: 0, max: 0, sum: 0 };
     const st2 = (m2 && statistics[m2]) ? statistics[m2] : null;
-    const catName = topCategory ? topCategory[0] : 'Principal Categoria';
+    const catName = topCategory ? topCategory[0] : 'Principal Segmento';
     const catVal = topCategory ? Number(topCategory[1]).toLocaleString('pt-MZ') : '0';
     const provName = topProvince ? topProvince[0] : 'Maputo';
     const provVal = topProvince ? Number(topProvince[1]).toLocaleString('pt-MZ') : '0';
     const anomCount = Array.isArray(anomalies) ? anomalies.length : 0;
 
-    if (/modelo|quem és|quem es|qual ia|gpt-oss/.test(q)) {
-      return `Estou a operar com o modelo open-source <strong>gpt-oss-20b</strong> (<code>openai/gpt-oss-20b</code>), integrado na plataforma <strong>Análise Automatizada</strong> para análise estatística, deteção de anomalias por Z-Score e inteligência de negócio sobre o dataset <strong>${dataset || 'atual'}</strong>.`;
-    }
-
     if (/outlier|anomalia|atípic|atipic|desvio|z-score/.test(q)) {
       if (anomCount === 0) {
-        return `[<strong>gpt-oss-20b</strong>] Após varredura estatística em <strong>${rowsCount || 0} registos</strong>, não foram detetados outliers severos (|z| &ge; 1.7) na métrica <strong>${m1}</strong> (Média: ${Number(st1.mean).toLocaleString('pt-MZ', { maximumFractionDigits: 2 })}, Desvio Padrão: ${Number(st1.std).toLocaleString('pt-MZ', { maximumFractionDigits: 2 })}). A distribuição apresenta estabilidade operacional.`;
+        return `Na análise de <strong>${rowsCount || 0} registos</strong> do conjunto <strong>${dataset || 'atual'}</strong>, não foram detetados outliers severos (|z| &ge; 1.7) na métrica <strong>${m1}</strong> (Média: ${Number(st1.mean).toLocaleString('pt-MZ', { maximumFractionDigits: 2 })}, Desvio Padrão: ${Number(st1.std).toLocaleString('pt-MZ', { maximumFractionDigits: 2 })}).`;
       }
       const topA = anomalies[0];
-      return `[<strong>gpt-oss-20b</strong>] Foram identificados <strong>${anomCount} outliers estatísticos</strong> (|z| &ge; 1.7). O desvio mais acentuado ocorre em <strong>${topA.label}</strong> na coluna <strong>${topA.col}</strong> com valor <strong>${Number(topA.val).toLocaleString('pt-MZ')} MT</strong> (Z-Score = <strong>${topA.z}</strong>). Recomenda-se auditar este registo para confirmar se representa um pico comercial legítimo ou erro de lançamento.`;
+      return `Foram identificados <strong>${anomCount} outliers estatísticos</strong> (|z| &ge; 1.7). O principal ocorre em <strong>${topA.label}</strong> (${topA.col} = <strong>${Number(topA.val).toLocaleString('pt-MZ')} MT</strong>, z = <strong>${topA.z}</strong>). Recomenda-se verificar este registo na aba <em>Insights &amp; Actions</em>.`;
     }
 
     if (/correlac|relação|relacao|padrão|padrao|tendência|tendencia/.test(q)) {
       const ratioInfo = st2
-        ? `A comparação entre <strong>${m1}</strong> (total: ${Number(st1.sum).toLocaleString('pt-MZ')} MT) e <strong>${m2}</strong> (média: ${Number(st2.mean).toLocaleString('pt-MZ', { maximumFractionDigits: 1 })}) demonstra consistência estrutural.`
-        : `A dispersão em torno da mediana (${Number(st1.median).toLocaleString('pt-MZ')} MT) face à média (${Number(st1.mean).toLocaleString('pt-MZ', { maximumFractionDigits: 1 })} MT) indica concentração nos segmentos de topo.`;
-      return `[<strong>gpt-oss-20b</strong>] Análise de padrões concluída: observa-se forte tração em <strong>${catName}</strong> (${catVal} MT) e predominância geográfica em <strong>${provName}</strong> (${provVal} MT). ${ratioInfo}`;
+        ? `A evolução conjunta entre <strong>${m1}</strong> (total: ${Number(st1.sum).toLocaleString('pt-MZ')} MT) e <strong>${m2}</strong> (média: ${Number(st2.mean).toLocaleString('pt-MZ', { maximumFractionDigits: 1 })}) confirma alinhamento operacional.`
+        : `A proximidade entre a mediana (${Number(st1.median).toLocaleString('pt-MZ')} MT) e a média (${Number(st1.mean).toLocaleString('pt-MZ', { maximumFractionDigits: 1 })} MT) demonstra consistência nos registos.`;
+      return `Observa-se concentração principal no segmento <strong>${catName}</strong> (${catVal} MT) e na região de <strong>${provName}</strong> (${provVal} MT). ${ratioInfo}`;
     }
 
     if (/província|provincia|região|regiao|cidade|maputo|beira|nampula|matola/.test(q)) {
-      return `[<strong>gpt-oss-20b</strong>] Na distribuição regional do dataset <strong>${dataset || 'ativo'}</strong>, o polo líder é <strong>${provName}</strong> com volume acumulado de <strong>${provVal} MT</strong>. Recomenda-se consolidar a logística neste corredor e replicar as campanhas de maior conversão nas restantes províncias.`;
+      return `Na distribuição regional do dataset <strong>${dataset || 'ativo'}</strong>, a região líder é <strong>${provName}</strong> com <strong>${provVal} MT</strong> acumulados. Consulte o gráfico de distribuição na aba <em>Visualizações</em> para comparar as restantes províncias.`;
     }
 
-    if (/categoria|produto|segmento|maior receita|melhor/.test(q)) {
-      return `[<strong>gpt-oss-20b</strong>] O segmento de maior desempenho em <strong>${m1}</strong> é <strong>${catName}</strong>, gerando <strong>${catVal} MT</strong> (amplitude do dataset entre ${Number(st1.min).toLocaleString('pt-MZ')} MT e ${Number(st1.max).toLocaleString('pt-MZ')} MT). Priorize stock e margem comercial nesta linha.`;
+    if (/categoria|segmento|maior receita|melhor/.test(q)) {
+      return `O segmento com maior volume em <strong>${m1}</strong> é <strong>${catName}</strong>, totalizando <strong>${catVal} MT</strong> (mínimo registado de ${Number(st1.min).toLocaleString('pt-MZ')} MT e máximo de ${Number(st1.max).toLocaleString('pt-MZ')} MT).`;
     }
 
-    if (/resumo|geral|executivo|kpi|média|media|total/.test(q)) {
-      return `[<strong>gpt-oss-20b</strong>] <strong>Síntese Executiva (${dataset || 'Dataset'}):</strong> Total de <strong>${Number(st1.sum).toLocaleString('pt-MZ')} MT</strong> em <strong>${rowsCount || 0} registos</strong> (${colsCount || 0} colunas). Média por registo de <strong>${Number(st1.mean).toLocaleString('pt-MZ', { maximumFractionDigits: 1 })} MT</strong> (Mediana: ${Number(st1.median).toLocaleString('pt-MZ')} MT). Liderança por segmento em <strong>${catName}</strong> (${catVal} MT) e por região em <strong>${provName}</strong> (${provVal} MT).`;
+    if (/resumo|geral|executivo|kpi|média|media|total|estat/.test(q)) {
+      return `<strong>Resumo Executivo (${dataset || 'Dataset'}):</strong> Volume total de <strong>${Number(st1.sum).toLocaleString('pt-MZ')} MT</strong> em <strong>${rowsCount || 0} registos</strong> (${colsCount || 0} colunas), com média de <strong>${Number(st1.mean).toLocaleString('pt-MZ', { maximumFractionDigits: 1 })} MT</strong> e mediana de <strong>${Number(st1.median).toLocaleString('pt-MZ')} MT</strong>. Destaques: <strong>${catName}</strong> (${catVal} MT) e <strong>${provName}</strong> (${provVal} MT).`;
     }
-
-    return `[<strong>gpt-oss-20b</strong>] Com base nos <strong>${rowsCount || 0} registos</strong> analisados para "<em>${prompt}</em>": a métrica principal <strong>${m1}</strong> acumula <strong>${Number(st1.sum).toLocaleString('pt-MZ')} MT</strong> (média de <strong>${Number(st1.mean).toLocaleString('pt-MZ', { maximumFractionDigits: 1 })} MT</strong> e máximo de <strong>${Number(st1.max).toLocaleString('pt-MZ')} MT</strong>), tendo <strong>${catName}</strong> e <strong>${provName}</strong> como principais motores de resultado.`;
   }
 
-  // 2. Respostas gerais do Assistente da Plataforma (Suporte & Orientação)
-  if (/modelo|quem és|quem es|qual ia|gpt-oss/.test(q)) {
-    return `Sou o assistente inteligente da <strong>Análise Automatizada</strong>, equipado com o modelo open-source <strong>gpt-oss-20b</strong> (<code>openai/gpt-oss-20b</code>). Posso analisar ficheiros CSV, interpretar estatísticas e outliers, ou ajudar com subscrições M-Pesa e e-Mola.`;
-  }
-  if (/mpesa|m-pesa|emola|e-mola|pagamento|plano|preço|preco|subscri/.test(q)) {
-    return `[<strong>gpt-oss-20b</strong>] A plataforma disponibiliza o <strong>Plano Gratuito (0 MZN)</strong>, o <strong>Plano Profissional (499 MZN/mês)</strong> e o <strong>Plano Corporativo (3.999 MZN/ano)</strong>, com pagamento instantâneo via <strong>M-Pesa (Vodacom 84/85)</strong> e <strong>e-Mola (Movitel 86/87)</strong> processado pela Kivora Payments.`;
-  }
-  if (/csv|upload|ficheiro|dados|gcs|como usar|analisar/.test(q)) {
-    return `[<strong>gpt-oss-20b</strong>] Para analisar os seus dados: aceda à <strong>Área de Análise</strong>, carregue um ficheiro <code>.csv</code> (ou clique em <em>Carregar conjunto de exemplo</em>), escreva a sua pergunta de negócio e clique em <strong>Gerar Relatório de Análise</strong>.`;
+  // 7. Como usar / carregar CSV / Saudação
+  if (/csv|upload|ficheiro|dados|gcs|como usar|analisar|relatorio|relatório/.test(q)) {
+    return 'Para realizar uma análise: aceda à <strong>Área de Análise</strong>, carregue o seu ficheiro <code>.csv</code> (ou selecione <em>Carregar conjunto de exemplo</em>), digite a sua questão de negócio e clique em <strong>Gerar Relatório de Análise</strong>.';
   }
 
-  return `[<strong>gpt-oss-20b</strong>] Olá! Estou ativo com o modelo open-source <strong>gpt-oss-20b</strong>. Carregue um conjunto de dados CSV na <strong>Área de Análise</strong> para fazermos cálculos estatísticos, deteção de outliers e gráficos interativos, ou pergunte-me sobre os planos M-Pesa e e-Mola.`;
+  return 'Olá! Sou o Assistente da <strong>Análise Automatizada</strong>. Posso ajudá-lo a analisar conjuntos de dados CSV, interpretar KPIs, gráficos e outliers, ou esclarecer dúvidas sobre planos e pagamentos via M-Pesa e e-Mola.';
 }
 
 module.exports = async function handler(req, res) {
@@ -122,20 +180,39 @@ module.exports = async function handler(req, res) {
 
     if (!prompt || !String(prompt).trim()) {
       return res.status(400).json({
-        error: { code: 'MISSING_PROMPT', message: 'A pergunta (prompt) é obrigatória.' }
+        error: { code: 'MISSING_PROMPT', message: 'A pergunta é obrigatória.' }
+      });
+    }
+
+    // Bloqueio imediato de questões gerais fora do sistema
+    if (!isSystemRelatedQuery(prompt)) {
+      return res.status(200).json({
+        success: true,
+        answer: buildOutOfScopeMessage()
+      });
+    }
+
+    // Resposta institucional imediata caso perguntem sobre o modelo da IA
+    if (/modelo|quem és|quem es|quem é você|qual ia|chatgpt|openai|gemini|claude|gpt/i.test(prompt)) {
+      return res.status(200).json({
+        success: true,
+        answer: buildCleanSystemResponse(prompt, context)
       });
     }
 
     const { apiKey, baseUrl, model } = resolveProviderConfig();
     let answer = '';
-    let providerUsed = 'gpt-oss-20b-local-engine';
 
-    // Se existir chave configurada para inferência remota do openai/gpt-oss-20b
+    // Chamada interna ao modelo gpt-oss-20b com instruções estritas de confidencialidade e escopo
     if (apiKey && !apiKey.includes('sua_chave')) {
       try {
         const systemInstruction =
-          'Você é o Agente Analista de Dados da plataforma Análise Automatizada (Moçambique), operando com o modelo open-source gpt-oss-20b. ' +
-          'Responda sempre em Português claro, executivo e preciso, utilizando Meticais (MT / MZN) para valores monetários. ' +
+          'Você é o Assistente Oficial da plataforma Análise Automatizada (Moçambique). ' +
+          'REGRAS OBRIGATÓRIAS: ' +
+          '1. NUNCA mencione nem explique qual é o seu modelo de IA subjacente (nunca cite gpt-oss-20b, OpenAI, LLM ou arquitetura). Apresente-se apenas como Assistente da Análise Automatizada. ' +
+          '2. Responda EXCLUSIVAMENTE a questões relacionadas com o sistema Análise Automatizada (análise de CSV, estatísticas, gráficos, outliers, relatórios PDF/JSON, autenticação e subscrições M-Pesa/e-Mola) e com os dados carregados. ' +
+          '3. Recuse educadamente qualquer pergunta de conhecimento geral ou fora do contexto do sistema. ' +
+          '4. Responda em Português claro e profissional, usando Meticais (MT / MZN). ' +
           (context ? `Contexto estatístico do dataset atual: ${JSON.stringify(context)}` : '');
 
         const llmRes = await fetch(baseUrl, {
@@ -150,8 +227,8 @@ module.exports = async function handler(req, res) {
               { role: 'system', content: systemInstruction },
               { role: 'user', content: String(prompt).trim() }
             ],
-            temperature: 0.3,
-            max_tokens: 500
+            temperature: 0.2,
+            max_tokens: 450
           })
         });
 
@@ -163,45 +240,39 @@ module.exports = async function handler(req, res) {
             llmData.choices[0].message &&
             llmData.choices[0].message.content;
           if (rawContent) {
-            answer = rawContent;
-            providerUsed = model;
+            answer = rawContent.replace(/\[?gpt-oss-20b\]?:?\s*/gi, '');
           }
         }
       } catch (apiErr) {
-        console.warn('Fallback para motor analítico local gpt-oss-20b:', apiErr.message);
+        console.warn('Usando motor local do sistema:', apiErr.message);
       }
     }
 
     if (!answer) {
-      answer = buildLocalGptOss20bReasoning(prompt, context);
+      answer = buildCleanSystemResponse(prompt, context);
     }
 
-    // Registar a consulta no MongoDB Atlas (coleção inquiries)
+    // Registar a consulta do sistema no MongoDB Atlas
     try {
       const { db } = await connectToDatabase();
       await db.collection('inquiries').insertOne({
-        dataset: (context && context.dataset) ? context.dataset : 'Assistente Geral',
+        dataset: (context && context.dataset) ? context.dataset : 'Assistente do Sistema',
         rows: (context && context.rowsCount) ? Number(context.rowsCount) : 0,
         prompt: String(prompt).trim(),
-        model: DEFAULT_MODEL,
         userEmail: userEmail || 'anonimo',
         status: 'completed',
         createdAt: new Date()
       });
-    } catch (dbErr) {
-      console.warn('Aviso ao gravar inquiry no MongoDB:', dbErr.message);
-    }
+    } catch (dbErr) {}
 
     return res.status(200).json({
       success: true,
-      model: DEFAULT_MODEL,
-      provider: providerUsed,
       answer
     });
   } catch (err) {
     console.error('Erro no endpoint /api/ai/chat:', err);
     return res.status(500).json({
-      error: { code: 'AI_CHAT_ERROR', message: 'Erro ao processar consulta no modelo gpt-oss-20b.' }
+      error: { code: 'AI_CHAT_ERROR', message: 'Erro ao processar a sua questão no assistente.' }
     });
   }
 };

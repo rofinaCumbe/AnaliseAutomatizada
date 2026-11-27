@@ -7541,7 +7541,7 @@
               </div>
               <div class="infra-detail-row">
                 <span>Modelo de IA:</span>
-                <strong style="color:#1A73E8;">openai/gpt-oss-20b (Open Source)</strong>
+                <strong style="color:#1A73E8;">Assistente Análise Automatizada (Ativo)</strong>
               </div>
               <div class="infra-detail-row">
                 <span>Endpoint IA:</span>
@@ -7754,11 +7754,10 @@
     </div>
   </div>
 
-    <!-- WIDGET FLUTUANTE: ASSISTENTE IA OPEN-SOURCE (GPT-OSS-20B) -->
-  <button type="button" class="oss-assistant-fab" id="btnToggleOssAssistant" title="Abrir Assistente IA (gpt-oss-20b)">
+    <!-- WIDGET FLUTUANTE: ASSISTENTE OFICIAL DO SISTEMA -->
+  <button type="button" class="oss-assistant-fab" id="btnToggleOssAssistant" title="Abrir Assistente da Plataforma">
     <span class="model-oss-dot"></span>
-    <span>Assistente IA</span>
-    <span class="oss-fab-tag">gpt-oss-20b</span>
+    <span>Assistente</span>
   </button>
 
   <div class="oss-assistant-drawer" id="ossAssistantDrawer">
@@ -7767,30 +7766,29 @@
         <div class="oss-drawer-title">
           <span>Assistente Análise Automatizada</span>
         </div>
-        <div class="oss-drawer-sub">Modelo Open-Source: openai/gpt-oss-20b</div>
+        <div class="oss-drawer-sub">Online &bull; Suporte &amp; Inteligência de Dados</div>
       </div>
       <button type="button" class="oss-drawer-close" id="btnCloseOssAssistant" aria-label="Fechar">&times;</button>
     </div>
 
     <div class="oss-drawer-messages" id="ossAssistantMessages">
       <div class="oss-msg bot">
-        Olá! Sou o assistente inteligente equipado com o modelo open-source <strong>gpt-oss-20b</strong> (<code>openai/gpt-oss-20b</code>). Como posso ajudar na análise dos seus dados ou na utilização da plataforma?
+        Olá! Sou o Assistente da <strong>Análise Automatizada</strong>. Posso ajudá-lo com a análise dos seus ficheiros CSV, interpretação de relatórios estatísticos, gráficos, outliers ou subscrições via M-Pesa e e-Mola.
       </div>
     </div>
 
     <div class="oss-quick-row">
-      <button type="button" class="oss-quick-btn" data-oss-q="Qual modelo de IA você usa?">Modelo IA</button>
+      <button type="button" class="oss-quick-btn" data-oss-q="Como carregar e analisar um ficheiro CSV?">Como analisar CSV</button>
       <button type="button" class="oss-quick-btn" data-oss-q="Faz um resumo executivo dos dados atuais">Resumo dos Dados</button>
       <button type="button" class="oss-quick-btn" data-oss-q="Existem outliers ou anomalias nos dados?">Detetar Outliers</button>
       <button type="button" class="oss-quick-btn" data-oss-q="Como funcionam os planos M-Pesa e e-Mola?">Planos M-Pesa</button>
     </div>
 
     <form class="oss-drawer-form" id="ossAssistantForm">
-      <input type="text" class="oss-drawer-input" id="ossAssistantInput" placeholder="Pergunte ao gpt-oss-20b..." autocomplete="off">
+      <input type="text" class="oss-drawer-input" id="ossAssistantInput" placeholder="Escreva a sua questão sobre o sistema..." autocomplete="off">
       <button type="submit" class="oss-drawer-send">Enviar</button>
     </form>
   </div>
-
   <div class="toast" id="toast"></div>
 
   <!-- ==================== LÓGICA DA APLICAÇÃO ==================== -->
@@ -9321,40 +9319,94 @@
       agentChatSendBtn.classList.toggle('ready', agentChatInput.value.trim().length > 0);
     });
 
+    const CLIENT_SYSTEM_KEYWORDS = [
+      'analise', 'sistema', 'plataforma', 'workspace', 'painel', 'dashboard',
+      'csv', 'ficheiro', 'arquivo', 'upload', 'carregar', 'importar', 'gcs', 'cloud', 'dataset', 'dados', 'tabela', 'coluna', 'linha', 'registo',
+      'estatistica', 'media', 'mediana', 'desvio', 'soma', 'total', 'minimo', 'maximo',
+      'kpi', 'metrica', 'grafico', 'visualizacao', 'tendencia', 'correlacao', 'padrao',
+      'outlier', 'anomalia', 'z-score', 'zscore', 'atipico',
+      'categoria', 'provincia', 'regiao', 'cidade', 'maputo', 'matola', 'beira', 'nampula', 'venda', 'receita', 'faturacao',
+      'relatorio', 'resumo', 'executivo', 'insight', 'recomendacao', 'pdf', 'json', 'exportar', 'imprimir', 'baixar', 'descarregar',
+      'plano', 'preco', 'subscricao', 'assinatura', 'gratuito', 'basico', 'profissional', 'pro', 'corporativo', 'anual', 'mensal',
+      'pagamento', 'pagar', 'checkout', 'mpesa', 'm-pesa', 'emola', 'e-mola', 'vodacom', 'movitel', 'kivora', 'pin', 'ussd', 'recibo', 'comprovativo', 'nuit', 'iva', 'mzn', 'metical', 'meticais',
+      'conta', 'login', 'entrar', 'registo', 'registar', 'criar conta', 'senha', 'palavra-passe', 'google', 'autenticacao', 'perfil',
+      'admin', 'administrador', 'utilizador', 'cliente', 'ficha', 'suspender', 'suspenso', 'reativar', 'editar', 'eliminar'
+    ];
+
+    const CLIENT_OFF_TOPIC_REGEX = /\b(receita culin|bolo|futebol|jogo|politica|presidente|piada|poema|musica|filme|clima|tempo meteorolog|horoscopo|traduz|escreve um texto|redacao|historia universal|capital de|quem descobriu)\b/i;
+    const CLIENT_GREETING_REGEX = /^(ola|oi|bom dia|boa tarde|boa noite|obrigad|ajuda|como funciona|menu|inicio)\b/i;
+
+    function isClientSystemQuery(promptText) {
+      const raw = String(promptText || '').trim();
+      const norm = raw.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      if (CLIENT_OFF_TOPIC_REGEX.test(norm)) return false;
+      if (CLIENT_GREETING_REGEX.test(norm)) return true;
+      if (/modelo|quem es|quem e voce|qual ia|chatgpt|openai|gemini|claude|gpt/.test(norm)) return true;
+      return CLIENT_SYSTEM_KEYWORDS.some(kw => norm.includes(kw));
+    }
+
     function buildClientSideGptOss20bFallback(promptText, reportCtx) {
-      const q = String(promptText || '').toLowerCase();
+      const raw = String(promptText || '').trim();
+      const q = raw.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+      // 1. Recusar qualquer pergunta geral fora do escopo do sistema
+      if (!isClientSystemQuery(raw)) {
+        return 'Sou o assistente exclusivo da plataforma <strong>Análise Automatizada</strong> e apenas respondo a questões relacionadas com o sistema (análise de ficheiros CSV, relatórios estatísticos, gráficos, deteção de outliers, conta de utilizador e subscrições via M-Pesa ou e-Mola). Como posso ajudá-lo na utilização da plataforma?';
+      }
+
+      // 2. Resposta institucional limpa sem revelar o modelo subjacente
+      if (/modelo|quem es|quem e voce|qual ia|chatgpt|openai|gemini|claude|gpt/.test(q)) {
+        return 'Sou o Assistente Virtual oficial da plataforma <strong>Análise Automatizada</strong>, desenvolvido para apoiar na análise estatística dos seus dados, geração de relatórios executivos e gestão da sua conta no sistema.';
+      }
+
+      // 3. Planos e Pagamentos M-Pesa / e-Mola
+      if (/mpesa|m-pesa|emola|e-mola|pagamento|pagar|plano|preco|subscri|checkout|recibo|nuit/.test(q)) {
+        return 'A plataforma disponibiliza o <strong>Plano Básico / Gratuito (0 MZN)</strong>, o <strong>Plano Profissional (499 MZN/mês)</strong> e o <strong>Plano Corporativo (3.999 MZN/ano)</strong>, com pagamento instantâneo via <strong>M-Pesa (Vodacom 84/85)</strong> e <strong>e-Mola (Movitel 86/87)</strong>.';
+      }
+
+      // 4. Conta, Login e Administração
+      if (/login|entrar|conta|registo|senha|palavra-passe|google|admin|ficha|suspenso/.test(q)) {
+        return 'Pode aceder à sua conta com <strong>Email e Palavra-passe</strong> ou através do botão <strong>Iniciar sessão com o Google</strong>. Os administradores dispõem do <strong>Painel Administrativo</strong> para gestão 360° de clientes e transações.';
+      }
+
+      // 5. Exportação PDF / JSON
+      if (/pdf|json|exportar|imprimir|baixar|descarregar/.test(q)) {
+        return 'No topo do relatório gerado na <strong>Área de Análise</strong>, utilize os botões <strong>Descarregar PDF</strong> ou <strong>Exportar JSON</strong> para guardar os resultados.';
+      }
+
+      // 6. Análise sobre o dataset carregado
       if (reportCtx && reportCtx.metrics && reportCtx.statistics) {
-        const { dataset, rowsCount, colsCount, metrics, statistics, topCategory, topProvince, anomalies } = reportCtx;
+        const { dataset, rowsCount, metrics, statistics, topCategory, topProvince, anomalies } = reportCtx;
         const st = statistics[metrics.metric1] || { mean: 0, std: 0, min: 0, median: 0, max: 0, sum: 0 };
         const catName = topCategory ? topCategory[0] : 'Principal';
         const catVal = topCategory ? Number(topCategory[1]).toLocaleString('pt-MZ') : '0';
         const provName = topProvince ? topProvince[0] : 'Maputo';
         const provVal = topProvince ? Number(topProvince[1]).toLocaleString('pt-MZ') : '0';
 
-        if (/modelo|quem és|quem es|qual ia|gpt-oss/.test(q)) {
-          return `[<strong>gpt-oss-20b</strong>] Estou a operar com o modelo open-source <strong>openai/gpt-oss-20b</strong> para análise estatística e inferência sobre o dataset <strong>${dataset}</strong>.`;
-        }
         if (/outlier|anomalia|desvio|z-score/.test(q)) {
           return (!anomalies || anomalies.length === 0)
-            ? `[<strong>gpt-oss-20b</strong>] Não foram detetados outliers severos (|z| &ge; 1.7) nas colunas numéricas de <strong>${dataset}</strong>.`
-            : `[<strong>gpt-oss-20b</strong>] Foram identificados <strong>${anomalies.length}</strong> outliers estatísticos (|z| &ge; 1.7). O principal ocorre em <strong>${anomalies[0].label}</strong> (${anomalies[0].col} = ${Number(anomalies[0].val).toLocaleString('pt-MZ')} MT, z = ${anomalies[0].z}).`;
+            ? `Não foram detetados outliers severos (|z| &ge; 1.7) nas colunas numéricas de <strong>${dataset}</strong>.`
+            : `Foram identificados <strong>${anomalies.length}</strong> outliers estatísticos (|z| &ge; 1.7). O principal ocorre em <strong>${anomalies[0].label}</strong> (${anomalies[0].col} = ${Number(anomalies[0].val).toLocaleString('pt-MZ')} MT, z = ${anomalies[0].z}).`;
         }
         if (/correlac|padr|tend/.test(q)) {
-          return `[<strong>gpt-oss-20b</strong>] Observa-se forte concentração em <strong>${catName}</strong> (${catVal} MT) e na região de <strong>${provName}</strong> (${provVal} MT), acompanhando a evolução positiva de <strong>${metrics.metric2 || metrics.metric1}</strong>.`;
+          return `Observa-se forte concentração em <strong>${catName}</strong> (${catVal} MT) e na região de <strong>${provName}</strong> (${provVal} MT), acompanhando a evolução positiva de <strong>${metrics.metric2 || metrics.metric1}</strong>.`;
         }
-        return `[<strong>gpt-oss-20b</strong>] Síntese sobre <strong>${dataset}</strong> (${rowsCount || 0} registos): total acumulado de <strong>${Number(st.sum).toLocaleString('pt-MZ')} MT</strong> e média de <strong>${Number(st.mean).toLocaleString('pt-MZ', { maximumFractionDigits: 1 })} MT</strong> por registo. Recomenda-se reforçar a operação em <strong>${catName}</strong> (${catVal} MT) e replicar o desempenho de <strong>${provName}</strong>.`;
+        if (/resumo|geral|executivo|kpi|media|total|estat|provincia|categoria/.test(q)) {
+          return `<strong>Síntese Executiva (${dataset}):</strong> Volume total de <strong>${Number(st.sum).toLocaleString('pt-MZ')} MT</strong> em <strong>${rowsCount || 0} registos</strong>, com média de <strong>${Number(st.mean).toLocaleString('pt-MZ', { maximumFractionDigits: 1 })} MT</strong> por registo. Destaques: <strong>${catName}</strong> (${catVal} MT) e <strong>${provName}</strong> (${provVal} MT).`;
+        }
       }
 
-      if (/modelo|quem és|quem es|qual ia|gpt-oss/.test(q)) {
-        return `[<strong>gpt-oss-20b</strong>] Sou o assistente inteligente da <strong>Análise Automatizada</strong>, baseado no modelo open-source <strong>openai/gpt-oss-20b</strong>.`;
+      if (/csv|upload|ficheiro|dados|gcs|como usar|analisar/.test(q)) {
+        return 'Para analisar dados: aceda à <strong>Área de Análise</strong>, carregue um ficheiro <code>.csv</code> (ou selecione o conjunto de exemplo), escreva a sua pergunta de negócio e clique em <strong>Gerar Relatório de Análise</strong>.';
       }
-      if (/mpesa|m-pesa|emola|e-mola|plano|preço|preco/.test(q)) {
-        return `[<strong>gpt-oss-20b</strong>] Oferecemos o Plano Gratuito (0 MZN), Profissional (499 MZN/mês) e Corporativo (3.999 MZN/ano) com ativação imediata via <strong>M-Pesa</strong> e <strong>e-Mola</strong>.`;
-      }
-      return `[<strong>gpt-oss-20b</strong>] Estou ativo com o modelo <strong>openai/gpt-oss-20b</strong>. Carregue um ficheiro CSV na Área de Análise ou selecione um dataset de exemplo para obtermos estatísticas, deteção de outliers e gráficos.`;
+
+      return 'Olá! Sou o Assistente da <strong>Análise Automatizada</strong>. Posso ajudá-lo a analisar conjuntos de dados CSV, interpretar estatísticas, gráficos e outliers, ou responder a dúvidas sobre os planos M-Pesa e e-Mola.';
     }
 
     async function queryGptOss20b(promptText) {
+      if (!isClientSystemQuery(promptText)) {
+        return buildClientSideGptOss20bFallback(promptText, latestReportData);
+      }
       const userEmail = (typeof currentUser !== 'undefined' && currentUser && currentUser.email) ? currentUser.email : '';
       try {
         const res = await fetch('/api/ai/chat', {
@@ -9383,7 +9435,7 @@
       item.className = 'chat-followup-item';
       item.innerHTML = `
         <div class="chat-followup-q">▸ ${promptText}</div>
-        <div class="chat-followup-a" style="color:#1A73E8;"><em>A processar no modelo open-source gpt-oss-20b...</em></div>
+        <div class="chat-followup-a" style="color:#1A73E8;"><em>A analisar os dados...</em></div>
       `;
       list.appendChild(item);
       agentChatBody.scrollTop = agentChatBody.scrollHeight;
@@ -10511,7 +10563,7 @@
 
       const botDiv = document.createElement('div');
       botDiv.className = 'oss-msg bot';
-      botDiv.innerHTML = '<em style="color:#1A73E8;">gpt-oss-20b a analisar...</em>';
+      botDiv.innerHTML = '<em style="color:#1A73E8;">A processar a sua questão...</em>';
       ossAssistantMessages.appendChild(botDiv);
       ossAssistantMessages.scrollTop = ossAssistantMessages.scrollHeight;
 
